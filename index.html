@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LIFF接続テスト</title>
+  <style>
+    body { font-family: -apple-system, "Hiragino Kaku Gothic ProN", sans-serif;
+           padding: 20px; line-height: 1.7; background: #fff; }
+    h1 { font-size: 18px; margin-bottom: 16px; }
+    #log { font-size: 14px; }
+    .ok   { color: #0a7d32; }
+    .ng   { color: #c00; font-weight: bold; }
+    .info { color: #555; word-break: break-all; }
+    .row  { padding: 6px 0; border-bottom: 1px solid #eee; }
+  </style>
+</head>
+<body>
+  <h1>LIFF接続テスト（GitHub Pages版）</h1>
+  <div id="log"></div>
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script>
+    // ▼▼▼ ここだけ、自分のLIFF IDに書き換える ▼▼▼
+    var LIFF_ID = "2010645044-u3myZwCm";
+    // ▲▲▲ ここだけ、自分のLIFF IDに書き換える ▲▲▲
+
+    var logEl = document.getElementById("log");
+    function say(msg, cls) {
+      var d = document.createElement("div");
+      d.className = "row " + (cls || "info");
+      d.textContent = msg;
+      logEl.appendChild(d);
+    }
+
+    say("① JS開始 OK", "ok");
+    say("② 現在のURL: " + location.href, "info");
+    say("③ liffオブジェクト: " + (typeof liff), (typeof liff === "object") ? "ok" : "ng");
+
+    // 10秒経っても init が返らなければ「沈黙」と判定
+    var settled = false;
+    setTimeout(function () {
+      if (!settled) {
+        say("⏰ init が10秒間、無応答（成功も失敗も返らず）", "ng");
+      }
+    }, 10000);
+
+    say("④ liff.init() 呼び出し…", "info");
+
+    liff.init({ liffId: LIFF_ID })
+      .then(function () {
+        settled = true;
+        say("⑤ init 成功！", "ok");
+        say("　 LINEアプリ内か: " + liff.isInClient(), "info");
+        say("　 OS: " + liff.getOS() + " / LIFF v" + liff.getVersion(), "info");
+        say("　 ログイン済み: " + liff.isLoggedIn(), "info");
+
+        if (!liff.isLoggedIn()) {
+          say("⑥ 未ログインのため中断（LINEアプリ内で開いてね）", "ng");
+          return;
+        }
+        return liff.getProfile().then(function (p) {
+          say("⑥ プロフィール取得 成功！", "ok");
+          say("🎉 完全成功：" + p.displayName + " さん", "ok");
+        });
+      })
+      .catch(function (err) {
+        settled = true;
+        say("❌ init 失敗", "ng");
+        say("　 code: " + (err && err.code), "ng");
+        say("　 message: " + (err && err.message), "ng");
+      });
+  </script>
+</body>
+</html>
