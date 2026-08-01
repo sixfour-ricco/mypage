@@ -1,75 +1,387 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>LIFF接続テスト</title>
-  <style>
-    body { font-family: -apple-system, "Hiragino Kaku Gothic ProN", sans-serif;
-           padding: 20px; line-height: 1.7; background: #fff; }
-    h1 { font-size: 18px; margin-bottom: 16px; }
-    #log { font-size: 14px; }
-    .ok   { color: #0a7d32; }
-    .ng   { color: #c00; font-weight: bold; }
-    .info { color: #555; word-break: break-all; }
-    .row  { padding: 6px 0; border-bottom: 1px solid #eee; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>マイページ</title>
+<style>
+  :root{ --bg:#eceae4; --ink:#2c2a22; --sub:#8a8578; }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; }
+  body{ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+    background:radial-gradient(120% 80% at 50% -10%, #f4f2ec 0%, var(--bg) 55%, #e2e0d8 100%);
+    min-height:100vh; color:var(--ink); padding:24px 14px 60px; }
+  .wrap{ max-width:410px; margin:0 auto; }
+  .head{ text-align:center; margin-bottom:18px; display:none; }
+  .head .brandmark{ font-size:11px; letter-spacing:.34em; color:var(--sub); text-transform:uppercase; margin-bottom:8px; padding-left:.34em; }
+  .head .who{ font-size:28px; font-weight:600; letter-spacing:.02em; }
+  .head .memberno{ display:inline-block; margin-top:9px; font-size:22px; font-weight:600; color:#6b6250; font-family:"SFMono-Regular",Consolas,"Courier New",monospace; letter-spacing:.14em; }
+  .rank-badge{ margin-top:13px; display:inline-flex; gap:9px; align-items:center; font-size:11.5px; padding:7px 15px 7px 12px; border-radius:22px; letter-spacing:.03em; box-shadow:0 3px 10px -4px rgba(90,70,40,.4), 0 0 0 1px rgba(255,255,255,.4) inset; }
+  .rank-badge .rk{ font-size:10px; font-weight:800; letter-spacing:.1em; }
+  .rank-badge b{ font-weight:700; }
+  .rank-badge .dot{ width:3px; height:3px; border-radius:50%; opacity:.5; background:currentColor; }
+  .rank-badge svg{ display:block; }
+  .sec-label{ display:flex; align-items:center; gap:10px; font-size:11px; letter-spacing:.18em; color:var(--sub); margin:22px 4px 12px; }
+  .sec-label::after{ content:""; flex:1; height:1px; background:rgba(0,0,0,.09); }
+  .card{ position:relative; border-radius:16px; padding:18px 20px 16px; margin-bottom:14px; overflow:hidden; isolation:isolate; transition:transform .18s ease; }
+  .card:active{ transform:scale(.99); }
+  .card-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .brand-logo{ width:auto; display:block; }
+  .ricco .brand-logo{ height:18px; }
+  .sixfour .brand-logo{ height:25px; }
+  .logo-text{ font-size:13px; font-weight:700; letter-spacing:.22em; opacity:.75; }
+  .card-no{ font-family:"SFMono-Regular",Consolas,"Courier New",monospace; font-size:22px; font-weight:600; letter-spacing:.12em; opacity:.92; }
+  .mid{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:10px; }
+  .mid-left{ min-width:0; }
+  .card-name{ font-size:30px; font-weight:600; letter-spacing:.03em; line-height:1.05; margin-bottom:4px; }
+  .card-sub{ font-size:12.5px; opacity:.82; }
+  .specs{ text-align:center; flex:none; }
+  .specs .gimg{ display:block; width:84px; height:auto; margin:0 auto; }
+  .aging-tag{ font-size:9.5px; opacity:.6; margin-top:6px; letter-spacing:.02em; }
+  .w-grid{ display:flex; gap:10px; padding-top:12px; border-top:1px solid rgba(0,0,0,.08); }
+  .w-cell{ flex:1; display:flex; align-items:center; gap:9px; min-width:0; }
+  .w-texts{ min-width:0; }
+  .w-label{ font-size:10.5px; opacity:.72; display:flex; align-items:center; gap:5px; margin-bottom:2px; white-space:nowrap; }
+  .w-date{ font-size:15px; font-weight:600; font-variant-numeric:tabular-nums; letter-spacing:.01em; }
+  .u15{ font-size:8.5px; font-weight:800; letter-spacing:.05em; padding:2px 5px; border-radius:4px; line-height:1; background:#2f6bd8; color:#fff; }
+  .u15-note{ font-size:10.5px; opacity:.62; margin-top:10px; letter-spacing:.01em; }
+  .together{ font-size:10.5px; opacity:.62; margin-top:8px; letter-spacing:.02em; }
+  .ring{ position:relative; width:46px; height:46px; flex:none; }
+  .ring svg{ transform:rotate(-90deg); display:block; }
+  .ring .rtxt{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.02; }
+  .ring .rtxt .r1{ font-size:7px; opacity:.62; }
+  .ring .rtxt .r2{ font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .ring .rtxt .r3{ font-size:7px; opacity:.62; }
+  .ring .rtxt .rsm{ font-size:9px; font-weight:700; opacity:.55; }
+  .link{ display:block; text-align:center; margin-top:14px; padding:10px; border-radius:10px; text-decoration:none; font-size:12px; font-weight:600; letter-spacing:.06em; }
+  .sixfour{ background:linear-gradient(152deg,#ffffff 0%,#fbfbf9 42%,#f2f1ec 100%); box-shadow:0 10px 26px -10px rgba(140,120,60,.28), 0 1px 0 rgba(255,255,255,.9) inset, 0 0 0 1px rgba(0,0,0,.04); color:#2c2a22; }
+  .sixfour::before{ content:""; position:absolute; top:-40%; left:-20%; width:80%; height:120%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent); transform:rotate(18deg); z-index:-1; }
+  .sixfour .link{ background:#b5182b; color:#fff; }
+  .ricco{ background:linear-gradient(157deg,#d9d3c5 0%,#cfc8b7 52%,#c4bca7 100%); box-shadow:0 12px 28px -12px rgba(90,78,50,.4), 0 0 0 1px rgba(150,130,85,.28) inset; color:#3a342a; }
+  .ricco .card-no{ color:#7a6b47; }
+  .ricco .w-grid{ border-top-color:rgba(70,60,40,.16); }
+  .ricco .link{ background:transparent; color:#6b5c3a; box-shadow:0 0 0 1px rgba(120,102,60,.45) inset; }
+  .card.archived{ background:linear-gradient(155deg,#e8e0d2,#ddd3c0); filter:sepia(.35) saturate(.85); box-shadow:0 4px 14px -8px rgba(90,70,40,.3), 0 0 0 1px rgba(0,0,0,.05); color:#6a6151; }
+  .card.archived .brand-logo{ filter:sepia(.6) opacity(.7); }
+  .card.archived .link{ display:none; }
+  .archived-stamp{ position:absolute; top:14px; right:15px; font-size:9px; letter-spacing:.14em; color:#a08a5c; border:1px solid currentColor; border-radius:4px; padding:2px 7px; transform:rotate(4deg); }
+  .archived-msg{ margin-top:12px; padding-top:11px; border-top:1px dashed rgba(120,100,70,.3); font-size:11.5px; line-height:1.6; color:#7c7059; }
+  .archived-msg b{ color:#5f553f; font-weight:600; }
+  .archive-toggle{ width:100%; text-align:left; background:none; border:none; cursor:pointer; display:flex; align-items:center; gap:9px; padding:10px 6px; font-size:12px; color:var(--sub); letter-spacing:.06em; }
+  .archive-toggle .chev{ transition:transform .2s ease; font-size:10px; }
+  .archive-toggle.open .chev{ transform:rotate(90deg); }
+  .archive-wrap{ display:none; }
+  .archive-wrap.open{ display:block; animation:fade .25s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(-4px);} to{opacity:1; transform:none;} }
+  .foot{ text-align:center; margin-top:32px; font-size:10px; color:var(--sub); letter-spacing:.1em; }
+
+  .msg-card{ border-radius:16px; padding:26px 22px; margin-bottom:14px; line-height:1.9; font-size:14px; }
+  .msg-card.sixfour{ background:linear-gradient(152deg,#ffffff 0%,#fbfbf9 42%,#f2f1ec 100%); box-shadow:0 10px 26px -10px rgba(140,120,60,.28), 0 0 0 1px rgba(0,0,0,.04); color:#2c2a22; }
+  .msg-card.ricco{ background:linear-gradient(157deg,#d9d3c5 0%,#cfc8b7 52%,#c4bca7 100%); box-shadow:0 12px 28px -12px rgba(90,78,50,.4), 0 0 0 1px rgba(150,130,85,.28) inset; color:#3a342a; }
+  .msg-brand{ font-size:10px; letter-spacing:.2em; opacity:.55; margin-bottom:12px; }
+  .msg-sub{ font-size:11px; opacity:.6; margin-top:14px; padding-top:12px; border-top:1px solid rgba(0,0,0,.08); }
+
+  .loading{ text-align:center; padding:60px 20px; color:var(--sub); font-size:13px; letter-spacing:.05em; }
+  .loading .spin{ width:26px; height:26px; margin:0 auto 14px; border:2px solid rgba(0,0,0,.1); border-top-color:#8a8578; border-radius:50%; animation:sp .8s linear infinite; }
+  @keyframes sp{ to{ transform:rotate(360deg); } }
+</style>
 </head>
 <body>
-  <h1>LIFF接続テスト（GitHub Pages版）</h1>
-  <div id="log"></div>
+<div class="wrap">
+  <div class="head" id="head">
+    <div class="brandmark">Members Card</div>
+    <div class="who" id="whoName"></div>
+    <div class="memberno" id="whoNo"></div>
+    <div id="tenureWrap"></div>
+  </div>
+  <div id="app">
+    <div class="loading"><div class="spin"></div>会員証を読み込んでいます…</div>
+  </div>
+  <div class="foot">SIXFOUR ／ RICCO</div>
+</div>
 
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <script>
-    // ▼▼▼ ここだけ、自分のLIFF IDに書き換える ▼▼▼
-    var LIFF_ID = "2010645044-u3myZwCm";
-    // ▲▲▲ ここだけ、自分のLIFF IDに書き換える ▲▲▲
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script>
+/* ============================================================
+ *  ★ナオユキさんが書き換えるのは、この下の2行だけ★
+ * ============================================================ */
 
-    var logEl = document.getElementById("log");
-    function say(msg, cls) {
-      var d = document.createElement("div");
-      d.className = "row " + (cls || "info");
-      d.textContent = msg;
-      logEl.appendChild(d);
+// ① LIFF ID（今は開発用。本番に変えるときはここだけ差し替え）
+var LIFF_ID = "2010645044-u3myZwCm";
+
+// ② GASのAPI用URL（/exec で終わる長いURL）を、下の""の中に貼る
+var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3IEiiTSjjzpUDKORMHD0iH3T9Ku43N6DGWvw8XgK0oV6/exec";
+
+/* ============================================================
+ *  ここから下は、何も書き換えなくてOK
+ * ============================================================ */
+
+  /* ===== メガネの絵とロゴは demo.html から自動で読み込む ===== */
+  var IMG = { ricco:"", six:"", glass:"", lens:"" };
+  var glassImg=new Image(), lensImg=new Image();
+  var imgReady=false;      // 絵の準備ができたか
+  var imgDone=false;       // 絵の読み込みを試し終わったか（失敗でもtrue）
+  var PAGE_DATA=null;      // GASから取ってきたデータを入れる箱
+
+  function pickImage(text, name){
+    var m = text.match(new RegExp("var\\s+"+name+"\\s*=\\s*\"(data:image[^\"]+)\""));
+    return m ? m[1] : "";
+  }
+
+  function loadImages(){
+    return fetch("demo.html")
+      .then(function(r){ if(!r.ok) throw new Error("demo.html not found"); return r.text(); })
+      .then(function(t){
+        IMG.ricco = pickImage(t, "LOGO_RICCO");
+        IMG.six   = pickImage(t, "LOGO_SIX");
+        IMG.glass = pickImage(t, "GLASS_SRC");
+        IMG.lens  = pickImage(t, "LENS_SRC");
+        if(!IMG.glass || !IMG.lens){ imgDone=true; render(); return; }
+        var n=0;
+        function done(){ if(++n>=2){ imgReady=true; imgDone=true; render(); } }
+        glassImg.onload=done; glassImg.onerror=done;
+        lensImg.onload=done;  lensImg.onerror=done;
+        glassImg.src=IMG.glass; lensImg.src=IMG.lens;
+      })
+      .catch(function(){ imgDone=true; render(); });
+  }
+
+  /* ===== メガネのエイジング描画 ===== */
+  function tint(frameColor, wpx, months){
+    if(!imgReady) return "";
+    var w=wpx, h=Math.round(wpx*glassImg.height/glassImg.width);
+    if(!h || !isFinite(h)) return "";
+    var dpr=window.devicePixelRatio||1;
+    var cv=document.createElement("canvas"); cv.width=w*dpr; cv.height=h*dpr;
+    var ctx=cv.getContext("2d"); ctx.scale(dpr,dpr);
+    ctx.drawImage(glassImg,0,0,w,h);
+    ctx.globalCompositeOperation="source-in";
+    ctx.fillStyle=frameColor; ctx.fillRect(0,0,w,h);
+    if(months>=12){
+      var sc=document.createElement("canvas"); sc.width=w*dpr; sc.height=h*dpr;
+      var s=sc.getContext("2d"); s.scale(dpr,dpr);
+      var n = months<36 ? 1 : 2;
+      s.strokeStyle="rgba(95,82,68,0.16)"; s.lineWidth=0.55; s.lineCap="round";
+      var lens=[[0.27,0.47],[0.73,0.47]], rr=w*0.07;
+      for(var li=0; li<2; li++){
+        var cx=w*lens[li][0], cy=h*lens[li][1];
+        for(var k=0;k<n;k++){
+          var a=-0.5;
+          var dx=Math.cos(a)*rr, dy=Math.sin(a)*rr, off=(k-(n-1)/2)*6;
+          s.beginPath(); s.moveTo(cx-dx, cy-dy+off); s.lineTo(cx+dx, cy+dy+off); s.stroke();
+        }
+      }
+      s.globalCompositeOperation="destination-in"; s.drawImage(lensImg,0,0,w,h);
+      ctx.globalCompositeOperation="source-over"; ctx.drawImage(sc,0,0,w,h);
+    }
+    return cv.toDataURL();
+  }
+  function ageColor(months){
+    var stops=[[201,168,118],[188,152,100],[176,138,86],[160,122,72],[146,108,60],
+               [130,95,50],[112,80,42],[96,68,36],[80,57,30],[66,47,24],[58,42,24]];
+    var i=Math.min(Math.floor(months/6), stops.length-1);
+    var c=stops[i]; return "rgb("+c[0]+","+c[1]+","+c[2]+")";
+  }
+  function agingLabel(months){
+    if(months<6) return "買ったばかり";
+    if(months<12) return "馴染み始め";
+    if(months<24) return "手に馴染む";
+    if(months<36) return "いい味に";
+    if(months<60) return "深い相棒感";
+    return "相棒";
+  }
+
+  /* ===== ランクの見た目 ===== */
+  function rankStyle(rankName){
+    if(rankName==="PLATINUM") return {name:"PLATINUM", grad:"linear-gradient(135deg,#eaeef2,#aeb7c2)", text:"#454f5b", icon:"#78828e"};
+    if(rankName==="GOLD")     return {name:"GOLD",     grad:"linear-gradient(135deg,#f5de92,#cba327)", text:"#5c4810", icon:"#a9861c"};
+    if(rankName==="SILVER")   return {name:"SILVER",   grad:"linear-gradient(135deg,#eff1f3,#bcc3cb)", text:"#525a63", icon:"#949ca4"};
+    return {name:"BRONZE", grad:"linear-gradient(135deg,#ddb082,#a5713f)", text:"#583517", icon:"#8a5a2f"};
+  }
+  function badgeGlasses(color){
+    return '<svg width="22" height="11" viewBox="0 0 38 17"><circle cx="9" cy="9" r="6" fill="none" stroke="'+color+'" stroke-width="1.7"/><circle cx="29" cy="9" r="6" fill="none" stroke="'+color+'" stroke-width="1.7"/><path d="M15 8 Q19 6.4 23 8" stroke="'+color+'" stroke-width="1.7" fill="none"/><path d="M3.2 9 L0.6 6.6 M34.8 9 L37.4 6.6" stroke="'+color+'" stroke-width="1.7"/></svg>';
+  }
+
+  /* ===== 保証リング ===== */
+  function ringSVG(ratio,track,arc){ var r=19,c=2*Math.PI*r,off=c*(1-ratio);
+    return '<svg width="46" height="46" viewBox="0 0 46 46"><circle cx="23" cy="23" r="'+r+'" fill="none" stroke="'+track+'" stroke-width="4"/>'+
+      (arc?'<circle cx="23" cy="23" r="'+r+'" fill="none" stroke="'+arc+'" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'"/>':'')+'</svg>'; }
+  function arcColor(r){ if(r>.4)return"#3a9a5c"; if(r>.15)return"#d9a441"; return"#c86a3a"; }
+  function ring(active,ratio,days,isRicco){
+    var track=isRicco?"rgba(120,102,60,.20)":"rgba(0,0,0,.1)";
+    if(!active) return '<div class="ring">'+ringSVG(0,track,null)+'<div class="rtxt"><span class="rsm">終了</span></div></div>';
+    return '<div class="ring">'+ringSVG(ratio,track,arcColor(ratio))+'<div class="rtxt"><span class="r1">残り</span><span class="r2">'+days+'</span><span class="r3">日</span></div></div>'; }
+  function ringNA(label,isRicco){
+    var track=isRicco?"rgba(120,102,60,.20)":"rgba(0,0,0,.1)";
+    return '<div class="ring">'+ringSVG(0,track,null)+'<div class="rtxt"><span class="rsm">'+label+'</span></div></div>';
+  }
+
+  /* ===== 文字を安全に表示する ===== */
+  function esc(s){
+    return String(s==null?"":s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+  }
+
+  /* ===== ロゴ（読めなかったら文字で代用） ===== */
+  function logoHtml(isRicco){
+    var src = isRicco ? IMG.ricco : IMG.six;
+    if(src) return '<img class="brand-logo" src="'+src+'" alt="">';
+    return '<div class="logo-text">'+(isRicco?"RICCO":"SIXFOUR")+'</div>';
+  }
+
+  /* ===== メガネの絵（読めなかったら何も出さない） ===== */
+  function specsHtml(months, withLabel){
+    var gsrc = tint(ageColor(months), 84, months);
+    if(!gsrc) return '<div class="specs"></div>';
+    return '<div class="specs"><img class="gimg" src="'+gsrc+'" alt="">'+
+      (withLabel ? '<div class="aging-tag">'+agingLabel(months)+'</div>' : '')+'</div>';
+  }
+
+  /* ===== 現役カード ===== */
+  function activeCard(card){
+    var isRicco=(card.brand==="RICCO"), cls=isRicco?"ricco":"sixfour";
+    var u15=card.isU15?' <span class="u15">U15</span>':'';
+    var frameCell;
+    if(card.lensOnly){
+      frameCell='<div class="w-cell">'+ringNA("対象外",isRicco)+
+        '<div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date" style="font-size:12.5px;opacity:.6">レンズ交換のため対象外</div></div></div>';
+    } else {
+      frameCell='<div class="w-cell">'+ring(card.frameActive,card.frameRatio,card.frameDays,isRicco)+
+        '<div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date">'+esc(card.frameEnd)+'</div></div></div>';
+    }
+    var html='<div class="card '+cls+'">'+
+      '<div class="card-top">'+logoHtml(isRicco)+'<div class="card-no">'+esc(card.memberNo)+'</div></div>'+
+      '<div class="mid"><div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+esc(card.sub)+'</div></div>'+
+        specsHtml(card.months, true)+'</div>'+
+      '<div class="w-grid">'+ frameCell +
+        '<div class="w-cell">'+ring(card.visionActive,card.visionRatio,card.visionDays,isRicco)+
+          '<div class="w-texts"><div class="w-label">見え方保証'+u15+'</div><div class="w-date">'+esc(card.visionEnd)+'</div></div></div>'+
+      '</div>';
+    if(card.togetherDays>0){
+      html+='<div class="together">このメガネと過ごして '+card.togetherDays+' 日</div>';
+    }
+    if(card.isU15){
+      var u15txt = isRicco ? '15歳以下のお客様は、見え方保証を6ヶ月とさせていただいております。' : '15歳以下のお客様は、見え方保証を6ヶ月に延長しています。';
+      html+='<div class="u15-note">'+u15txt+'</div>';
+    }
+    html+='<a class="link" href="#">保証・修理について詳しくはこちら</a></div>';
+    return html;
+  }
+
+  /* ===== 殿堂入りカード ===== */
+  function archivedCard(card){
+    var isRicco=(card.brand==="RICCO");
+    return '<div class="card '+(isRicco?"ricco":"sixfour")+' archived"><div class="archived-stamp">ARCHIVE</div>'+
+      '<div class="card-top">'+logoHtml(isRicco)+'<div class="card-no">'+esc(card.memberNo)+'</div></div>'+
+      '<div class="mid"><div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+esc(card.sub)+'</div></div>'+
+        specsHtml(card.months, false)+'</div>'+
+      '<div class="w-grid"><div class="w-cell"><div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date">'+esc(card.frameEnd)+'</div></div></div>'+
+        '<div class="w-cell"><div class="w-texts"><div class="w-label">見え方保証</div><div class="w-date">'+esc(card.visionEnd)+'</div></div></div></div>'+
+      '<div class="archived-msg">🏆 <b>殿堂入りメガネ</b><br>たくさんの景色を、一緒に見てきましたね。<br>お疲れさま。そして、ありがとう👓<br>——調整・クリーニングは、いつまでも無料です☺️</div></div>';
+  }
+
+  window.toggleArchive=function(btn){
+    btn.classList.toggle("open");
+    btn.nextElementSibling.classList.toggle("open");
+  };
+
+  /* ===== 画面を描く ===== */
+  function render(){
+    if(!PAGE_DATA || !imgDone) return;   // データと絵の準備が両方そろってから
+    var d=PAGE_DATA;
+    var cards=d.cards||[];
+
+    if(cards.length===0){ renderNoCard(); return; }
+
+    document.getElementById("head").style.display="block";
+    document.getElementById("whoName").textContent=d.name||"";
+    document.getElementById("whoNo").textContent=d.no||"";
+    if(d.rank){
+      var rk=rankStyle(d.rank);
+      var totalTxt = d.total ? '<span class="dot"></span><span>通算 <b>'+d.total+'本</b></span>' : '';
+      document.getElementById("tenureWrap").innerHTML=
+        '<div class="rank-badge" style="background:'+rk.grad+'; color:'+rk.text+'">'+
+          badgeGlasses(rk.icon)+'<span class="rk">'+rk.name+'</span>'+totalTxt+'</div>';
+    } else {
+      document.getElementById("tenureWrap").innerHTML="";
     }
 
-    say("① JS開始 OK", "ok");
-    say("② 現在のURL: " + location.href, "info");
-    say("③ liffオブジェクト: " + (typeof liff), (typeof liff === "object") ? "ok" : "ng");
+    var active=cards.filter(function(c){return !c.archived;});
+    var archived=cards.filter(function(c){return c.archived;});
 
-    // 10秒経っても init が返らなければ「沈黙」と判定
-    var settled = false;
-    setTimeout(function () {
-      if (!settled) {
-        say("⏰ init が10秒間、無応答（成功も失敗も返らず）", "ng");
+    var html="";
+    if(active.length){
+      html+='<div class="sec-label">ご利用中のメガネ</div>';
+      active.forEach(function(c){ html+=activeCard(c); });
+    } else {
+      // 現役ゼロ＝卒業生。最新の1枚は必ず表示する
+      html+='<div class="sec-label">ご利用中のメガネ</div>';
+      html+=archivedCard(archived[0]);
+      archived=archived.slice(1);
+      html+='<div class="msg-card sixfour"><div class="msg-brand">Sixfour</div>'+
+        '今お使いのメガネ・サングラスの保証は、すべて終了しています。<br>でも、調整・クリーニングはいつまでも無料です☺️<br>新しい一本も、いつでもお待ちしてます👓🕶️</div>';
+    }
+    if(archived.length){
+      html+='<button class="archive-toggle" onclick="toggleArchive(this)"><span class="chev">▶</span> 保証が終了したメガネ（'+archived.length+'本）</button><div class="archive-wrap">';
+      archived.forEach(function(c){ html+=archivedCard(c); });
+      html+='</div>';
+    }
+    document.getElementById("app").innerHTML=html;
+  }
+
+  /* ===== 会員証がまだない人 ===== */
+  function renderNoCard(){
+    document.getElementById("head").style.display="none";
+    document.getElementById("app").innerHTML=
+      '<div class="msg-card sixfour"><div class="msg-brand">Sixfour</div>'+
+        '👓ただいま準備中です<br>スタッフが会員証をせっせと準備しています。<br>お渡しの手続きが済むと、ここに会員証が表示されます☺️'+
+        '<div class="msg-sub">保証の残り日数も、ひと目でわかるようになります。</div></div>';
+  }
+
+  /* ===== エラー画面 ===== */
+  function renderError(msg){
+    document.getElementById("head").style.display="none";
+    document.getElementById("app").innerHTML=
+      '<div class="msg-card sixfour"><div class="msg-brand">Sixfour</div>'+
+        '申し訳ありません。会員証を読み込めませんでした。<br>通信環境の良い場所で、もう一度お試しください。'+
+        '<div class="msg-sub">'+esc(msg||"")+'</div></div>';
+  }
+
+  /* ===== GASにデータを取りに行く ===== */
+  function fetchCards(idToken){
+    // ヘッダーは付けない（付けると通信がブロックされるため）
+    return fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "getMemberCards", idToken: idToken })
+    })
+    .then(function(res){ return res.json(); })
+    .then(function(json){
+      if(!json || json.ok !== true){
+        renderError(json && json.error ? json.error : "データ取得に失敗しました");
+        return;
       }
-    }, 10000);
+      PAGE_DATA = json;
+      render();
+    })
+    .catch(function(err){
+      renderError(String(err && err.message ? err.message : err));
+    });
+  }
 
-    say("④ liff.init() 呼び出し…", "info");
+  /* ===== 起動 ===== */
+  loadImages();
 
-    liff.init({ liffId: LIFF_ID })
-      .then(function () {
-        settled = true;
-        say("⑤ init 成功！", "ok");
-        say("　 LINEアプリ内か: " + liff.isInClient(), "info");
-        say("　 OS: " + liff.getOS() + " / LIFF v" + liff.getVersion(), "info");
-        say("　 ログイン済み: " + liff.isLoggedIn(), "info");
-
-        if (!liff.isLoggedIn()) {
-          say("⑥ 未ログインのため中断（LINEアプリ内で開いてね）", "ng");
-          return;
-        }
-        return liff.getProfile().then(function (p) {
-          say("⑥ プロフィール取得 成功！", "ok");
-          say("🎉 完全成功：" + p.displayName + " さん", "ok");
-        });
-      })
-      .catch(function (err) {
-        settled = true;
-        say("❌ init 失敗", "ng");
-        say("　 code: " + (err && err.code), "ng");
-        say("　 message: " + (err && err.message), "ng");
-      });
-  </script>
+  liff.init({ liffId: LIFF_ID })
+    .then(function(){
+      if(!liff.isLoggedIn()){ liff.login(); return; }
+      var idToken = liff.getIDToken();
+      if(!idToken){ renderError("ログイン情報を取得できませんでした"); return; }
+      return fetchCards(idToken);
+    })
+    .catch(function(err){
+      renderError("LIFF: " + (err && err.message ? err.message : err));
+    });
+</script>
 </body>
 </html>
