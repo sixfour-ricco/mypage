@@ -111,7 +111,6 @@ var LIFF_ID = "2010645044-u3myZwCm";
 
 // ② GASのAPI用URL（/exec で終わる長いURL）を、下の""の中に貼る
 var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3IEiiTSjjzpUDKORMHD0iH3T9Ku43N6DGWvw8XgK0oV6/exec";
-
 /* ============================================================
  *  ここから下は、何も書き換えなくてOK
  * ============================================================ */
@@ -350,23 +349,44 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
 
   /* ===== GASにデータを取りに行く ===== */
   function fetchCards(idToken){
-    // ヘッダーは付けない（付けると通信がブロックされるため）
-    return fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "getMemberCards", idToken: idToken })
-    })
-    .then(function(res){ return res.json(); })
-    .then(function(json){
+    // GASはPOSTだと転送の途中でHTMLを返してしまうため、GET（JSONP）で受け取る
+    var cbName = "__cards_" + Date.now();
+    var timer = setTimeout(function(){
+      renderError("通信がタイムアウトしました");
+      cleanup();
+    }, 20000);
+
+    function cleanup(){
+      try{ delete window[cbName]; }catch(e){ window[cbName] = undefined; }
+      var s = document.getElementById(cbName);
+      if(s && s.parentNode) s.parentNode.removeChild(s);
+    }
+
+    window[cbName] = function(json){
+      clearTimeout(timer);
+      cleanup();
       if(!json || json.ok !== true){
         renderError(json && json.error ? json.error : "データ取得に失敗しました");
         return;
       }
       PAGE_DATA = json;
       render();
-    })
-    .catch(function(err){
-      renderError(String(err && err.message ? err.message : err));
-    });
+    };
+
+    var url = API_URL
+      + "?action=getMemberCards"
+      + "&idToken=" + encodeURIComponent(idToken)
+      + "&callback=" + cbName;
+
+    var sc = document.createElement("script");
+    sc.id = cbName;
+    sc.src = url;
+    sc.onerror = function(){
+      clearTimeout(timer);
+      cleanup();
+      renderError("サーバーに接続できませんでした");
+    };
+    document.body.appendChild(sc);
   }
 
   /* ===== 起動 ===== */
