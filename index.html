@@ -23,7 +23,7 @@
   .rank-badge svg{ display:block; }
   .sec-label{ display:flex; align-items:center; gap:10px; font-size:11px; letter-spacing:.18em; color:var(--sub); margin:22px 4px 12px; }
   .sec-label::after{ content:""; flex:1; height:1px; background:rgba(0,0,0,.09); }
-  .card{ position:relative; border-radius:16px; padding:18px 20px 16px; margin-bottom:14px; overflow:hidden; isolation:isolate; transition:transform .18s ease; }
+  .card{ position:relative; border-radius:16px; padding:18px 20px 26px; margin-bottom:14px; overflow:hidden; isolation:isolate; transition:transform .18s ease; }
   .card:active{ transform:scale(.99); }
   .card-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
   .brand-logo{ width:auto; display:block; }
@@ -393,11 +393,14 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     return '<div class="logo-text">'+(isRicco?"RICCO":"SIXFOUR")+'</div>';
   }
 
-  /* ===== メガネの絵（読めなかったら何も出さない） ===== */
+  /* ===== メガネの絵（読めなかったら何も出さない） =====
+   *  ★絵の大きさを変えたいときは、この GLASS_W の数字だけ直す（CSSも連動する）
+   */
+  var GLASS_W = 84;   // メガネの絵の横幅（px）
   function specsHtml(months, withLabel){
-    var gsrc = tint(ageColor(months), 84, months);
+    var gsrc = tint(ageColor(months), GLASS_W, months);
     if(!gsrc) return '<div class="specs"></div>';
-    return '<div class="specs"><img class="gimg" src="'+gsrc+'" alt="">'+
+    return '<div class="specs"><img class="gimg" src="'+gsrc+'" alt="" style="width:'+GLASS_W+'px">'+
       (withLabel ? '<div class="aging-tag">'+agingLabel(months)+'</div>' : '')+'</div>';
   }
 
