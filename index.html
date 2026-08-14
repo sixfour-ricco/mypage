@@ -81,6 +81,48 @@
   .msg-brand{ font-size:10px; letter-spacing:.2em; opacity:.55; margin-bottom:12px; }
   .msg-sub{ font-size:11px; opacity:.6; margin-top:14px; padding-top:12px; border-top:1px solid rgba(0,0,0,.08); }
 
+  /* ===== 月替わりのひとこと ===== */
+  .monthly{ margin:0 2px 20px; padding:15px 18px; border-radius:14px; font-size:12.5px; line-height:1.85;
+    background:linear-gradient(150deg,rgba(255,255,255,.72),rgba(255,255,255,.42));
+    box-shadow:0 6px 18px -12px rgba(120,100,60,.5), 0 0 0 1px rgba(255,255,255,.55) inset;
+    color:#4a4436; letter-spacing:.01em; }
+  .monthly .mo-mark{ font-size:9.5px; letter-spacing:.2em; opacity:.45; margin-bottom:7px; }
+
+  /* ===== 土台の共通ボタン（カードの外・常設） ===== */
+  .actions{ display:none; gap:9px; margin:20px 2px 0; }
+  .actions button{ flex:1; min-width:0; border:none; cursor:pointer; font-family:inherit;
+    padding:13px 8px; border-radius:12px; font-size:12px; font-weight:600; letter-spacing:.04em;
+    background:rgba(255,255,255,.8); color:#4a4436;
+    box-shadow:0 6px 16px -10px rgba(120,100,60,.6), 0 0 0 1px rgba(0,0,0,.06); }
+  .actions button:active{ transform:scale(.98); }
+  .actions .btn-consult{ background:#06c755; color:#fff; box-shadow:0 6px 16px -8px rgba(6,199,85,.6); }
+
+  /* ===== 保証・修理の説明（マイページ内蔵） ===== */
+  .sheet{ display:none; position:fixed; inset:0; z-index:50; }
+  .sheet.open{ display:block; }
+  .sheet .veil{ position:absolute; inset:0; background:rgba(30,26,18,.5); }
+  .sheet .panel{ position:absolute; left:0; right:0; bottom:0; max-height:86vh; overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    background:linear-gradient(152deg,#ffffff 0%,#fbfaf6 100%); border-radius:18px 18px 0 0;
+    padding:22px 20px 30px; animation:up .22s ease; }
+  @keyframes up{ from{ transform:translateY(18px); opacity:0; } to{ transform:none; opacity:1; } }
+  .sheet h2{ font-size:15px; margin:0 0 4px; letter-spacing:.04em; }
+  .sheet .lead{ font-size:11.5px; color:var(--sub); margin-bottom:16px; }
+  .sheet .w-item{ padding:14px 0; border-top:1px solid rgba(0,0,0,.08); }
+  .sheet .w-item h3{ font-size:13px; margin:0 0 6px; letter-spacing:.03em; }
+  .sheet .w-item p{ font-size:12px; line-height:1.85; margin:0; color:#4a4436; }
+  .sheet .term{ display:inline-block; font-size:11px; font-weight:700; letter-spacing:.04em;
+    background:#efece2; color:#6b6250; border-radius:5px; padding:3px 8px; margin-bottom:7px; }
+  .sheet .forever{ font-weight:700; font-size:13px; color:#a8452c; }
+  .sheet .more{ display:block; text-align:center; margin-top:16px; padding:12px; border-radius:11px;
+    background:#b5182b; color:#fff; text-decoration:none; font-size:12px; font-weight:600; letter-spacing:.05em; }
+  .sheet .close{ display:block; width:100%; margin-top:12px; padding:12px; border:none; cursor:pointer;
+    font-family:inherit; border-radius:11px; background:#efece6; color:#5a5346; font-size:12px; font-weight:600; }
+
+  .forever-in{ font-weight:700; font-size:1.08em; color:#a8452c; }
+  .archived .forever-in{ color:#8f5a3a; }
+  .ricco .forever-in{ color:#7d4a2e; }
+
   .loading{ text-align:center; padding:60px 20px; color:var(--sub); font-size:13px; letter-spacing:.05em; }
   .loading .spin{ width:26px; height:26px; margin:0 auto 14px; border:2px solid rgba(0,0,0,.1); border-top-color:#8a8578; border-radius:50%; animation:sp .8s linear infinite; }
   @keyframes sp{ to{ transform:rotate(360deg); } }
@@ -97,7 +139,52 @@
   <div id="app">
     <div class="loading"><div class="spin"></div>会員証を読み込んでいます…</div>
   </div>
+  <div class="actions" id="actions">
+    <button type="button" onclick="openWarranty()">保証・修理について</button>
+    <button type="button" class="btn-consult" onclick="consult()">💬 LINEで相談する</button>
+  </div>
   <div class="foot">SIXFOUR ／ RICCO</div>
+</div>
+
+<!-- 保証・修理の説明（外部サイトに飛ばさず、この中で完結させる） -->
+<div class="sheet" id="warrantySheet">
+  <div class="veil" onclick="closeWarranty()"></div>
+  <div class="panel">
+    <h2>保証・修理について</h2>
+    <div class="lead">お渡し日から下記の期間、無料で対応いたします。</div>
+
+    <div class="w-item">
+      <span class="term">見え方保証 ／ 90日</span>
+      <h3>度数が合わないと感じたとき</h3>
+      <p>お渡し日から90日以内であれば、レンズを無料でお作り直しします。<br>
+      15歳以下のお客様は、成長で度数が変わりやすいため<b>180日</b>とさせていただいております。<br>
+      期間を過ぎた後のレンズ交換は有料になりますが、<span class="forever">見え方の確認はいつまでも無料</span>です。</p>
+    </div>
+
+    <div class="w-item">
+      <span class="term">メガネ・サングラス保証 ／ 1年</span>
+      <h3>フレームやレンズに不具合が出たとき</h3>
+      <p>お渡し日から1年以内の、通常のご使用による不具合は無料で修理・交換いたします。<br>
+      落下・踏みつけなど、お客様の過失による破損は対象外となりますが、その場合もできる限り安価な方法をご提案いたします。</p>
+    </div>
+
+    <div class="w-item">
+      <span class="term">点検・調整 ／ 期限なし</span>
+      <h3>ゆるみ・ズレ・汚れが気になったとき</h3>
+      <p>かけ具合の調整、ネジの締め直し、超音波洗浄は<span class="forever">いつまでも無料</span>です。<br>
+      保証期間が終わった後も、何年経っても承ります。お気軽にお立ち寄りください。</p>
+    </div>
+
+    <div class="w-item">
+      <span class="term">お手続き</span>
+      <h3>ご来店のとき</h3>
+      <p>この会員証の画面をスタッフにお見せいただければ、それだけで確認できます。<br>
+      保証書やレシートのご持参は不要です。</p>
+    </div>
+
+    <a class="more" id="warrantyMore" href="https://www.6666mega.net/guarantee-repair/" target="_blank" rel="noopener">Sixfour公式サイトでさらに詳しく</a>
+    <button type="button" class="close" onclick="closeWarranty()">閉じる</button>
+  </div>
 </div>
 
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -109,8 +196,10 @@
 // ① LIFF ID（今は開発用。本番に変えるときはここだけ差し替え）
 var LIFF_ID = "2010645044-u3myZwCm";
 
-// ② GASのAPI用URL（/exec で終わる長いURL）を、下の""の中に貼る
+// ② GASのAPI用URL（/exec で終わる長いURL）
+//    ★今つかっている index.html の同じ行と見比べて、違っていたら今の方に直してください
 var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3IEiiTSjjzpUDKORMHD0iH3T9Ku43N6DGWvw8XgK0oV6/exec";
+
 /* ============================================================
  *  ここから下は、何も書き換えなくてOK
  * ============================================================ */
@@ -215,6 +304,81 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     return '<div class="ring">'+ringSVG(0,track,null)+'<div class="rtxt"><span class="rsm">'+label+'</span></div></div>';
   }
 
+  /* ============================================================
+   *  月替わりのひとこと（コピー集シーン10・共通声）
+   *   3年サイクル：お付き合いの年数 % 3 → 0=①出会い / 1=②常連 / 2=③家族
+   *   12月だけ2フェーズ：1〜24日=師走 / 25日以降=年末の御礼
+   *   ※「\n」の位置で改行される
+   * ============================================================ */
+  var MONTHLY = {
+    1:[ "あけましておめでとうございます。\n今年もよく見える一年になりますように👓",
+        "あけましておめでとうございます。\n今年もあなたのメガネ選び、こっそり応援してます☺️",
+        "「あけましておめでとうございます」も何度目でしょうね。\n毎年こうして挨拶できるのが、しみじみ嬉しいんです☺️" ],
+    2:[ "一年で一番寒い時期。\nメガネが曇ったら、それは温かい場所にいる証拠です☺️",
+        "空気が乾く季節。レンズのホコリを、から拭きは傷のもと。\n洗面所でサッと水洗いが正解ですよ👓",
+        "寒いと、ついメガネをかけたままうたた寝しちゃう季節。\n起きたらメガネ負傷😭→全力でお直しします🛠️" ],
+    3:[ "花粉、飛んでますね。\nメガネ、花粉対策にも地味に役立つんですよ👓",
+        "また花粉の季節です。去年も言いましたが、メガネ、地味に効くんです。\n（今年こそ症状、軽めでありますように）😌",
+        "今年も花粉、つらい時期ですよね。\n「メガネ、地味に効くんです」ってもう耳タコでしょ？でも本当なんです😌" ],
+    4:[ "桜の季節ですね。お花見、行きました？\nピントの合った桜は、格別です🌸",
+        "また桜の季節。同じ景色でも去年とちょっと違って見えるのは、\nあなたが変わったからかも🌸",
+        "今年も桜の季節。何度見ても、いいものはいい。\nあなたと見た桜が、また一つ増えました🌸" ],
+    5:[ "5月は紫外線がもっとも強くなる季節。\n今のレンズのUVカット率、店頭で測れますよ。無料で簡単に確認できます☺️",
+        "新緑がきれいな季節。緑を見ると目が休まるって、本当なんです。\nたまには画面から離れて、遠くの緑を🌿",
+        "「紫外線は5月がピーク」——毎年言ってますね😌\nUVカット率測定、今年も無料なのでチェックを！レンズは経年でカット率下がるんです" ],
+    6:[ "梅雨入り。雨粒でメガネが見えづらい日は、\nちょっとだけ世界がにじんで見えますね☔",
+        "梅雨、今年も来ました☔\n雨の日のレンズ拭き、もう達人の域でしょ？",
+        "梅雨入り。雨の日のレンズ、もう気にならなくなってきたでしょ？\n慣れって、すごい☔" ],
+    7:[ "夏本番。汗でメガネがずり落ちる季節です。\n鼻パッド調整、無料でやってますよ😌",
+        "夏本番。冷房の効いた部屋は、目が乾きがちです。\n意識してまばたきを。メガネは乾燥も少し防いでくれます👓",
+        "夏本番。ずり落ちるメガネ、そろそろ調整の頃合いです。\nいつでも無料、遠慮はいりませんからね😌" ],
+    8:[ "暑い日が続きますね。水分補給はこまめに。\nメガネも汗をかいてます。洗ってあげてください👓",
+        "猛暑日。メガネもあなたも、ぐったり。\n汗でベタついたメガネ、超音波洗浄でスッキリ。もちろん無料ですよ👓",
+        "毎年恒例の猛暑です。メガネもあなたも、無理は禁物。\n洗って、休んで、また一緒に夏を越えましょう👓" ],
+    9:[ "少しずつ、秋の気配。\n夜が長くなると、読書やスマホの時間も増えますね。目、大事にしてあげてください📖",
+        "秋の夜長。スマホの見過ぎで、目、疲れてませんか？\nたまにはお月様🌙を見て、休ませてあげてください",
+        "秋の夜長。あなたと過ごす秋も、もう何度目でしょう。\n数えないでおきます。野暮ですからね☺️" ],
+    10:[ "空気が澄んで、遠くまでよく見える季節。\n度数、合ってますか？👀",
+         "食欲の秋、そして目にもごちそうの季節。\n紅葉のグラデーション、ピントが合うと本当にきれいです🍁",
+         "空気が澄んで、遠くの山までくっきり。\n毎年この景色を、あなたと一緒に見られる幸せ👓" ],
+    11:[ "温かい飲み物が恋しい季節。\n……メガネが曇るのは、もう諦めましょう☕",
+         "また来ました、曇るシーズン☕\n「もう諦めた」って、去年も言った気がします",
+         "また来ました、曇る季節。\n諦めるのも、もう年中行事。笑って拭きましょう☕" ],
+    12:[ "師走に入りましたね。今年も一年、あっという間でした。\n大掃除のついでに、メガネも店頭で無料クリーニング、いかがですか👓",
+         "気づけば、もう師走。一年って、本当に早いですね。\n気ぜわしい毎日こそ、視界はスッキリと。汚れが気になったら、無料の超音波洗浄にどうぞ👓",
+         "今年も師走がやってきましたね。\n何かと慌ただしい季節ですが、どうかご無理なさらず。目とメガネも、たまには休ませてあげてください☺️" ],
+    "12b":[ "今年もお世話になりました。\n来年も、思わず笑顔になる景色をたくさん見ましょう👓",
+            "今年もありがとうございました。\n一緒に見た景色、また一年ぶん増えましたね👓",
+            "今年も一年、ありがとうございました。\n何年経っても、あなたと見る景色が一番の宝物です👓" ]
+  };
+
+  function monthlyHtml(years){
+    var d = new Date();
+    var m = d.getMonth() + 1;
+    var key = (m === 12 && d.getDate() >= 25) ? "12b" : m;      // 12/25以降は年末の御礼
+    var set = MONTHLY[key];
+    if(!set) return "";
+    var y = parseInt(years, 10); if(isNaN(y) || y < 0) y = 0;
+    var txt = set[y % 3];                                        // 3年サイクル
+    return '<div class="monthly"><div class="mo-mark">'+m+'月のひとこと</div>'+
+           esc(txt).replace(/\n/g, "<br>")+'</div>';
+  }
+
+  /* ===== 3桁カンマ区切り ===== */
+  function comma(n){
+    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  /* ===== 共に過ごした日数（コピー集シーン9・現役は現在進行形／殿堂入りは完了形） ===== */
+  function togetherText(card){
+    var isRicco = (card.brand === "RICCO");
+    var n = comma(card.togetherDays) + "日間、";
+    if(card.archived){
+      return n + (isRicco ? "共に時を過ごしてまいりました" : "たくさんの景色を一緒に見てきました");
+    }
+    return n + (isRicco ? "共に時を過ごしております" : "毎日一緒に見ています👓");
+  }
+
   /* ===== 文字を安全に表示する ===== */
   function esc(s){
     return String(s==null?"":s)
@@ -258,26 +422,33 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
           '<div class="w-texts"><div class="w-label">見え方保証'+u15+'</div><div class="w-date">'+esc(card.visionEnd)+'</div></div></div>'+
       '</div>';
     if(card.togetherDays>0){
-      html+='<div class="together">このメガネと過ごして '+card.togetherDays+' 日</div>';
+      html+='<div class="together">'+esc(togetherText(card))+'</div>';
     }
     if(card.isU15){
       var u15txt = isRicco ? '15歳以下のお客様は、見え方保証を6ヶ月とさせていただいております。' : '15歳以下のお客様は、見え方保証を6ヶ月に延長しています。';
       html+='<div class="u15-note">'+u15txt+'</div>';
     }
-    html+='<a class="link" href="#">保証・修理について詳しくはこちら</a></div>';
+    // 「保証・修理について」はカードの外（土台の共通ボタン）に移動した
+    html+='</div>';
     return html;
   }
 
   /* ===== 殿堂入りカード ===== */
   function archivedCard(card){
     var isRicco=(card.brand==="RICCO");
+    var days = (card.togetherDays>0) ? esc(togetherText(card))+'<br>' : '';
+    var msg = isRicco
+      ? '🏆 <b>殿堂入りアイウェア</b><br>'+days+
+        'この相棒👓🕶️との時間は、まだまだ続きます。<br>調整・クリーニングは、<span class="forever-in">いつまでも</span>無料で承ります。'
+      : '🏆 <b>殿堂入りメガネ</b><br>'+days+
+        'お疲れさま。そして、ありがとう👓🕶️<br>——調整・クリーニングは、<span class="forever-in">いつまでも</span>無料です☺️';
     return '<div class="card '+(isRicco?"ricco":"sixfour")+' archived"><div class="archived-stamp">ARCHIVE</div>'+
       '<div class="card-top">'+logoHtml(isRicco)+'<div class="card-no">'+esc(card.memberNo)+'</div></div>'+
       '<div class="mid"><div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+esc(card.sub)+'</div></div>'+
         specsHtml(card.months, false)+'</div>'+
       '<div class="w-grid"><div class="w-cell"><div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date">'+esc(card.frameEnd)+'</div></div></div>'+
         '<div class="w-cell"><div class="w-texts"><div class="w-label">見え方保証</div><div class="w-date">'+esc(card.visionEnd)+'</div></div></div></div>'+
-      '<div class="archived-msg">🏆 <b>殿堂入りメガネ</b><br>たくさんの景色を、一緒に見てきましたね。<br>お疲れさま。そして、ありがとう👓<br>——調整・クリーニングは、いつまでも無料です☺️</div></div>';
+      '<div class="archived-msg">'+msg+'</div></div>';
   }
 
   window.toggleArchive=function(btn){
@@ -309,7 +480,8 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var active=cards.filter(function(c){return !c.archived;});
     var archived=cards.filter(function(c){return c.archived;});
 
-    var html="";
+    var html = monthlyHtml(d.memberYears);   // ★月替わりのひとこと（カード群の上）
+
     if(active.length){
       html+='<div class="sec-label">ご利用中のメガネ</div>';
       active.forEach(function(c){ html+=activeCard(c); });
@@ -317,9 +489,13 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       // 現役ゼロ＝卒業生。最新の1枚は必ず表示する
       html+='<div class="sec-label">ご利用中のメガネ</div>';
       html+=archivedCard(archived[0]);
+      var isRicco = (archived[0].brand === "RICCO");   // ★直近カードのブランドで文体を分ける
       archived=archived.slice(1);
-      html+='<div class="msg-card sixfour"><div class="msg-brand">Sixfour</div>'+
-        '今お使いのメガネ・サングラスの保証は、すべて終了しています。<br>でも、調整・クリーニングはいつまでも無料です☺️<br>新しい一本も、いつでもお待ちしてます👓🕶️</div>';
+      html += isRicco
+        ? '<div class="msg-card ricco"><div class="msg-brand">RICCO</div>'+
+          '現在、保証期間中のアイウェアはございません。<br>お手入れは、<span class="forever-in">いつまでも</span>承ります。<br>次の一本との出会いも、心よりお待ちしております。</div>'
+        : '<div class="msg-card sixfour"><div class="msg-brand">Sixfour</div>'+
+          '今お使いのメガネ・サングラスの保証は、すべて終了しています。<br>でも、調整・クリーニングは<span class="forever-in">いつまでも</span>無料です☺️<br>新しい一本も、いつでもお待ちしてます👓🕶️</div>';
     }
     if(archived.length){
       html+='<button class="archive-toggle" onclick="toggleArchive(this)"><span class="chev">▶</span> 保証が終了したメガネ（'+archived.length+'本）</button><div class="archive-wrap">';
@@ -327,15 +503,25 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       html+='</div>';
     }
     document.getElementById("app").innerHTML=html;
+    showActions();
   }
 
-  /* ===== 会員証がまだない人 ===== */
+  /* ===== 会員証がまだない人 =====
+   *  pending=true  … 会員Noは入っている＝スタッフが準備中（コピー集シーン1）
+   *  pending=false … まだ一度もお作りいただいていない（コピー集シーン7 D-1）
+   *  ※この状態ではI列（登録ショップ）が決まらないため、Sixfourの声で表示する
+   */
   function renderNoCard(){
     document.getElementById("head").style.display="none";
+    var pending = !!(PAGE_DATA && PAGE_DATA.pending);
+    var body = pending
+      ? '🎉ようこそ、メガネの沼へ！<br>ただいま、スタッフが会員証をせっせと準備中です<br>完成まで気長にお待ちください👓🕶️'+
+        '<div class="msg-sub">お渡しの手続きが済むと、ここに会員証が表示されます。保証の残り日数も、ひと目でわかるようになります。</div>'
+      : '👓まだ会員証がありません<br>Sixfourでメガネ・サングラスをお作りいただくと、<br>あなただけの会員証が発行されます。'+
+        '<div class="msg-sub">保証の残り日数も、ひと目でわかります☺️</div>';
     document.getElementById("app").innerHTML=
-      '<div class="msg-card sixfour"><div class="msg-brand">Sixfour</div>'+
-        '👓ただいま準備中です<br>スタッフが会員証をせっせと準備しています。<br>お渡しの手続きが済むと、ここに会員証が表示されます☺️'+
-        '<div class="msg-sub">保証の残り日数も、ひと目でわかるようになります。</div></div>';
+      '<div class="msg-card sixfour"><div class="msg-brand">Sixfour</div>'+body+'</div>';
+    showActions();
   }
 
   /* ===== エラー画面 ===== */
@@ -345,7 +531,47 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       '<div class="msg-card sixfour"><div class="msg-brand">Sixfour</div>'+
         '申し訳ありません。会員証を読み込めませんでした。<br>通信環境の良い場所で、もう一度お試しください。'+
         '<div class="msg-sub">'+esc(msg||"")+'</div></div>';
+    showActions();
   }
+
+  /* ============================================================
+   *  土台の共通ボタン（カードの外・どの状態でも必ず出す）
+   * ============================================================ */
+  function showActions(){
+    document.getElementById("actions").style.display = "flex";
+    // Sixfourのカードを1枚でも持っている人にだけ、公式サイトへの導線を出す
+    var hasSix = true;
+    if(PAGE_DATA && PAGE_DATA.cards && PAGE_DATA.cards.length){
+      hasSix = PAGE_DATA.cards.some(function(c){ return c.brand !== "RICCO"; });
+    }
+    document.getElementById("warrantyMore").style.display = hasSix ? "block" : "none";
+  }
+
+  window.openWarranty = function(){
+    document.getElementById("warrantySheet").classList.add("open");
+    document.body.style.overflow = "hidden";
+  };
+  window.closeWarranty = function(){
+    document.getElementById("warrantySheet").classList.remove("open");
+    document.body.style.overflow = "";
+  };
+
+  /* ===== 💬 LINEで相談する =====
+   *  「お問い合わせ」という言葉をトークに送る → 既存の応答メッセージがそのまま返る
+   *  ※LIFF設定で「chat_message.write」を有効にしておくこと
+   */
+  window.consult = function(){
+    var word = "お問い合わせ";
+    try{
+      if(liff.isApiAvailable && liff.isApiAvailable("sendMessages")){
+        liff.sendMessages([{ type:"text", text: word }])
+          .then(function(){ liff.closeWindow(); })
+          .catch(function(){ alert("トーク画面で「"+word+"」と送信してください。すぐにご案内が届きます。"); });
+        return;
+      }
+    }catch(e){}
+    alert("トーク画面で「"+word+"」と送信してください。すぐにご案内が届きます。");
+  };
 
   /* ===== GASにデータを取りに行く ===== */
   function fetchCards(idToken){
