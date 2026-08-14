@@ -248,8 +248,9 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     if(months>=12){
       var sc=document.createElement("canvas"); sc.width=w*dpr; sc.height=h*dpr;
       var s=sc.getContext("2d"); s.scale(dpr,dpr);
-      var n = months<36 ? 1 : 2;
-      s.strokeStyle="rgba(95,82,68,0.16)"; s.lineWidth=0.55; s.lineCap="round";
+      // ★傷の見え方（2026/8/14 調整）：本数・濃さ・太さはこの2行で決まる
+      var n = months<36 ? 2 : 3;
+      s.strokeStyle="rgba(95,82,68,0.28)"; s.lineWidth=1.1; s.lineCap="round";
       var lens=[[0.27,0.47],[0.73,0.47]], rr=w*0.07;
       for(var li=0; li<2; li++){
         var cx=w*lens[li][0], cy=h*lens[li][1];
@@ -396,7 +397,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   /* ===== メガネの絵（読めなかったら何も出さない） =====
    *  ★絵の大きさを変えたいときは、この GLASS_W の数字だけ直す（CSSも連動する）
    */
-  var GLASS_W = 124;   // メガネの絵の横幅（px）
+  var GLASS_W = 108;  // メガネの絵の横幅（px）
   function specsHtml(months, withLabel){
     var gsrc = tint(ageColor(months), GLASS_W, months);
     if(!gsrc) return '<div class="specs"></div>';
