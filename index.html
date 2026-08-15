@@ -566,15 +566,33 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
    */
   window.consult = function(){
     var word = "お問い合わせ";
+
+    // ★診断用：今どういう状態でLIFFが開かれているかを集める
+    var info = "";
     try{
-      if(liff.isApiAvailable && liff.isApiAvailable("sendMessages")){
-        liff.sendMessages([{ type:"text", text: word }])
-          .then(function(){ liff.closeWindow(); })
-          .catch(function(){ alert("トーク画面で「"+word+"」と送信してください。すぐにご案内が届きます。"); });
-        return;
-      }
-    }catch(e){}
-    alert("トーク画面で「"+word+"」と送信してください。すぐにご案内が届きます。");
+      var ctx = {};
+      try{ ctx = liff.getContext() || {}; }catch(e){}
+      info =
+        "LINEの中で開いている？ : " + (liff.isInClient ? liff.isInClient() : "不明") + "\n" +
+        "開かれ方(type) : " + (ctx.type || "なし") + "\n" +
+        "OS : " + (liff.getOS ? liff.getOS() : "不明") + "\n" +
+        "ログイン済み？ : " + (liff.isLoggedIn ? liff.isLoggedIn() : "不明") + "\n" +
+        "送信機能つかえる？ : " + (liff.isApiAvailable ? liff.isApiAvailable("sendMessages") : "不明");
+    }catch(e){ info = "状態の取得に失敗：" + e; }
+
+    // isApiAvailable の結果に関わらず、いちど本当に送信を試す
+    try{
+      liff.sendMessages([{ type:"text", text: word }])
+        .then(function(){ liff.closeWindow(); })
+        .catch(function(err){
+          var detail = "";
+          try{ detail = (err && (err.code || err.message)) ? ((err.code||"") + " " + (err.message||"")) : String(err); }
+          catch(e2){ detail = "不明"; }
+          alert("【診断】送信できませんでした\n\n" + info + "\n\nエラー内容 : " + detail);
+        });
+    }catch(e){
+      alert("【診断】送信を実行できませんでした\n\n" + info + "\n\n例外 : " + e);
+    }
   };
 
   /* ===== GASにデータを取りに行く ===== */
