@@ -561,20 +561,25 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   };
 
   /* ===== 💬 LINEで相談する =====
-   *  「お問い合わせ」という言葉をトークに送る → 既存の応答メッセージがそのまま返る
-   *  ※LIFF設定で「chat_message.write」を有効にしておくこと
+   *  「お問い合わせ」をトークに送る → 既存の応答メッセージがそのまま返る
+   *  ※LIFF設定で「chat_message.write」を有効にしておくこと（2026/8/15 設定済み）
+   *
+   *  ★重要（2026/8/15 判明）：
+   *    liff.isApiAvailable("sendMessages") で事前チェックしてはいけない。
+   *    LINEミニアプリでは、実際には送信できる状況でも false を返すことがあり、
+   *    その場合ボタンが永久に案内アラートしか出さなくなる。
+   *    事前チェックはせず、必ず「まず送ってみて、失敗したら案内」の順にすること。
    */
   window.consult = function(){
     var word = "お問い合わせ";
+    var guide = "トーク画面で「"+word+"」と送信してください。すぐにご案内が届きます。";
     try{
-      if(liff.isApiAvailable && liff.isApiAvailable("sendMessages")){
-        liff.sendMessages([{ type:"text", text: word }])
-          .then(function(){ liff.closeWindow(); })
-          .catch(function(){ alert("トーク画面で「"+word+"」と送信してください。すぐにご案内が届きます。"); });
-        return;
-      }
-    }catch(e){}
-    alert("トーク画面で「"+word+"」と送信してください。すぐにご案内が届きます。");
+      liff.sendMessages([{ type:"text", text: word }])
+        .then(function(){ liff.closeWindow(); })
+        .catch(function(){ alert(guide); });
+    }catch(e){
+      alert(guide);
+    }
   };
 
   /* ===== GASにデータを取りに行く ===== */
