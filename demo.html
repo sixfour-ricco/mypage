@@ -39,21 +39,31 @@
   .specs .gimg{ display:block; width:84px; height:auto; margin:0 auto; }
   .mini-row{ display:flex; align-items:center; justify-content:center; gap:2px; margin-top:8px; height:22px; }
   .mini-row .cnt{ font-size:10px; opacity:.72; margin-left:4px; font-weight:600; }
-  .w-grid{ display:flex; gap:10px; padding-top:12px; border-top:1px solid rgba(0,0,0,.08); }
-  .w-cell{ flex:1; display:flex; align-items:center; gap:9px; min-width:0; }
+  .w-grid{ display:flex; gap:8px; padding-top:12px; border-top:1px solid rgba(0,0,0,.08); }
+  .w-cell{ flex:1; display:flex; align-items:center; gap:8px; min-width:0; }
   .w-texts{ min-width:0; }
   .w-label{ font-size:10.5px; opacity:.72; display:flex; align-items:center; gap:5px; margin-bottom:2px; white-space:nowrap; }
   .w-date{ font-size:15px; font-weight:600; font-variant-numeric:tabular-nums; letter-spacing:.01em; }
   .u15{ font-size:8.5px; font-weight:800; letter-spacing:.05em; padding:2px 5px; border-radius:4px; line-height:1; background:#2f6bd8; color:#fff; }
   .u15-note{ font-size:10.5px; opacity:.62; margin-top:10px; letter-spacing:.01em; }
   .lens-badge{ display:inline-block; font-size:9px; font-weight:700; letter-spacing:.04em; padding:2px 7px; border-radius:5px; background:rgba(120,100,70,.16); color:#6b5c3a; margin-left:8px; vertical-align:2px; }
-  .ring{ position:relative; width:46px; height:46px; flex:none; }
-  .ring svg{ transform:rotate(-90deg); display:block; }
-  .ring .rtxt{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.02; }
-  .ring .rtxt .r1{ font-size:7px; opacity:.62; }
-  .ring .rtxt .r2{ font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; }
-  .ring .rtxt .r3{ font-size:7px; opacity:.62; }
-  .ring .rtxt .rsm{ font-size:9px; font-weight:700; opacity:.55; }
+  .ring{ position:relative; width:56px; height:56px; flex:none; }
+  .ring svg{ transform:rotate(-90deg); display:block; width:100%; height:100%; }
+  .ring .rtxt{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.0; }
+  /* ★リング内は円の内側ギリギリまで使う。これ以上大きくすると輪に文字がかかる
+     （内径41px ＝ r23 - 線幅5の半分×2。9 + 22 + 9 = 40px でちょうど収まる） */
+  .ring .rtxt .r1{ font-size:9px; opacity:.62; }
+  .ring .rtxt .r2{ font-size:22px; font-weight:700; font-variant-numeric:tabular-nums; letter-spacing:-.03em; }
+  .ring .rtxt .r3{ font-size:9px; opacity:.62; }
+  .ring .rtxt .rsm{ font-size:11px; font-weight:700; opacity:.55; }
+
+  /* 狭い端末（iPhone SE等）でリングとラベルが見切れないように縮める */
+  @media (max-width:370px){
+    .ring{ width:48px; height:48px; }
+    .ring .rtxt .r1, .ring .rtxt .r3{ font-size:8px; }
+    .ring .rtxt .r2{ font-size:19px; }
+    .w-label{ font-size:10px; }
+  }
   .link{ display:block; text-align:center; margin-top:14px; padding:10px; border-radius:10px; text-decoration:none; font-size:12px; font-weight:600; letter-spacing:.06em; }
   .sixfour{ background:linear-gradient(152deg,#ffffff 0%,#fbfbf9 42%,#f2f1ec 100%); box-shadow:0 10px 26px -10px rgba(140,120,60,.28), 0 1px 0 rgba(255,255,255,.9) inset, 0 0 0 1px rgba(0,0,0,.04); color:#2c2a22; }
   .sixfour::before{ content:""; position:absolute; top:-40%; left:-20%; width:80%; height:120%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent); transform:rotate(18deg); z-index:-1; }
@@ -237,9 +247,9 @@
     ]}
   };
 
-  function ringSVG(ratio,track,arc){ var r=19,c=2*Math.PI*r,off=c*(1-ratio);
-    return '<svg width="46" height="46" viewBox="0 0 46 46"><circle cx="23" cy="23" r="'+r+'" fill="none" stroke="'+track+'" stroke-width="4"/>'+
-      (arc?'<circle cx="23" cy="23" r="'+r+'" fill="none" stroke="'+arc+'" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'"/>':'')+'</svg>'; }
+  function ringSVG(ratio,track,arc){ var r=23,c=2*Math.PI*r,off=c*(1-ratio);
+    return '<svg width="56" height="56" viewBox="0 0 56 56"><circle cx="28" cy="28" r="'+r+'" fill="none" stroke="'+track+'" stroke-width="5"/>'+
+      (arc?'<circle cx="28" cy="28" r="'+r+'" fill="none" stroke="'+arc+'" stroke-width="5" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'"/>':'')+'</svg>'; }
   function arcColor(r){ if(r>.4)return"#3a9a5c"; if(r>.15)return"#d9a441"; return"#c86a3a"; }
   function ring(active,ratio,days,isRicco){
     var track=isRicco?"rgba(120,102,60,.20)":"rgba(0,0,0,.1)";
