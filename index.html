@@ -50,7 +50,7 @@
   .ring svg{ transform:rotate(-90deg); display:block; }
   .ring .rtxt{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.02; }
   .ring .rtxt .r1{ font-size:7px; opacity:.62; }
-  .ring .rtxt .r2{ font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .ring .rtxt .r2{ font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; }
   .ring .rtxt .r3{ font-size:7px; opacity:.62; }
   .ring .rtxt .rsm{ font-size:9px; font-weight:700; opacity:.55; }
   .link{ display:block; text-align:center; margin-top:14px; padding:10px; border-radius:10px; text-decoration:none; font-size:12px; font-weight:600; letter-spacing:.06em; }
@@ -123,12 +123,19 @@
   .archived .forever-in{ color:#8f5a3a; }
   .ricco .forever-in{ color:#7d4a2e; }
 
-  /* ===== 保証の残り30日以内：ゆっくり脈打って気づかせる ===== */
-  @keyframes ringPulse{ 0%,100%{ opacity:1; } 50%{ opacity:.42; } }
-  .ring.warn svg circle:last-of-type{ animation:ringPulse 2s ease-in-out infinite; }
-  .ring.warn .rtxt .r2{ color:#c86a3a; animation:ringPulse 2s ease-in-out infinite; }
-  .ring.warn .rtxt .r1, .ring.warn .rtxt .r3{ color:#c86a3a; opacity:.75; }
-  /* 動きを減らす設定にしている人には点滅させない（色だけで伝える） */
+  /* ===== 保証の残り30日以内：数字を大きくして、ゆっくり脈打たせる =====
+   *  ・周期は3秒（2秒だとせわしなく感じるため）
+   *  ・薄くなりすぎると読めないので、下限は .68 までに留める
+   *  ・色は JS の WARN_COLOR と揃えること（#b5432b）
+   */
+  @keyframes ringPulse{ 0%,100%{ opacity:1; } 50%{ opacity:.68; } }
+  .ring.warn .rtxt .r2{
+    font-size:19px; font-weight:800; color:#b5432b; letter-spacing:-.02em;
+    animation:ringPulse 3s ease-in-out infinite;
+  }
+  .ring.warn .rtxt .r1, .ring.warn .rtxt .r3{ color:#b5432b; opacity:.85; font-weight:600; }
+  .ring.warn svg circle:last-of-type{ animation:ringPulse 3s ease-in-out infinite; }
+  /* 動きを減らす設定にしている人には点滅させない（大きさと色だけで伝える） */
   @media (prefers-reduced-motion: reduce){
     .ring.warn svg circle:last-of-type, .ring.warn .rtxt .r2{ animation:none; }
   }
@@ -309,7 +316,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
 
   /* ★残りが何日以下になったら警告表示にするか（ここの数字だけ直せば変わる） */
   var WARN_DAYS = 30;
-  var WARN_COLOR = "#c86a3a";
+  var WARN_COLOR = "#b5432b";   // ※CSSの .ring.warn 側の色と揃えること
 
   function ring(active,ratio,days,isRicco){
     var track=isRicco?"rgba(120,102,60,.20)":"rgba(0,0,0,.1)";
