@@ -34,24 +34,25 @@
   .mid{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:10px; }
   .mid-left{ min-width:0; }
   .card-name{ font-size:30px; font-weight:600; letter-spacing:.03em; line-height:1.05; margin-bottom:4px; }
-  .card-sub{ font-size:12.5px; opacity:.82; }
+  .card-sub{ font-size:13.8px; opacity:.82; }
   .specs{ text-align:center; flex:none; }
   .specs .gimg{ display:block; width:84px; height:auto; margin:0 auto; }
-  .aging-tag{ font-size:9.5px; opacity:.6; margin-top:6px; letter-spacing:.02em; }
+  .aging-tag{ font-size:10.5px; opacity:.6; margin-top:6px; letter-spacing:.02em; }
   .w-grid{ display:flex; gap:10px; padding-top:12px; border-top:1px solid rgba(0,0,0,.08); }
   .w-cell{ flex:1; display:flex; align-items:center; gap:9px; min-width:0; }
   .w-texts{ min-width:0; }
-  .w-label{ font-size:10.5px; opacity:.72; display:flex; align-items:center; gap:5px; margin-bottom:2px; white-space:nowrap; }
-  .w-date{ font-size:15px; font-weight:600; font-variant-numeric:tabular-nums; letter-spacing:.01em; }
+  .w-label{ font-size:11.5px; opacity:.72; display:flex; align-items:center; gap:5px; margin-bottom:2px; white-space:nowrap; }
+  .w-date{ font-size:16.5px; font-weight:600; font-variant-numeric:tabular-nums; letter-spacing:.01em; }
   .u15{ font-size:8.5px; font-weight:800; letter-spacing:.05em; padding:2px 5px; border-radius:4px; line-height:1; background:#2f6bd8; color:#fff; }
   .u15-note{ font-size:10.5px; opacity:.62; margin-top:10px; letter-spacing:.01em; }
-  .together{ font-size:10.5px; opacity:.62; margin-top:8px; letter-spacing:.02em; }
+  .together{ font-size:11.5px; opacity:.62; margin-top:8px; letter-spacing:.02em; }
   .ring{ position:relative; width:46px; height:46px; flex:none; }
   .ring svg{ transform:rotate(-90deg); display:block; }
-  .ring .rtxt{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.02; }
-  .ring .rtxt .r1{ font-size:7px; opacity:.62; }
-  .ring .rtxt .r2{ font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; }
-  .ring .rtxt .r3{ font-size:7px; opacity:.62; }
+  .ring .rtxt{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.0; }
+  /* ★リング内は円の内側ギリギリまで使う。これ以上大きくすると輪に文字がかかる */
+  .ring .rtxt .r1{ font-size:8px; opacity:.62; }
+  .ring .rtxt .r2{ font-size:18px; font-weight:700; font-variant-numeric:tabular-nums; letter-spacing:-.03em; }
+  .ring .rtxt .r3{ font-size:8px; opacity:.62; }
   .ring .rtxt .rsm{ font-size:9px; font-weight:700; opacity:.55; }
   .link{ display:block; text-align:center; margin-top:14px; padding:10px; border-radius:10px; text-decoration:none; font-size:12px; font-weight:600; letter-spacing:.06em; }
   .sixfour{ background:linear-gradient(152deg,#ffffff 0%,#fbfbf9 42%,#f2f1ec 100%); box-shadow:0 10px 26px -10px rgba(140,120,60,.28), 0 1px 0 rgba(255,255,255,.9) inset, 0 0 0 1px rgba(0,0,0,.04); color:#2c2a22; }
@@ -128,9 +129,9 @@
    *  ・薄くなりすぎると読めないので、下限は .68 までに留める
    *  ・色は JS の WARN_COLOR と揃えること（#b5432b）
    */
-  @keyframes ringPulse{ 0%,100%{ opacity:1; } 50%{ opacity:.68; } }
+  @keyframes ringPulse{ 0%,100%{ opacity:1; } 50%{ opacity:.55; } }
   .ring.warn .rtxt .r2{
-    font-size:19px; font-weight:800; color:#b5432b; letter-spacing:-.02em;
+    font-weight:800; color:#b5432b;
     animation:ringPulse 3s ease-in-out infinite;
   }
   .ring.warn .rtxt .r1, .ring.warn .rtxt .r3{ color:#b5432b; opacity:.85; font-weight:600; }
@@ -439,7 +440,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var frameCell;
     if(card.lensOnly){
       frameCell='<div class="w-cell">'+ringNA("対象外",isRicco)+
-        '<div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date" style="font-size:12.5px;opacity:.6">レンズ交換のため対象外</div></div></div>';
+        '<div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date" style="font-size:13.8px;opacity:.6">レンズ交換のため対象外</div></div></div>';
     } else {
       frameCell='<div class="w-cell">'+ring(card.frameActive,card.frameRatio,card.frameDays,isRicco)+
         '<div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date">'+esc(card.frameEnd)+'</div></div></div>';
