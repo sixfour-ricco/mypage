@@ -123,6 +123,16 @@
   .archived .forever-in{ color:#8f5a3a; }
   .ricco .forever-in{ color:#7d4a2e; }
 
+  /* ===== 保証の残り30日以内：ゆっくり脈打って気づかせる ===== */
+  @keyframes ringPulse{ 0%,100%{ opacity:1; } 50%{ opacity:.42; } }
+  .ring.warn svg circle:last-of-type{ animation:ringPulse 2s ease-in-out infinite; }
+  .ring.warn .rtxt .r2{ color:#c86a3a; animation:ringPulse 2s ease-in-out infinite; }
+  .ring.warn .rtxt .r1, .ring.warn .rtxt .r3{ color:#c86a3a; opacity:.75; }
+  /* 動きを減らす設定にしている人には点滅させない（色だけで伝える） */
+  @media (prefers-reduced-motion: reduce){
+    .ring.warn svg circle:last-of-type, .ring.warn .rtxt .r2{ animation:none; }
+  }
+
   .loading{ text-align:center; padding:60px 20px; color:var(--sub); font-size:13px; letter-spacing:.05em; }
   .loading .spin{ width:26px; height:26px; margin:0 auto 14px; border:2px solid rgba(0,0,0,.1); border-top-color:#8a8578; border-radius:50%; animation:sp .8s linear infinite; }
   @keyframes sp{ to{ transform:rotate(360deg); } }
@@ -296,10 +306,20 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     return '<svg width="46" height="46" viewBox="0 0 46 46"><circle cx="23" cy="23" r="'+r+'" fill="none" stroke="'+track+'" stroke-width="4"/>'+
       (arc?'<circle cx="23" cy="23" r="'+r+'" fill="none" stroke="'+arc+'" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'"/>':'')+'</svg>'; }
   function arcColor(r){ if(r>.4)return"#3a9a5c"; if(r>.15)return"#d9a441"; return"#c86a3a"; }
+
+  /* ★残りが何日以下になったら警告表示にするか（ここの数字だけ直せば変わる） */
+  var WARN_DAYS = 30;
+  var WARN_COLOR = "#c86a3a";
+
   function ring(active,ratio,days,isRicco){
     var track=isRicco?"rgba(120,102,60,.20)":"rgba(0,0,0,.1)";
     if(!active) return '<div class="ring">'+ringSVG(0,track,null)+'<div class="rtxt"><span class="rsm">終了</span></div></div>';
-    return '<div class="ring">'+ringSVG(ratio,track,arcColor(ratio))+'<div class="rtxt"><span class="r1">残り</span><span class="r2">'+days+'</span><span class="r3">日</span></div></div>'; }
+    // 保証の種類（90日/180日/365日）に関係なく「残り日数」で判定する。
+    // 割合だけで色を決めると、メガネ保証だけ先に赤くなって基準がバラつくため。
+    var n = parseInt(days,10);
+    var warn = (!isNaN(n) && n <= WARN_DAYS);
+    var col = warn ? WARN_COLOR : arcColor(ratio);
+    return '<div class="ring'+(warn?' warn':'')+'">'+ringSVG(ratio,track,col)+'<div class="rtxt"><span class="r1">残り</span><span class="r2">'+days+'</span><span class="r3">日</span></div></div>'; }
   function ringNA(label,isRicco){
     var track=isRicco?"rgba(120,102,60,.20)":"rgba(0,0,0,.1)";
     return '<div class="ring">'+ringSVG(0,track,null)+'<div class="rtxt"><span class="rsm">'+label+'</span></div></div>';
