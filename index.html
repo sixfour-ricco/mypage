@@ -151,8 +151,25 @@
   }
 
   .loading{ text-align:center; padding:60px 20px; color:var(--sub); font-size:13px; letter-spacing:.05em; }
-  .loading .spin{ width:26px; height:26px; margin:0 auto 14px; border:2px solid rgba(0,0,0,.1); border-top-color:#8a8578; border-radius:50%; animation:sp .8s linear infinite; }
+
+  /* ===== 読み込み中アイコン（LINE公式スピナー）=====
+     公式ガイドラインの指定：サイズ30x30px・画面中央に表示。
+     画像ファイルは LINE_spinner_light.svg（公式配布物をそのまま使用・加工しない）。 */
+  .loading .spin{ width:30px; height:30px; margin:0 auto 14px; display:block;
+                  animation:sp .8s linear infinite; }
   @keyframes sp{ to{ transform:rotate(360deg); } }
+  /* 動きを減らす設定にしている人には回さない */
+  @media (prefers-reduced-motion: reduce){
+    .loading .spin{ animation:none; }
+  }
+
+  /* ===== LINEミニアプリのセーフエリア（公式ガイドライン）=====
+     ノーマルモード：下34px ／ ランドスケープモード：左右44px・下21px
+     bodyのpadding-bottomは60pxあるので、下方向は両モードとも足りている。
+     不足しているのは横向きのときの左右のみ。 */
+  @media (orientation: landscape){
+    body{ padding-left:44px; padding-right:44px; }
+  }
 </style>
 </head>
 <body>
@@ -164,7 +181,7 @@
     <div id="tenureWrap"></div>
   </div>
   <div id="app">
-    <div class="loading"><div class="spin"></div>会員証を読み込んでいます…</div>
+    <div class="loading"><img class="spin" src="LINE_spinner_light.svg" width="30" height="30" alt="">会員証を読み込んでいます…</div>
   </div>
   <div class="actions" id="actions">
     <button type="button" onclick="openWarranty()">保証・修理について</button>
