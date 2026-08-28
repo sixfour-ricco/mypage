@@ -154,14 +154,10 @@
 
   /* ===== 読み込み中アイコン（LINE公式スピナー）=====
      公式ガイドラインの指定：サイズ30x30px・画面中央に表示。
-     画像ファイルは LINE_spinner_light.svg（公式配布物をそのまま使用・加工しない）。 */
-  .loading .spin{ width:30px; height:30px; margin:0 auto 14px; display:block;
-                  animation:sp .8s linear infinite; }
-  @keyframes sp{ to{ transform:rotate(360deg); } }
-  /* 動きを減らす設定にしている人には回さない */
-  @media (prefers-reduced-motion: reduce){
-    .loading .spin{ animation:none; }
-  }
+     画像ファイルは LINE_spinner_light.svg（公式配布物をそのまま使用・加工しない）。
+     ★2026/8/28 実機確認：この公式SVGには最初から回転アニメーションが入っている。
+       こちらでCSSの回転を足すと二重に回って速すぎるため、回転は付けないこと。 */
+  .loading .spin{ width:30px; height:30px; margin:0 auto 14px; display:block; }
 
   /* ===== LINEミニアプリのセーフエリア（公式ガイドライン）=====
      ノーマルモード：下34px ／ ランドスケープモード：左右44px・下21px
