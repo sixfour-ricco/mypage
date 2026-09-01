@@ -166,6 +166,36 @@
   @media (orientation: landscape){
     body{ padding-left:44px; padding-right:44px; }
   }
+
+  /* ===== 初回登録フォーム（2026/8/30 追加）===== */
+  .reg-lead{ font-size:13.5px; line-height:1.95; margin-bottom:18px; text-align:center; }
+  .reg-lead b{ font-size:15px; display:block; margin-bottom:6px; }
+  .reg-field{ margin-bottom:13px; }
+  .reg-field label{ display:block; font-size:11.5px; font-weight:700; color:#5a544b; margin-bottom:4px; }
+  .reg-field .hint{ font-size:10.5px; color:var(--sub); font-weight:400; margin-left:5px; }
+  .reg-field .req{ font-size:10px; color:#fff; background:#9E1A3A; border-radius:3px;
+                   padding:1px 5px; margin-left:5px; font-weight:700; }
+  .reg-field input, .reg-field select{ width:100%; padding:11px; font-size:15px;
+      border:1px solid #d5d0c7; border-radius:8px; background:#fff; font-family:inherit;
+      -webkit-appearance:none; appearance:none; }
+  .reg-field select{ background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%238a8578'/></svg>");
+      background-repeat:no-repeat; background-position:right 10px center; padding-right:26px; }
+  .reg-two{ display:flex; gap:8px; } .reg-two > *{ flex:1; min-width:0; }
+  .reg-three{ display:flex; gap:6px; } .reg-three > *{ flex:1; min-width:0; }
+  .reg-three select{ padding:11px 4px; font-size:14px; }
+  .reg-why{ background:#fbfaf8; border:1px solid #ece8e1; border-radius:8px;
+            padding:10px 12px; font-size:11.5px; color:#6b6459; line-height:1.85;
+            margin:-4px 0 13px; text-align:center; }
+  .reg-yesno{ display:flex; gap:8px; }
+  .reg-yesno button{ flex:1; padding:12px 6px; border-radius:9px; border:1.5px solid #d5d0c7;
+      background:#fff; color:var(--ink); font-size:13.5px; font-family:inherit; font-weight:700; }
+  .reg-yesno button.on{ border-color:var(--ink); background:var(--ink); color:#fff; }
+  .reg-btn{ width:100%; padding:14px; font-size:15px; font-weight:700; color:#fff;
+      background:var(--ink); border:none; border-radius:10px; margin-top:6px; font-family:inherit; }
+  .reg-btn:disabled{ opacity:.45; }
+  .reg-privacy{ font-size:10.5px; color:var(--sub); text-align:center; margin-top:12px; line-height:1.8; }
+  .reg-privacy a{ color:var(--ink); }
+  .reg-err{ font-size:12px; color:#9E1A3A; text-align:center; margin-top:10px; min-height:1.2em; }
 </style>
 </head>
 <body>
@@ -237,6 +267,23 @@
 //    開発用に戻すとき → 2010645044-u3myZwCm
 //    審査用           → 2010645045-liO4OLYM
 var LIFF_ID = "2010645046-1nZwiX2R";
+
+  /* ★2026/8/30 追加：どちらのブランドから開かれたかを判定する。
+     リッチメニューのURLに ?shop=ricco / ?shop=sixfour を付けておく。
+     LIFFはクエリを liff.state に入れて渡すことがあるので、そちらも見る。
+     判定できない場合は sixfour（既定） */
+  var SHOP = (function(){
+    function pick(qs){
+      var m = /[?&]shop=([^&]+)/.exec(qs || '');
+      return m ? decodeURIComponent(m[1]).toLowerCase() : '';
+    }
+    var v = pick(location.search);
+    if(!v){
+      var st = /[?&]liff\.state=([^&]+)/.exec(location.search);
+      if(st) v = pick(decodeURIComponent(st[1]));
+    }
+    return (v === 'ricco') ? 'ricco' : 'sixfour';
+  })();
 
 // ② GASのAPI用URL（/exec で終わる長いURL）
 //    ★今つかっている index.html の同じ行と見比べて、違っていたら今の方に直してください
@@ -518,6 +565,9 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var d=PAGE_DATA;
     var cards=d.cards||[];
 
+    // ★2026/8/30 まだ行が無い＝一度もご登録いただいていない → 登録フォームを出す
+    if(d.registered === false){ renderRegister(); return; }
+
     if(cards.length===0){ renderNoCard(); return; }
 
     document.getElementById("head").style.display="block";
@@ -562,22 +612,190 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     showActions();
   }
 
-  /* ===== 会員証がまだない人 =====
-   *  pending=true  … 会員Noは入っている＝スタッフが準備中（コピー集シーン1）
-   *  pending=false … まだ一度もお作りいただいていない（コピー集シーン7 D-1）
-   *  ※この状態ではI列（登録ショップ）が決まらないため、Sixfourの声で表示する
+  /* ===== 会員証がまだない人（★2026/8/30 3通りに分岐）=====
+   *  pending=true   … 会員Noは入っている＝スタッフが準備中（コピー集 シーン1）
+   *  bought='あり'  … 登録済み・購入歴あり・未紐付け（コピー集 D-3）
+   *  それ以外       … 登録済み・購入歴なし（コピー集 D-1）
+   *  ※ブランドは SHOP（リッチメニューのURLの目印）で判定する
    */
   function renderNoCard(){
     document.getElementById("head").style.display="none";
     var pending = !!(PAGE_DATA && PAGE_DATA.pending);
-    var body = pending
-      ? '🎉ようこそ、メガネの沼へ！<br>ただいま、スタッフが会員証をせっせと準備中です<br>完成まで気長にお待ちください👓🕶️'+
-        '<div class="msg-sub">お渡しの手続きが済むと、ここに会員証が表示されます。保証の残り日数も、ひと目でわかるようになります。</div>'
-      : '👓まだ会員証がありません<br>Sixfourでメガネ・サングラスをお作りいただくと、<br>あなただけの会員証が発行されます。'+
-        '<div class="msg-sub">保証の残り日数も、ひと目でわかります☺️</div>';
+    var bought  = (PAGE_DATA && PAGE_DATA.bought) === 'あり';
+    var ricco   = (SHOP === 'ricco');
+    var body;
+
+    if(pending){
+      body = ricco
+        ? 'ようこそ、RICCOへ！<br><br>あなたのアイウェアライフに、<br>そっと寄り添うページを👓️🕶️<br>只今、心を込めて準備しております😌'
+        : '🎉ようこそ、メガネの沼へ！<br><br>ただいま、スタッフが会員証を<br>せっせと準備中です<br>完成まで気長にお待ちください👓️🕶️';
+      body += '<div class="msg-sub">お渡しの手続きが済むと、ここに会員証が表示されます。保証の残り日数も、ひと目でわかるようになります。</div>';
+    } else if(bought){
+      body = ricco
+        ? 'ありがとうございます😌<br><br>ただいま、これまでお選びいただいた<br>アイウェアと会員証を、<br>おつなぎする準備をしております。<br><br>次回ご来店の折に、<br>スタッフへお声がけくださいませ👓️'
+        : 'ありがとうございます😌<br><br>ただいま、これまでのご購入内容と<br>会員証をおつなぎする準備を<br>しております。<br><br>次回ご来店の際に<br>スタッフへお声がけください👓️<br>その場で会員証が発行できます。';
+    } else {
+      body = ricco
+        ? '👓️まだ会員証がございません<br><br>SixfourとRICCOで<br>アイウェアを<br>お作りいただきますと、<br>あなただけの会員証が発行されます。<div class="msg-sub">保証の残り日数も、ひと目で。</div>'
+        : '👓️まだ会員証がありません<br><br>SixfourとRICCOで<br>メガネ・サングラスを<br>お作りいただくと、<br>あなただけの会員証が発行されます。<div class="msg-sub">保証の残り日数も、ひと目でわかります☺️</div>';
+    }
+
     document.getElementById("app").innerHTML=
-      '<div class="msg-card sixfour"><div class="msg-brand">Sixfour</div>'+body+'</div>';
+      '<div class="msg-card '+(ricco?'ricco':'sixfour')+'"><div class="msg-brand">'+
+      (ricco?'RICCO':'Sixfour')+'</div>'+body+'</div>';
     showActions();
+  }
+
+  /* ============================================================
+   *  ★初回登録フォーム（2026/8/30 追加）
+   *  これが無いと会員データに行が作られず、会員証を発行できない。
+   *  ブランドは SHOP（リッチメニューのURLの ?shop=）で決まる。
+   * ============================================================ */
+  var REG_BOUGHT = null;   // 購入歴（'あり' / 'なし' / null=未選択）
+
+  function renderRegister(){
+    document.getElementById("head").style.display="none";
+    var ricco = (SHOP === 'ricco');
+
+    var yearOpts = '<option value="">年</option>';
+    for(var y=2026; y>=1930; y--){ yearOpts += '<option value="'+y+'">'+y+'（'+wareki(y)+'）</option>'; }
+    var monOpts = '<option value="">月</option>';
+    for(var m=1;m<=12;m++) monOpts += '<option value="'+m+'">'+m+'</option>';
+
+    document.getElementById("app").innerHTML =
+      '<div class="reg-lead"><b>会員証をお作りします👓️</b>'+
+        'ご登録いただくと、<br>ご購入後にデジタル会員証が<br>発行されます。</div>'+
+
+      '<div class="reg-field"><label>お名前<span class="req">必須</span></label>'+
+        '<div class="reg-two"><input id="rSei" type="text" placeholder="姓" maxlength="20">'+
+        '<input id="rMei" type="text" placeholder="名" maxlength="20"></div></div>'+
+
+      '<div class="reg-field"><label>フリガナ<span class="req">必須</span></label>'+
+        '<div class="reg-two"><input id="rSeiK" type="text" placeholder="セイ" maxlength="20">'+
+        '<input id="rMeiK" type="text" placeholder="メイ" maxlength="20"></div></div>'+
+
+      '<div class="reg-field"><label>生年月日<span class="hint">任意</span></label>'+
+        '<div class="reg-three"><select id="rY">'+yearOpts+'</select>'+
+        '<select id="rM">'+monOpts+'</select><select id="rD"></select></div></div>'+
+
+      '<div class="reg-why">15歳以下のお客様は、<br><b>見え方保証が3ヶ月→6ヶ月</b>になります。<br><br>'+
+        'それと──<br>あなたの目が何年がんばってきたか、<br>メガネ屋👓️としては、<br>ちょっと知っておきたいのです😌</div>'+
+
+      '<div class="reg-field"><label>SixfourまたはRICCOでメガネ👓️や<br>サングラス🕶️をご購入されたことはありますか？<span class="req">必須</span></label>'+
+        '<div class="reg-yesno"><button type="button" id="rYes" onclick="setBought(\'あり\')">はい</button>'+
+        '<button type="button" id="rNo" onclick="setBought(\'なし\')">いいえ</button></div></div>'+
+
+      '<button class="reg-btn" id="rBtn" onclick="submitRegister()">登録する</button>'+
+      '<div class="reg-err" id="rErr"></div>'+
+      '<div class="reg-privacy">お預かりした情報は、<br>会員証と保証のためだけに使います<br>'+
+        '<a href="privacy.html" target="_blank">プライバシーポリシー</a></div>';
+
+    document.getElementById("actions").style.display = "none";   // 登録前は下のボタンを出さない
+    buildDays();
+    document.getElementById("rY").addEventListener("change", buildDays);
+    document.getElementById("rM").addEventListener("change", buildDays);
+    primeYearSetup();
+  }
+
+  /* 和暦（西暦が主・和暦がサブ） */
+  function wareki(y){
+    var G=[[2019,'令和',2018],[1989,'平成',1988],[1926,'昭和',1925]];
+    for(var i=0;i<G.length;i++){
+      if(y>=G[i][0]){ var n=y-G[i][2]; return G[i][1]+(n===1?'元':n)+'年'; }
+    }
+    return '';
+  }
+  /* 月に合わせて日の選択肢を作る */
+  function buildDays(){
+    var yv=parseInt(document.getElementById("rY").value,10);
+    var mv=parseInt(document.getElementById("rM").value,10);
+    var last=(yv&&mv)?new Date(yv,mv,0).getDate():31;
+    var dsel=document.getElementById("rD"); var keep=dsel.value;
+    var h='<option value="">日</option>';
+    for(var d=1;d<=last;d++) h+='<option value="'+d+'">'+d+'</option>';
+    dsel.innerHTML=h;
+    if(keep && parseInt(keep,10)<=last) dsel.value=keep;
+  }
+  /* ★見た目は空欄のまま、開いたときは2000年の位置に来るようにする。
+     タップされた瞬間だけ2000年を仮に選び、選ばずに閉じたら空欄に戻す。
+     ブラウザ／OSで効き方が違う可能性あり。 */
+  function primeYearSetup(){
+    var ysel=document.getElementById("rY"); var primed=false;
+    function prime(){ if(ysel.value===''){ ysel.value='2000'; primed=true; } }
+    ysel.addEventListener("mousedown", prime);
+    ysel.addEventListener("touchstart", prime);
+    ysel.addEventListener("focus", prime);
+    ysel.addEventListener("change", function(){ primed=false; });
+    ysel.addEventListener("blur", function(){ if(primed){ ysel.value=''; primed=false; } });
+  }
+  function setBought(v){
+    REG_BOUGHT=v;
+    document.getElementById("rYes").className = (v==='あり') ? 'on' : '';
+    document.getElementById("rNo").className  = (v==='なし') ? 'on' : '';
+  }
+
+  function submitRegister(){
+    var err=document.getElementById("rErr");
+    var g=function(id){ return (document.getElementById(id).value||'').trim(); };
+    var sei=g("rSei"), mei=g("rMei"), seiK=g("rSeiK"), meiK=g("rMeiK");
+
+    if(!sei||!mei){ err.textContent="お名前をご入力ください"; return; }
+    if(!seiK||!meiK){ err.textContent="フリガナをご入力ください"; return; }
+    if(!REG_BOUGHT){ err.textContent="ご購入の有無をお選びください"; return; }
+
+    var y=g("rY"), m=g("rM"), d=g("rD"), birthday='';
+    if(y&&m&&d){
+      birthday = y+'-'+('0'+m).slice(-2)+'-'+('0'+d).slice(-2);
+    }else if(y||m||d){
+      err.textContent="生年月日は、年・月・日をすべてお選びください"; return;
+    }
+
+    err.textContent="";
+    var btn=document.getElementById("rBtn");
+    btn.disabled=true; btn.textContent="登録しています…";
+
+    var idToken = liff.getIDToken();
+    var cbName = "regcb_" + Date.now();
+    var timer = setTimeout(function(){
+      cleanupReg(cbName);
+      btn.disabled=false; btn.textContent="登録する";
+      err.textContent="通信に時間がかかっています。電波の良い場所でもう一度お試しください";
+    }, 15000);
+
+    window[cbName] = function(json){
+      clearTimeout(timer);
+      cleanupReg(cbName);
+      if(json && json.ok){
+        location.reload();          // 登録できたら読み込み直して、次の状態を表示する
+      }else{
+        btn.disabled=false; btn.textContent="登録する";
+        err.textContent = (json && json.error) ? json.error : "登録できませんでした";
+      }
+    };
+
+    var url = API_URL + "?action=register"
+      + "&idToken="  + encodeURIComponent(idToken)
+      + "&sei="      + encodeURIComponent(sei)
+      + "&mei="      + encodeURIComponent(mei)
+      + "&seiKana="  + encodeURIComponent(seiK)
+      + "&meiKana="  + encodeURIComponent(meiK)
+      + "&birthday=" + encodeURIComponent(birthday)
+      + "&brand="    + encodeURIComponent(SHOP)
+      + "&bought="   + encodeURIComponent(REG_BOUGHT)
+      + "&callback=" + cbName;
+
+    var sc=document.createElement("script");
+    sc.id=cbName; sc.src=url;
+    sc.onerror=function(){
+      clearTimeout(timer); cleanupReg(cbName);
+      btn.disabled=false; btn.textContent="登録する";
+      err.textContent="サーバーに接続できませんでした";
+    };
+    document.body.appendChild(sc);
+  }
+  function cleanupReg(cbName){
+    try{ delete window[cbName]; }catch(e){ window[cbName]=undefined; }
+    var el=document.getElementById(cbName); if(el) el.parentNode.removeChild(el);
   }
 
   /* ===== エラー画面 ===== */
