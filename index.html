@@ -89,6 +89,12 @@
   .msg-card.sixfour{ background:linear-gradient(152deg,#ffffff 0%,#fbfbf9 42%,#f2f1ec 100%); box-shadow:0 10px 26px -10px rgba(140,120,60,.28), 0 0 0 1px rgba(0,0,0,.04); color:#2c2a22; }
   .msg-card.ricco{ background:linear-gradient(157deg,#d9d3c5 0%,#cfc8b7 52%,#c4bca7 100%); box-shadow:0 12px 28px -12px rgba(90,78,50,.4), 0 0 0 1px rgba(150,130,85,.28) inset; color:#3a342a; }
   .msg-brand{ font-size:10px; letter-spacing:.2em; opacity:.55; margin-bottom:12px; }
+  /* ★2026/9/2 メッセージカードの店名もロゴ画像にする（カードと同じ絵を使う） */
+  .msg-brand img{ display:block; width:auto; height:20px; opacity:.75; }
+  .msg-card.ricco .msg-brand img{ height:16px; }   /* RICCOは字面が強いので1割強ちいさく */
+  .foot img{ display:inline-block; vertical-align:middle; width:auto; height:13px; opacity:.5; }
+  .foot .ricco-logo{ height:11px; }
+  .foot .sep{ margin:0 8px; vertical-align:middle; }
   .msg-sub{ font-size:11px; opacity:.6; margin-top:14px; padding-top:12px; border-top:1px solid rgba(0,0,0,.08); }
 
   /* ===== 月替わりのひとこと ===== */
@@ -213,7 +219,7 @@
     <button type="button" onclick="openWarranty()">保証・修理について</button>
     <button type="button" class="btn-consult" onclick="consult()">💬 LINEで相談する</button>
   </div>
-  <div class="foot">SIXFOUR ／ RICCO</div>
+  <div class="foot"></div>
 </div>
 
 <!-- 保証・修理の説明（外部サイトに飛ばさず、この中で完結させる） -->
@@ -493,6 +499,26 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     return '<div class="logo-text">'+(isRicco?"RICCO":"SIXFOUR")+'</div>';
   }
 
+  /* ★メッセージカードの店名（ロゴが読めなければ文字で代用） */
+  function msgBrandHtml(isRicco){
+    var src = isRicco ? IMG.ricco : IMG.six;
+    if(src) return '<div class="msg-brand"><img src="'+src+'" alt="'+(isRicco?"RICCO":"Sixfour")+'"></div>';
+    return '<div class="msg-brand">'+(isRicco?"RICCO":"Sixfour")+'</div>';
+  }
+
+  /* ★フッターの店名（ロゴが読めなければ文字で代用） */
+  function fillFoot(){
+    var el = document.querySelector(".foot");
+    if(!el) return;
+    if(IMG.six && IMG.ricco){
+      el.innerHTML = '<img src="'+IMG.six+'" alt="Sixfour">' +
+                     '<span class="sep">／</span>' +
+                     '<img class="ricco-logo" src="'+IMG.ricco+'" alt="RICCO">';
+    }else{
+      el.textContent = "Sixfour ／ RICCO";
+    }
+  }
+
   /* ===== メガネの絵（読めなかったら何も出さない） =====
    *  ★絵の大きさを変えたいときは、この GLASS_W の数字だけ直す（CSSも連動する）
    */
@@ -562,6 +588,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   /* ===== 画面を描く ===== */
   function render(){
     if(!PAGE_DATA || !imgDone) return;   // データと絵の準備が両方そろってから
+    fillFoot();                          // ★フッターの店名（ロゴ）を入れる
     var d=PAGE_DATA;
     var cards=d.cards||[];
 
@@ -598,9 +625,9 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       var isRicco = (archived[0].brand === "RICCO");   // ★直近カードのブランドで文体を分ける
       archived=archived.slice(1);
       html += isRicco
-        ? '<div class="msg-card ricco"><div class="msg-brand">RICCO</div>'+
+        ? '<div class="msg-card ricco">'+msgBrandHtml(true)+
           '現在、保証期間中のアイウェアはございません。<br>お手入れは、<span class="forever-in">いつまでも</span>承ります。<br>次の一本との出会いも、心よりお待ちしております。</div>'
-        : '<div class="msg-card sixfour"><div class="msg-brand">Sixfour</div>'+
+        : '<div class="msg-card sixfour">'+msgBrandHtml(false)+
           '今お使いのメガネ・サングラスの保証は、すべて終了しています。<br>でも、調整・クリーニングは<span class="forever-in">いつまでも</span>無料です☺️<br>新しい一本も、いつでもお待ちしてます👓🕶️</div>';
     }
     if(archived.length){
@@ -641,8 +668,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     }
 
     document.getElementById("app").innerHTML=
-      '<div class="msg-card '+(ricco?'ricco':'sixfour')+'"><div class="msg-brand">'+
-      (ricco?'RICCO':'Sixfour')+'</div>'+body+'</div>';
+      '<div class="msg-card '+(ricco?'ricco':'sixfour')+'">'+msgBrandHtml(ricco)+body+'</div>';
     showActions();
   }
 
@@ -802,7 +828,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   function renderError(msg){
     document.getElementById("head").style.display="none";
     document.getElementById("app").innerHTML=
-      '<div class="msg-card sixfour"><div class="msg-brand">Sixfour</div>'+
+      '<div class="msg-card sixfour">'+msgBrandHtml(false)+
         '申し訳ありません。会員証を読み込めませんでした。<br>通信環境の良い場所で、もう一度お試しください。'+
         '<div class="msg-sub">'+esc(msg||"")+'</div></div>';
     showActions();
