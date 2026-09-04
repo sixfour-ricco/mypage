@@ -406,32 +406,118 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       .catch(function(){ render(); });
   }
 
-  /* ★2026/9/3 改修（A案）：フレームの色は変えない。
-   *  べっ甲はべっ甲のまま、ピンクゴールドはピンクゴールドのまま表示する。
-   *  エイジングは「ラベル文字（主役）」と「レンズの擦り傷」で伝える。
-   *  ＝以前あった色の飴色化（ageColor）は、この関数では使わない。 */
-  function tintWith(img, wpx, months){
+  /* ★2026/9/4 改修（B案）：フレームの色そのものは変えない。
+   *  経年は「白化・くすみ」＋「レンズの細い擦り傷」の2つで伝える。
+   *
+   *  【白化・くすみ】絵の点ひとつずつの明るさを見て、寄せる先を変える
+   *    暗い所（黒セル・べっ甲の濃い部分）→ 白へ寄る ＝塗装が擦れて白茶ける
+   *    明るい所（金属・べっ甲の黄色）    → くすみ色へ寄る ＝曇る
+   *  強さは 全体2%／年・フチ8%／年。10年で頭打ち。
+   *
+   *  【傷】1年に1本ずつ増え、5本で打ち止め。外側→内側の順。
+   *  すべてレンズの輪郭に沿った「＼」向き。
+   *
+   *  ※数字を触りたいときは、下の定数だけ直せば見た目が変わります。 */
+
+  var AGE_ALL_PER_YEAR  = 0.02;   // 全体の白化（1年あたり）
+  var AGE_EDGE_PER_YEAR = 0.08;   // フチの白化（1年あたり）
+  var AGE_MAX_YEARS     = 10;     // これ以上は進まない
+  var AGE_EDGE_PX       = 2.5;    // 「フチ」とみなす太さ（px）
+  var DULL              = [176,172,165];  // くすみ色（わずかに黄み寄りのグレー）
+
+  /* レンズの開口部（6色ぶん実測）：[中心x, 中心y, 横半径, 縦半径]＝絵の幅・高さに対する比 */
+  var LENS_GEO = {
+    1:{L:[0.255,0.480,0.165,0.350], R:[0.745,0.480,0.165,0.350]},  // ブラック×ゴールド
+    2:{L:[0.255,0.530,0.185,0.310], R:[0.755,0.530,0.185,0.310]},  // シャンパンシルバー
+    3:{L:[0.285,0.575,0.155,0.225], R:[0.735,0.575,0.155,0.225]},  // デミ柄
+    4:{L:[0.265,0.515,0.175,0.360], R:[0.755,0.515,0.175,0.360]},  // ブラック×シルバー
+    5:{L:[0.245,0.525,0.190,0.370], R:[0.760,0.525,0.190,0.370]},  // シルバー×ネイビー
+    6:{L:[0.245,0.500,0.170,0.365], R:[0.755,0.500,0.170,0.365]}   // ピンクゴールド
+  };
+
+  /* 傷の位置：[左右, 円周の角度(度), レンズ半径に対する位置] を外側→内側の順に */
+  var SCRATCH_SPOT  = [["L",132,0.78],["R",-50,0.78],["L",140,0.56],["R",-38,0.50],["L",148,0.34]];
+  var SCRATCH_COLOR = "rgba(95,82,68,0.42)";  // 傷の濃さ
+  var SCRATCH_WIDTH = 0.55;                   // 傷の太さ（px）
+  var SCRATCH_LEN   = 0.035;                  // 傷の長さ（絵の幅に対する比・中心から片側）
+
+  /* 絵の中の各点が「フチから何px内側か」を測る（2パス近似） */
+  function edgeDistance(mask, w, h){
+    var INF=1e9, d=new Float32Array(w*h), i, x, y, m;
+    for(i=0;i<w*h;i++) d[i] = mask[i] ? INF : 0;
+    for(y=0;y<h;y++) for(x=0;x<w;x++){
+      i=y*w+x; if(d[i]===0) continue; m=d[i];
+      if(x>0)          m=Math.min(m, d[i-1]+1);
+      if(y>0)          m=Math.min(m, d[i-w]+1);
+      if(x>0&&y>0)     m=Math.min(m, d[i-w-1]+1.414);
+      if(x<w-1&&y>0)   m=Math.min(m, d[i-w+1]+1.414);
+      d[i]=m;
+    }
+    for(y=h-1;y>=0;y--) for(x=w-1;x>=0;x--){
+      i=y*w+x; if(d[i]===0) continue; m=d[i];
+      if(x<w-1)        m=Math.min(m, d[i+1]+1);
+      if(y<h-1)        m=Math.min(m, d[i+w]+1);
+      if(x<w-1&&y<h-1) m=Math.min(m, d[i+w+1]+1.414);
+      if(x>0&&y<h-1)   m=Math.min(m, d[i+w-1]+1.414);
+      d[i]=m;
+    }
+    return d;
+  }
+
+  function tintWith(img, wpx, months, designNo){
     if(!img || !img.complete || !img.naturalWidth) return "";
     var w=wpx, h=Math.round(wpx*img.height/img.width);
     if(!h || !isFinite(h)) return "";
+    var no = parseInt(designNo,10); if(isNaN(no) || !LENS_GEO[no]) no = 1;
     var dpr=window.devicePixelRatio||1;
-    var cv=document.createElement("canvas"); cv.width=w*dpr; cv.height=h*dpr;
+    var cv=document.createElement("canvas");
+    cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr);
     var ctx=cv.getContext("2d"); ctx.scale(dpr,dpr);
     ctx.drawImage(img,0,0,w,h);            // ★元の色のまま描く
 
-    if(months>=12){
-      // ★傷の見え方（2026/8/14 調整）：本数・濃さ・太さはこの2行で決まる
-      var n = months<36 ? 2 : 3;
-      ctx.save();
-      ctx.strokeStyle="rgba(95,82,68,0.28)"; ctx.lineWidth=1.1; ctx.lineCap="round";
-      var lens=[[0.27,0.47],[0.73,0.47]], rr=w*0.07;
-      for(var li=0; li<2; li++){
-        var cx=w*lens[li][0], cy=h*lens[li][1];
-        for(var k=0;k<n;k++){
-          var a=-0.5;
-          var dx=Math.cos(a)*rr, dy=Math.sin(a)*rr, off=(k-(n-1)/2)*6;
-          ctx.beginPath(); ctx.moveTo(cx-dx, cy-dy+off); ctx.lineTo(cx+dx, cy+dy+off); ctx.stroke();
+    var years = Math.min((months||0)/12, AGE_MAX_YEARS);
+
+    /* ① 白化・くすみ */
+    if(years > 0){
+      var pw=cv.width, phh=cv.height, im=null;
+      try { im = ctx.getImageData(0,0,pw,phh); } catch(e){ im = null; }
+      if(im){
+        var px=im.data, n=pw*phh, mask=new Uint8Array(n), k;
+        for(k=0;k<n;k++) mask[k] = px[k*4+3] > 40 ? 1 : 0;
+        var dt=edgeDistance(mask,pw,phh);
+        var pAll=AGE_ALL_PER_YEAR*years, pEdge=AGE_EDGE_PER_YEAR*years;
+        var edgePx=AGE_EDGE_PX*dpr;
+        for(k=0;k<n;k++){
+          if(!mask[k]) continue;
+          var ew=1-(dt[k]-0.5)/edgePx; if(ew<0) ew=0; if(ew>1) ew=1;   // フチ度 0〜1
+          var s=pAll+(pEdge-pAll)*ew;                                   // その点の白化率
+          var o=k*4, r=px[o], g=px[o+1], b=px[o+2];
+          var lum=0.299*r+0.587*g+0.114*b;
+          var t=(lum-90)/120; if(t<0) t=0; if(t>1) t=1;                 // 明るいほど「くすみ」へ
+          px[o]   = r + (255*(1-t) + DULL[0]*t - r)*s;
+          px[o+1] = g + (255*(1-t) + DULL[1]*t - g)*s;
+          px[o+2] = b + (255*(1-t) + DULL[2]*t - b)*s;
         }
+        ctx.putImageData(im,0,0);
+      }
+    }
+
+    /* ② レンズの擦り傷（1年に1本・5本まで・外→内） */
+    var nScr = Math.min(Math.floor((months||0)/12), SCRATCH_SPOT.length);
+    if(nScr > 0){
+      var geo=LENS_GEO[no], L=w*SCRATCH_LEN;
+      ctx.save();
+      ctx.strokeStyle=SCRATCH_COLOR; ctx.lineWidth=SCRATCH_WIDTH; ctx.lineCap="round";
+      for(var si=0; si<nScr; si++){
+        var sp=SCRATCH_SPOT[si], gg=geo[sp[0]];
+        var cx=gg[0]*w, cy=gg[1]*h, rx=gg[2]*w, ry=gg[3]*h;
+        var ang=sp[1]*Math.PI/180, rr=sp[2];
+        var qx=cx+rr*rx*Math.cos(ang), qy=cy+rr*ry*Math.sin(ang);
+        var tx=-rx*Math.sin(ang), ty=ry*Math.cos(ang);          // レンズの輪郭に沿う向き
+        var nn=Math.sqrt(tx*tx+ty*ty); tx/=nn; ty/=nn;
+        ctx.beginPath();
+        ctx.moveTo(qx-tx*L, qy-ty*L); ctx.lineTo(qx+tx*L, qy+ty*L);
+        ctx.stroke();
       }
       ctx.restore();
     }
@@ -606,7 +692,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   var _drawImg = new Image();
   function specsHtml(months, withLabel, design, rowId){
     var no = parseInt(design,10); if(isNaN(no)||no<1||no>6) no = 1;
-    var gsrc = tintWith(FRAME_CACHE[no], GLASS_W, months);
+    var gsrc = tintWith(FRAME_CACHE[no], GLASS_W, months, no);
     if(!gsrc) return '<div class="specs"></div>';
     var pick = rowId ? '<button type="button" class="pick-btn" onclick="openPicker(\''+rowId+'\','+no+')">'+
                        (SHOP==='ricco' ? '👓️🕶️ アイウェアを選ぶ' : '👓️🕶️ メガネを選ぶ')+'</button>' : '';
