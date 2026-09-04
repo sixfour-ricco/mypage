@@ -15,11 +15,25 @@
   .head{ text-align:center; margin-bottom:18px; display:none; }
   .head .brandmark{ font-size:11px; letter-spacing:.34em; color:var(--sub); text-transform:uppercase; margin-bottom:8px; padding-left:.34em; }
   .head .who{ font-size:28px; font-weight:600; letter-spacing:.02em; }
-  .head .memberno{ display:inline-block; margin-top:9px; font-size:22px; font-weight:600; color:#6b6250; font-family:"SFMono-Regular",Consolas,"Courier New",monospace; letter-spacing:.14em; }
-  .rank-badge{ margin-top:13px; display:inline-flex; gap:9px; align-items:center; font-size:11.5px; padding:7px 15px 7px 12px; border-radius:22px; letter-spacing:.03em; box-shadow:0 3px 10px -4px rgba(90,70,40,.4), 0 0 0 1px rgba(255,255,255,.4) inset; }
-  .rank-badge .rk{ font-size:10px; font-weight:800; letter-spacing:.1em; }
-  .rank-badge b{ font-weight:700; }
+  /* ★2026/9/4 会員No.とランクバッジの大きさ
+     端末によって同じpx指定でも文字の見た目の大きさが変わるため、2段階を用意する。
+       既定（Android・Windows）              … C案：28px／太さ800
+       body.mono-large（iPhone・iPad・Mac）  … B案：25px／太さ700
+     ※どちらの太さも700以上。600だとAndroidで太くならないため使わない。 */
+  .head .memberno{ display:inline-block; margin-top:10px; font-size:28px; font-weight:800; color:#453f31; font-family:"SFMono-Regular",Consolas,"Courier New",monospace; letter-spacing:.15em; }
+  .rank-badge{ margin-top:15px; display:inline-flex; gap:10px; align-items:center; padding:9px 18px 9px 15px; border-radius:24px; letter-spacing:.03em; box-shadow:0 3px 10px -4px rgba(90,70,40,.4), 0 0 0 1px rgba(255,255,255,.4) inset; }
+  .rank-badge .rk{ font-size:11px; font-weight:800; letter-spacing:.1em; opacity:.85; }
+  .rank-badge .total-txt{ font-size:16px; font-weight:700; }
+  .rank-badge b{ font-weight:800; font-size:18.5px; }
+  .rank-badge svg{ display:block; width:24px; height:11px; }
   .rank-badge .dot{ width:3px; height:3px; border-radius:50%; opacity:.5; background:currentColor; }
+
+  body.mono-large .head .memberno{ font-size:25px; font-weight:700; color:#57503f; }
+  body.mono-large .rank-badge{ padding:8px 16px 8px 13px; }
+  body.mono-large .rank-badge .rk{ font-size:10.5px; }
+  body.mono-large .rank-badge .total-txt{ font-size:14px; }
+  body.mono-large .rank-badge b{ font-size:16.5px; }
+  body.mono-large .rank-badge svg{ width:23px; height:10px; }
   .rank-badge svg{ display:block; }
   .sec-label{ display:flex; align-items:center; gap:10px; font-size:11px; letter-spacing:.18em; color:var(--sub); margin:22px 4px 12px; }
   .sec-label::after{ content:""; flex:1; height:1px; background:rgba(0,0,0,.09); }
@@ -30,7 +44,7 @@
   .ricco .brand-logo{ height:18px; }
   .sixfour .brand-logo{ height:25px; }
   .logo-text{ font-size:13px; font-weight:700; letter-spacing:.22em; opacity:.75; }
-  .card-no{ font-family:"SFMono-Regular",Consolas,"Courier New",monospace; font-size:22px; font-weight:600; letter-spacing:.12em; opacity:.92; }
+  .card-no{ font-family:"SFMono-Regular",Consolas,"Courier New",monospace; font-size:22px; font-weight:800; letter-spacing:0; opacity:1; white-space:nowrap; }
   .mid{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:10px; }
   .mid-left{ min-width:0; }
   .card-name{ font-size:30px; font-weight:600; letter-spacing:.03em; line-height:1.05; margin-bottom:4px; }
@@ -68,7 +82,7 @@
   .sixfour::before{ content:""; position:absolute; top:-40%; left:-20%; width:80%; height:120%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent); transform:rotate(18deg); z-index:-1; }
   .sixfour .link{ background:#b5182b; color:#fff; }
   .ricco{ background:linear-gradient(157deg,#d9d3c5 0%,#cfc8b7 52%,#c4bca7 100%); box-shadow:0 12px 28px -12px rgba(90,78,50,.4), 0 0 0 1px rgba(150,130,85,.28) inset; color:#3a342a; }
-  .ricco .card-no{ color:#7a6b47; }
+  .ricco .card-no{ color:#6a5c3d; }
   .ricco .w-grid{ border-top-color:rgba(70,60,40,.16); }
   .ricco .link{ background:transparent; color:#6b5c3a; box-shadow:0 0 0 1px rgba(120,102,60,.45) inset; }
   .card.archived{ background:linear-gradient(155deg,#e8e0d2,#ddd3c0); filter:sepia(.35) saturate(.85); box-shadow:0 4px 14px -8px rgba(90,70,40,.3), 0 0 0 1px rgba(0,0,0,.05); color:#6a6151; }
@@ -655,6 +669,34 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
   }
 
+  /* ★カード右上に出す番号（例：01-02423-38）
+     末尾の数字が「そのメガネが何本目か」。丸数字は50までしか文字が無く、
+     51本目以降だけ表記が変わってしまうため、すべてハイフン＋数字で統一する。 */
+  function cardNoHtml(card){
+    var n = parseInt(card.count, 10);
+    var suffix = (!isNaN(n) && n >= 1) ? ("-" + n) : "";
+    return esc(card.memberNo) + esc(suffix);
+  }
+
+  /* ★端末が持っている等幅フォントによって、同じpx指定でも文字の大きさが変わる。
+     SF Mono（Apple製）が使える端末は文字が大きめに出るので、そちら向けの設定に切り替える。 */
+  function applyMonoClass(){
+    try{
+      var s=document.createElement("span");
+      s.style.cssText="position:absolute;left:-9999px;top:-9999px;font-size:72px;white-space:nowrap;";
+      s.textContent="mmmmmmmmmmlliWWW";
+      document.body.appendChild(s);
+      s.style.fontFamily="monospace";
+      var base=s.offsetWidth, found=false, list=["SFMono-Regular","SF Mono"];
+      for(var i=0;i<list.length;i++){
+        s.style.fontFamily='"'+list[i]+'",monospace';
+        if(s.offsetWidth!==base){ found=true; break; }
+      }
+      document.body.removeChild(s);
+      if(found) document.body.classList.add("mono-large");
+    }catch(e){ /* 判定できなければ既定（大きめ）のまま */ }
+  }
+
   /* ===== ロゴ（読めなかったら文字で代用） ===== */
   function logoHtml(isRicco){
     var src = isRicco ? IMG.ricco : IMG.six;
@@ -713,7 +755,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
         '<div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date">'+esc(card.frameEnd)+'</div></div></div>';
     }
     var html='<div class="card '+cls+'">'+
-      '<div class="card-top">'+logoHtml(isRicco)+'<div class="card-no">'+esc(card.memberNo)+'</div></div>'+
+      '<div class="card-top">'+logoHtml(isRicco)+'<div class="card-no">'+cardNoHtml(card)+'</div></div>'+
       '<div class="mid"><div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+esc(card.sub)+'</div></div>'+
         specsHtml(card.months, true, card.design, card.rowId)+'</div>'+
       '<div class="w-grid">'+ frameCell +
@@ -742,7 +784,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       : '🏆 <b>殿堂入りメガネ</b><br>'+days+
         'お疲れさま。そして、ありがとう👓🕶️<br>——調整・クリーニングは、<span class="forever-in">いつまでも</span>無料です☺️';
     return '<div class="card '+(isRicco?"ricco":"sixfour")+' archived"><div class="archived-stamp">ARCHIVE</div>'+
-      '<div class="card-top">'+logoHtml(isRicco)+'<div class="card-no">'+esc(card.memberNo)+'</div></div>'+
+      '<div class="card-top">'+logoHtml(isRicco)+'<div class="card-no">'+cardNoHtml(card)+'</div></div>'+
       '<div class="mid"><div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+esc(card.sub)+'</div></div>'+
         specsHtml(card.months, false, card.design, null)+'</div>'+
       '<div class="w-grid"><div class="w-cell"><div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date">'+esc(card.frameEnd)+'</div></div></div>'+
@@ -758,6 +800,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   /* ===== 画面を描く ===== */
   function render(){
     if(!PAGE_DATA || !imgDone) return;   // データと絵の準備が両方そろってから
+    applyMonoClass();                    // ★端末のフォントに合わせて文字の大きさを決める
     fillFoot();                          // ★フッターの店名（ロゴ）を入れる
     var d=PAGE_DATA;
     var cards=d.cards||[];
@@ -772,7 +815,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     document.getElementById("whoNo").textContent=d.no||"";
     if(d.rank){
       var rk=rankStyle(d.rank);
-      var totalTxt = d.total ? '<span class="dot"></span><span>通算 <b>'+d.total+'本</b></span>' : '';
+      var totalTxt = d.total ? '<span class="dot"></span><span class="total-txt">通算 <b>'+d.total+'本</b></span>' : '';
       document.getElementById("tenureWrap").innerHTML=
         '<div class="rank-badge" style="background:'+rk.grad+'; color:'+rk.text+'">'+
           badgeGlasses(rk.icon)+'<span class="rk">'+rk.name+'</span>'+totalTxt+'</div>';
