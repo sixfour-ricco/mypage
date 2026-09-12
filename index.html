@@ -379,6 +379,37 @@ var LIFF_ID = "2010645046-1nZwiX2R";
     return (v === 'ricco') ? 'ricco' : 'sixfour';
   })();
 
+  /* ============================================================
+   *  ★診断用（2026/9/12 一時追加）
+   *  URLの末尾に &debug=1 を付けて開くと、画面上に経過が文字で出る。
+   *  お客様には絶対に見えない（付けない限りずっと非表示）。
+   *  原因が分かったら、この一式は消してOK。
+   * ============================================================ */
+  var DEBUG_MODE = (function(){
+    function has(qs){ return /[?&]debug=1(&|$)/.test(qs||'') || /debug%3D1/i.test(qs||''); }
+    if(has(location.search)) return true;
+    var st = /[?&]liff\.state=([^&]+)/.exec(location.search);
+    if(st && has(decodeURIComponent(st[1]))) return true;
+    return false;
+  })();
+  var DBG_BOX = null;
+  function dbg(msg){
+    if(!DEBUG_MODE) return;
+    if(!DBG_BOX){
+      DBG_BOX = document.createElement('div');
+      DBG_BOX.style.cssText = 'position:fixed;top:0;left:0;right:0;max-height:48vh;overflow-y:auto;'
+        + 'background:rgba(20,20,20,.92);color:#7CFC7C;font-size:11px;font-family:monospace;'
+        + 'padding:8px 10px;z-index:999;white-space:pre-wrap;line-height:1.6;';
+      document.body.appendChild(DBG_BOX);
+    }
+    var line = document.createElement('div');
+    var t = new Date();
+    var hh = ('0'+t.getHours()).slice(-2), mm=('0'+t.getMinutes()).slice(-2), ss=('0'+t.getSeconds()).slice(-2);
+    line.textContent = hh+':'+mm+':'+ss+' | ' + msg;
+    DBG_BOX.appendChild(line);
+    DBG_BOX.scrollTop = DBG_BOX.scrollHeight;
+  }
+
 // ② GASのAPI用URL（/exec で終わる長いURL）
 //    ★今つかっている index.html の同じ行と見比べて、違っていたら今の方に直してください
 var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3IEiiTSjjzpUDKORMHD0iH3T9Ku43N6DGWvw8XgK0oV6/exec";
@@ -1358,9 +1389,11 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
 
   /* ===== GASにデータを取りに行く ===== */
   function fetchCards(idToken){
+    dbg('fetchCards 開始');
     // GASはPOSTだと転送の途中でHTMLを返してしまうため、GET（JSONP）で受け取る
     var cbName = "__cards_" + Date.now();
     var timer = setTimeout(function(){
+      dbg('★タイムアウト発生（20秒間、応答なし）');
       renderError("通信がタイムアウトしました");
       cleanup();
     }, 20000);
@@ -1374,6 +1407,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     window[cbName] = function(json){
       clearTimeout(timer);
       cleanup();
+      dbg('GASから応答あり: ' + JSON.stringify(json).substring(0,150));
       if(!json || json.ok !== true){
         renderError(json && json.error ? json.error : "データ取得に失敗しました");
         return;
@@ -1387,10 +1421,12 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       + "&idToken=" + encodeURIComponent(idToken)
       + "&callback=" + cbName;
 
+    dbg('GASへリクエスト送信します\nURL: ' + url.substring(0,140) + '...');
     var sc = document.createElement("script");
     sc.id = cbName;
     sc.src = url;
     sc.onerror = function(){
+      dbg('★scriptタグの読み込みでエラー発生（onerror）＝ネットワーク的に届いていない可能性');
       clearTimeout(timer);
       cleanup();
       renderError("サーバーに接続できませんでした");
@@ -1495,14 +1531,20 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   preloadFrames();
   loadImages();
 
+  dbg('起動しました。LIFF_ID='+LIFF_ID+' / shop='+SHOP);
+  dbg('LIFF初期化(liff.init)を開始します…');
   liff.init({ liffId: LIFF_ID })
     .then(function(){
-      if(!liff.isLoggedIn()){ liff.login(); return; }
+      dbg('LIFF初期化 成功');
+      if(!liff.isLoggedIn()){ dbg('未ログイン → liff.login()を呼びます'); liff.login(); return; }
+      dbg('ログイン済みです');
       var idToken = liff.getIDToken();
+      dbg('idToken: ' + (idToken ? ('取得できました（先頭16文字）'+idToken.substring(0,16)+'…') : '★取得できませんでした'));
       if(!idToken){ renderError("ログイン情報を取得できませんでした"); return; }
       return fetchCards(idToken);
     })
     .catch(function(err){
+      dbg('★LIFF初期化 失敗: ' + (err && err.message ? err.message : err));
       renderError("LIFF: " + (err && err.message ? err.message : err));
     });
 </script>
