@@ -38,8 +38,9 @@
   .specs{ text-align:center; flex:none; }
   .specs .gimg{ display:block; width:84px; height:auto; margin:0 auto; }
   .aging-tag{ font-size:10.5px; opacity:.6; margin-top:6px; letter-spacing:.02em; }
-  .w-grid{ display:flex; gap:8px; padding-top:12px; border-top:1px solid rgba(0,0,0,.08); }
-  .w-cell{ flex:1; display:flex; align-items:center; gap:8px; min-width:0; }
+  /* ★2026/9/12：保証リングとラベルが詰まって見えたため、すき間を少し広げた */
+  .w-grid{ display:flex; gap:10px; padding-top:14px; border-top:1px solid rgba(0,0,0,.08); }
+  .w-cell{ flex:1; display:flex; align-items:center; gap:9px; min-width:0; }
   .w-texts{ min-width:0; }
   .w-label{ font-size:10.5px; opacity:.72; display:flex; align-items:center; gap:5px; margin-bottom:2px; white-space:nowrap; }
   .w-date{ font-size:16.5px; font-weight:600; font-variant-numeric:tabular-nums; letter-spacing:.01em; }
@@ -56,8 +57,11 @@
   .ring .rtxt .r3{ font-size:9px; opacity:.62; }
   .ring .rtxt .rsm{ font-size:11px; font-weight:700; opacity:.55; }
 
-  /* 狭い端末（iPhone SE等）でリングとラベルが見切れないように縮める */
-  @media (max-width:370px){
+  /* 狭い端末でリングとラベルが見切れないように縮める。
+     ★2026/9/12：iPhoneの多くは幅390〜430pxで、370pxの指定では効いていなかった。
+       実機で保証リングが窮屈に見えたため430pxまで広げた。
+       リングと中の文字はセットで縮むので、文字がはみ出すことはない。 */
+  @media (max-width:430px){
     .ring{ width:48px; height:48px; }
     .ring .rtxt .r1, .ring .rtxt .r3{ font-size:8px; }
     .ring .rtxt .r2{ font-size:19px; }
@@ -205,10 +209,13 @@
 
   /* ===== 絵柄を選ぶ（2026/9/3 追加）===== */
   /* ★2026/9/3：下線リンクだと「押せる」と気づかれないため、枠付きのボタンにした */
-  .pick-btn{ display:inline-block; margin:7px auto 0; font-size:10.5px;
+  /* ★2026/9/12：メモボタンが増えたため横並びにした。
+     縦積みにするとカードの高さが伸びて保証欄の線とぶつかるため。 */
+  .pick-row{ display:flex; gap:5px; justify-content:center; margin-top:7px; }
+  .pick-btn{ display:inline-block; font-size:9.5px;
              color:var(--ink); background:rgba(255,255,255,.72);
              border:1px solid rgba(0,0,0,.16); border-radius:999px;
-             padding:4px 11px; cursor:pointer; font-family:inherit; white-space:nowrap; }
+             padding:4px 8px; cursor:pointer; font-family:inherit; white-space:nowrap; }
   .msg-card.ricco .pick-btn, .card.ricco .pick-btn{ background:rgba(255,255,255,.6); }
   .pick-btn:active{ transform:scale(.97); }
   .dp-veil{ position:fixed; inset:0; background:rgba(30,28,24,.45); z-index:60; display:none; }
@@ -237,6 +244,37 @@
             background:var(--ink); color:#fff; font-size:14px; font-weight:700; font-family:inherit; }
   .dp-save:disabled{ opacity:.45; }
   .dp-msg{ font-size:11.5px; text-align:center; margin-top:9px; min-height:1.2em; color:#9E1A3A; }
+
+  /* ============================================================
+   *  メガネ手帳（メモ欄）2026/9/12 追加
+   *   カードごとに自由に書けるメモ。保存先はお客様のスマホの中だけで、
+   *   サーバー（スプレッドシート）には一切送らない。
+   * ============================================================ */
+  .memo-preview{ margin-top:12px; padding-top:10px; font-size:11.5px; line-height:1.6;
+                 border-top:1px dashed rgba(0,0,0,.18); opacity:.85;
+                 word-break:break-word; }
+  .card.ricco .memo-preview{ border-top-color:rgba(70,60,40,.25); }
+  .card.archived .memo-preview{ border-top-color:rgba(120,100,70,.3); }
+
+  .mm-veil{ position:fixed; inset:0; background:rgba(30,28,24,.45); z-index:60; display:none; }
+  .mm-veil.open{ display:block; }
+  .mm{ position:fixed; left:0; right:0; bottom:0; z-index:61; background:#fff;
+       border-radius:16px 16px 0 0; padding:16px 16px 20px; max-height:88vh; overflow-y:auto;
+       -webkit-overflow-scrolling:touch; }
+  .mm-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:9px; }
+  .mm-title{ font-size:14px; font-weight:700; }
+  .mm-close{ font-size:12px; color:var(--sub); background:none; border:none; font-family:inherit; }
+  .mm-note{ font-size:11.5px; color:var(--sub); line-height:1.7; margin-bottom:10px; }
+  /* ★入力例はプレースホルダーに入れると1つしか見えないため、独立した枠で常に3つ見せる */
+  .mm-ex{ font-size:11px; color:#a39d8c; line-height:1.8; margin-bottom:10px;
+          background:#fbfaf8; border:1px solid #ece8e1; border-radius:8px; padding:8px 10px; }
+  .mm-input{ width:100%; padding:11px; font-size:15px; border:1px solid #d5d0c7;
+             border-radius:8px; box-sizing:border-box; font-family:inherit; color:var(--ink); }
+  .mm-count{ text-align:right; font-size:10.5px; color:var(--sub); margin-top:4px; }
+  .mm-save{ width:100%; margin-top:10px; padding:13px; border:none; border-radius:10px;
+            background:var(--ink); color:#fff; font-size:14px; font-weight:700; font-family:inherit; }
+  .mm-del{ width:100%; margin-top:8px; padding:11px; border:none; border-radius:10px;
+           background:#f2efe9; color:#8a8578; font-size:12px; font-family:inherit; }
 
   /* ============================================================
    *  季節アニメーション（2026/9/12 追加）
@@ -278,6 +316,11 @@
     0%  { transform:translateX(0); }
     100%{ transform:translateX(var(--drift,180px)); }
   }
+  /* ★2026/9/12：月と雲が会員番号・お名前に重なって読めなくなったため、8割の大きさにした */
+  @keyframes sDrift80{
+    0%  { transform:translateX(0) scale(.8); }
+    100%{ transform:translateX(var(--drift,180px)) scale(.8); }
+  }
 </style>
 </head>
 <body>
@@ -307,6 +350,21 @@
     <div class="dp-grid" id="dpGrid"></div>
     <button class="dp-save" id="dpSave" onclick="saveDesign()">これにする</button>
     <div class="dp-msg" id="dpMsg"></div>
+  </div>
+
+  <!-- メガネ手帳（メモ欄）2026/9/12 追加。保存先はお客様のスマホの中だけ -->
+  <div class="mm-veil" id="mmVeil" onclick="if(event.target.id==='mmVeil')closeMemo()"></div>
+  <div class="mm" id="mm" style="display:none;">
+    <div class="mm-head">
+      <span class="mm-title" id="mmTitle">📝 このメガネのメモ</span>
+      <button class="mm-close" onclick="closeMemo()">閉じる</button>
+    </div>
+    <div class="mm-note" id="mmNote"></div>
+    <div class="mm-ex">例）ランニング用メガネ(T_T)<br>　　なくしたと思って買った2本目<br>　　寝落ち用(意外と丈夫)</div>
+    <input class="mm-input" id="mmInput" type="text" maxlength="30" placeholder="メモを入力">
+    <div class="mm-count" id="mmCount">0/30</div>
+    <button class="mm-save" onclick="saveMemo()">保存する</button>
+    <button class="mm-del" id="mmDel" onclick="deleteMemo()" style="display:none;">メモを消す</button>
   </div>
 </div>
 
@@ -696,6 +754,19 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
   }
 
+  /* ★2026/9/12 追加：カード2行目（例「MOSCOT ／ 2026.9.10 お渡し」）の改行位置を整える。
+     そのまま出すと「お渡し」の"し"だけが次の行に落ちることがあったため、
+     ／ の前後をそれぞれ「途中で切らないひと塊」にして、／ の位置でだけ折り返すようにした。 */
+  function subHtml(sub){
+    var t = String(sub == null ? "" : sub);
+    if(t.indexOf("／") < 0) return '<span style="white-space:nowrap">'+esc(t)+'</span>';
+    var parts = t.split("／"), out = [], i;
+    for(i = 0; i < parts.length; i++){
+      out.push('<span style="white-space:nowrap">'+esc(parts[i].replace(/^\s+|\s+$/g, ""))+'</span>');
+    }
+    return out.join(' ／ ');
+  }
+
   /* ===== ロゴ（読めなかったら文字で代用） ===== */
   function logoHtml(isRicco){
     var src = isRicco ? IMG.ricco : IMG.six;
@@ -726,19 +797,111 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   /* ===== メガネの絵（読めなかったら何も出さない） =====
    *  ★絵の大きさを変えたいときは、この GLASS_W の数字だけ直す（CSSも連動する）
    */
-  var GLASS_W = 108;  // メガネの絵の横幅（px）
+  /* ★2026/9/12：「小さすぎる」というご意見が2件あり、15%大きくした（108→124px）
+     ※「メガネを選ぶ」を押したときに出る6本の一覧は別のCSS（.dp-thumb）なので影響しない */
+  var GLASS_W = 124;  // メガネの絵の横幅（px）
 
   /* ★2026/9/3 カードごとに絵柄を切り替えて描く。
      canvas は同期処理なので、その場で絵柄を差し替えてから描画する。 */
   var _drawImg = new Image();
-  function specsHtml(months, withLabel, design, rowId){
+  /* ============================================================
+   *  メガネ手帳（メモ欄）2026/9/12 追加
+   *
+   *  ■何をするもの？
+   *    カードが増えるとどれがどのメガネか分からなくなるため、
+   *    お客様が1枚ごとに自由に書けるメモ欄。
+   *
+   *  ■どこに保存される？
+   *    お客様のスマホの中だけ（localStorage）。
+   *    ★サーバー（スプレッドシート）には一切送らない。
+   *    だから「お店からは全く見えません」という説明が技術的に本当になる。
+   *    その代わり、機種変更すると消える（そのことは画面にも明記してある）。
+   *
+   *  ■文字数
+   *    30文字まで（MEMO_MAX の数字を直せば変わる）
+   *  ============================================================ */
+
+  var MEMO_MAX = 30;        // ★メモに書ける文字数の上限
+  var MEMO_ROW = null;      // いま編集しているカードの行ID
+
+  /* 保存に使う名前。カードの行IDごとに分けて覚える */
+  function memoKey(rowId){ return "sf_memo_" + rowId; }
+
+  function memoGet(rowId){
+    if(!rowId) return "";
+    try{ return window.localStorage.getItem(memoKey(rowId)) || ""; }
+    catch(e){ return ""; }   /* 保存が使えない端末では空のまま（害はない） */
+  }
+  function memoSet(rowId, text){
+    try{
+      if(text){ window.localStorage.setItem(memoKey(rowId), text); }
+      else    { window.localStorage.removeItem(memoKey(rowId)); }
+      return true;
+    }catch(e){ return false; }
+  }
+
+  /* カードの下に出すメモの表示 */
+  function memoPreviewHtml(rowId){
+    var t = memoGet(rowId);
+    if(!t) return "";
+    return '<div class="memo-preview">📝 '+esc(t)+'</div>';
+  }
+
+  window.openMemo = function(rowId){
+    MEMO_ROW = rowId;
+    var ricco = (SHOP === 'ricco');
+    document.getElementById('mmTitle').textContent =
+      ricco ? '📝 このアイウェアのメモ' : '📝 このメガネのメモ';
+    document.getElementById('mmNote').innerHTML =
+      'このメモは、あなたのスマホの中だけに保存されます。<br>'+
+      'お店からは全く見えませんので、ご自由にどうぞ☺️<br>'+
+      '※なのでスマホを機種変更すると消えます。あしからず。';
+    var cur = memoGet(rowId);
+    var inp = document.getElementById('mmInput');
+    inp.value = cur;
+    inp.setAttribute('maxlength', MEMO_MAX);
+    document.getElementById('mmCount').textContent = cur.length + '/' + MEMO_MAX;
+    document.getElementById('mmDel').style.display = cur ? 'block' : 'none';
+    document.getElementById('mmVeil').classList.add('open');
+    document.getElementById('mm').style.display = 'block';
+  };
+
+  window.closeMemo = function(){
+    document.getElementById('mmVeil').classList.remove('open');
+    document.getElementById('mm').style.display = 'none';
+  };
+
+  window.saveMemo = function(){
+    var t = (document.getElementById('mmInput').value || '').replace(/^\s+|\s+$/g, '');
+    memoSet(MEMO_ROW, t);
+    closeMemo();
+    render();          /* カード下のメモ表示をその場で更新する */
+  };
+
+  window.deleteMemo = function(){
+    memoSet(MEMO_ROW, '');
+    closeMemo();
+    render();
+  };
+
+  /* ★2026/9/12 改修：メモボタンを追加し、2つのボタンを横並びにした。
+     pickRowId … 絵柄を選ぶボタンを出す行ID（現役カードのみ。不要なら null）
+     memoRowId … メモボタンを出す行ID（殿堂入りカードにも出す。不要なら null） */
+  function specsHtml(months, withLabel, design, pickRowId, memoRowId){
     var no = parseInt(design,10); if(isNaN(no)||no<1||no>6) no = 1;
     var gsrc = tintWith(FRAME_CACHE[no], GLASS_W, months, no);
     if(!gsrc) return '<div class="specs"></div>';
-    var pick = rowId ? '<button type="button" class="pick-btn" onclick="openPicker(\''+rowId+'\','+no+')">'+
-                       (SHOP==='ricco' ? '👓️🕶️ アイウェアを選ぶ' : '👓️🕶️ メガネを選ぶ')+'</button>' : '';
+    var btns = '';
+    if(pickRowId){
+      btns += '<button type="button" class="pick-btn" onclick="openPicker(\''+pickRowId+'\','+no+')">'+
+              (SHOP==='ricco' ? '👓️🕶️ アイウェアを選ぶ' : '👓️🕶️ メガネを選ぶ')+'</button>';
+    }
+    if(memoRowId){
+      btns += '<button type="button" class="pick-btn" onclick="openMemo(\''+memoRowId+'\')">📝 メモ</button>';
+    }
+    var row = btns ? '<div class="pick-row">'+btns+'</div>' : '';
     return '<div class="specs"><img class="gimg" src="'+gsrc+'" alt="" style="width:'+GLASS_W+'px">'+
-      (withLabel ? '<div class="aging-tag">'+agingLabel(months)+'</div>' : '')+ pick +'</div>';
+      (withLabel ? '<div class="aging-tag">'+agingLabel(months)+'</div>' : '')+ row +'</div>';
   }
 
   /* ===== 現役カード ===== */
@@ -755,8 +918,8 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     }
     var html='<div class="card '+cls+'">'+
       '<div class="card-top">'+logoHtml(isRicco)+'<div class="card-no">'+esc(card.memberNo)+'</div></div>'+
-      '<div class="mid"><div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+esc(card.sub)+'</div></div>'+
-        specsHtml(card.months, true, card.design, card.rowId)+'</div>'+
+      '<div class="mid"><div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+subHtml(card.sub)+'</div></div>'+
+        specsHtml(card.months, true, card.design, card.rowId, card.rowId)+'</div>'+
       '<div class="w-grid">'+ frameCell +
         '<div class="w-cell">'+ring(card.visionActive,card.visionRatio,card.visionDays,isRicco)+
           '<div class="w-texts"><div class="w-label">見え方保証'+u15+'</div><div class="w-date">'+esc(card.visionEnd)+'</div></div></div>'+
@@ -768,6 +931,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       var u15txt = isRicco ? '15歳以下のお客様は、見え方保証を6ヶ月とさせていただいております。' : '15歳以下のお客様は、見え方保証を6ヶ月に延長しています。';
       html+='<div class="u15-note">'+u15txt+'</div>';
     }
+    html+=memoPreviewHtml(card.rowId);   // ★メガネ手帳のメモ（書いてあるときだけ出る）
     // 「保証・修理について」はカードの外（土台の共通ボタン）に移動した
     html+='</div>';
     return html;
@@ -784,11 +948,12 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
         'お疲れさま。そして、ありがとう👓🕶️<br>——調整・クリーニングは、<span class="forever-in">いつまでも</span>無料です☺️';
     return '<div class="card '+(isRicco?"ricco":"sixfour")+' archived"><div class="archived-stamp">ARCHIVE</div>'+
       '<div class="card-top">'+logoHtml(isRicco)+'<div class="card-no">'+esc(card.memberNo)+'</div></div>'+
-      '<div class="mid"><div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+esc(card.sub)+'</div></div>'+
-        specsHtml(card.months, false, card.design, null)+'</div>'+
+      '<div class="mid"><div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+subHtml(card.sub)+'</div></div>'+
+        specsHtml(card.months, false, card.design, null, card.rowId)+'</div>'+
       '<div class="w-grid"><div class="w-cell"><div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date">'+esc(card.frameEnd)+'</div></div></div>'+
         '<div class="w-cell"><div class="w-texts"><div class="w-label">見え方保証</div><div class="w-date">'+esc(card.visionEnd)+'</div></div></div></div>'+
-      '<div class="archived-msg">'+msg+'</div></div>';
+      '<div class="archived-msg">'+msg+'</div>'+
+      memoPreviewHtml(card.rowId)+'</div>';   // ★メガネ手帳のメモ
   }
 
   window.toggleArchive=function(btn){
@@ -950,8 +1115,9 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   }
 
   function seasonDrawSun(box){
+    /* ★2026/9/12：会員番号・お名前に重なって読めなくなったため8割に縮小（112→90px） */
     var el = document.createElement("div");
-    el.style.cssText = "width:112px;height:112px;right:6%;top:7%;animation:sShine 2.4s ease-in-out infinite;";
+    el.style.cssText = "width:90px;height:90px;right:6%;top:7%;animation:sShine 2.4s ease-in-out infinite;";
     el.innerHTML = seasonSunSVG();
     box.appendChild(el);
   }
@@ -983,15 +1149,17 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   }
 
   function seasonDrawMoon(box){
-    /* 満月 */
+    /* 満月 ★2026/9/12：会員番号・お名前に重なって読めなくなったため8割に縮小（112→90px） */
     var moon = document.createElement("div");
-    moon.style.cssText = "width:112px;height:112px;border-radius:50%;right:8%;top:7%;background:#F5E050;";
+    moon.style.cssText = "width:90px;height:90px;border-radius:50%;right:8%;top:7%;background:#F5E050;";
     box.appendChild(moon);
-    /* 雲（2枚を重ねて、月の下のほうにかかった状態からスタート→ゆっくり流れて満月が現れる） */
-    var startLeft = (window.innerWidth || 380) * 0.52;
+    /* 雲（2枚を重ねて、月の下のほうにかかった状態からスタート→ゆっくり流れて満月が現れる）
+       ★雲は sDrift80 で流す（動きながら8割の大きさを保つキーフレーム） */
+    var startLeft = (window.innerWidth || 380) * 0.55;
     var cloud = document.createElement("div");
-    cloud.style.cssText = "width:150px;height:66px;top:92px;left:"+startLeft+"px;"
-      + "--drift:200px;animation:sDrift 9s ease-out 1 forwards;";
+    cloud.style.cssText = "width:150px;height:66px;top:76px;left:"+startLeft+"px;"
+      + "transform-origin:top left;"
+      + "--drift:200px;animation:sDrift80 9s ease-out 1 forwards;";
     var back = document.createElement("div");
     back.style.cssText = "position:absolute;left:0;top:0;width:90px;height:46px;";
     back.innerHTML = seasonCloudHTML(SEASON_CLOUD_BACK, 0.8);
@@ -1494,6 +1662,15 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   /* ===== 起動 ===== */
   preloadFrames();
   loadImages();
+
+  /* メモ入力欄の文字数表示をつなぐ（2026/9/12 追加） */
+  (function(){
+    var inp = document.getElementById('mmInput');
+    if(!inp) return;
+    inp.addEventListener('input', function(){
+      document.getElementById('mmCount').textContent = inp.value.length + '/' + MEMO_MAX;
+    });
+  })();
 
   liff.init({ liffId: LIFF_ID })
     .then(function(){
