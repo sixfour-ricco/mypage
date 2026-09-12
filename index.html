@@ -15,25 +15,11 @@
   .head{ text-align:center; margin-bottom:18px; display:none; }
   .head .brandmark{ font-size:11px; letter-spacing:.34em; color:var(--sub); text-transform:uppercase; margin-bottom:8px; padding-left:.34em; }
   .head .who{ font-size:28px; font-weight:600; letter-spacing:.02em; }
-  /* ★2026/9/4 会員No.とランクバッジの大きさ
-     端末によって同じpx指定でも文字の見た目の大きさが変わるため、2段階を用意する。
-       既定（Android・Windows）              … C案：28px／太さ800
-       body.mono-large（iPhone・iPad・Mac）  … B案：25px／太さ700
-     ※どちらの太さも700以上。600だとAndroidで太くならないため使わない。 */
-  .head .memberno{ display:inline-block; margin-top:10px; font-size:28px; font-weight:800; color:#453f31; font-family:"SFMono-Regular",Consolas,"Courier New",monospace; letter-spacing:.15em; }
-  .rank-badge{ margin-top:15px; display:inline-flex; gap:10px; align-items:center; padding:9px 18px 9px 15px; border-radius:24px; letter-spacing:.03em; box-shadow:0 3px 10px -4px rgba(90,70,40,.4), 0 0 0 1px rgba(255,255,255,.4) inset; }
-  .rank-badge .rk{ font-size:11px; font-weight:800; letter-spacing:.1em; opacity:.85; }
-  .rank-badge .total-txt{ font-size:16px; font-weight:700; }
-  .rank-badge b{ font-weight:800; font-size:18.5px; }
-  .rank-badge svg{ display:block; width:24px; height:11px; }
+  .head .memberno{ display:inline-block; margin-top:9px; font-size:22px; font-weight:600; color:#6b6250; font-family:"SFMono-Regular",Consolas,"Courier New",monospace; letter-spacing:.14em; }
+  .rank-badge{ margin-top:13px; display:inline-flex; gap:9px; align-items:center; font-size:11.5px; padding:7px 15px 7px 12px; border-radius:22px; letter-spacing:.03em; box-shadow:0 3px 10px -4px rgba(90,70,40,.4), 0 0 0 1px rgba(255,255,255,.4) inset; }
+  .rank-badge .rk{ font-size:10px; font-weight:800; letter-spacing:.1em; }
+  .rank-badge b{ font-weight:700; }
   .rank-badge .dot{ width:3px; height:3px; border-radius:50%; opacity:.5; background:currentColor; }
-
-  body.mono-large .head .memberno{ font-size:25px; font-weight:700; color:#57503f; }
-  body.mono-large .rank-badge{ padding:8px 16px 8px 13px; }
-  body.mono-large .rank-badge .rk{ font-size:10.5px; }
-  body.mono-large .rank-badge .total-txt{ font-size:14px; }
-  body.mono-large .rank-badge b{ font-size:16.5px; }
-  body.mono-large .rank-badge svg{ width:23px; height:10px; }
   .rank-badge svg{ display:block; }
   .sec-label{ display:flex; align-items:center; gap:10px; font-size:11px; letter-spacing:.18em; color:var(--sub); margin:22px 4px 12px; }
   .sec-label::after{ content:""; flex:1; height:1px; background:rgba(0,0,0,.09); }
@@ -44,7 +30,7 @@
   .ricco .brand-logo{ height:18px; }
   .sixfour .brand-logo{ height:25px; }
   .logo-text{ font-size:13px; font-weight:700; letter-spacing:.22em; opacity:.75; }
-  .card-no{ font-family:"SFMono-Regular",Consolas,"Courier New",monospace; font-size:22px; font-weight:800; letter-spacing:0; opacity:1; white-space:nowrap; }
+  .card-no{ font-family:"SFMono-Regular",Consolas,"Courier New",monospace; font-size:22px; font-weight:600; letter-spacing:.12em; opacity:.92; }
   .mid{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:10px; }
   .mid-left{ min-width:0; }
   .card-name{ font-size:30px; font-weight:600; letter-spacing:.03em; line-height:1.05; margin-bottom:4px; }
@@ -82,7 +68,7 @@
   .sixfour::before{ content:""; position:absolute; top:-40%; left:-20%; width:80%; height:120%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent); transform:rotate(18deg); z-index:-1; }
   .sixfour .link{ background:#b5182b; color:#fff; }
   .ricco{ background:linear-gradient(157deg,#d9d3c5 0%,#cfc8b7 52%,#c4bca7 100%); box-shadow:0 12px 28px -12px rgba(90,78,50,.4), 0 0 0 1px rgba(150,130,85,.28) inset; color:#3a342a; }
-  .ricco .card-no{ color:#6a5c3d; }
+  .ricco .card-no{ color:#7a6b47; }
   .ricco .w-grid{ border-top-color:rgba(70,60,40,.16); }
   .ricco .link{ background:transparent; color:#6b5c3a; box-shadow:0 0 0 1px rgba(120,102,60,.45) inset; }
   .card.archived{ background:linear-gradient(155deg,#e8e0d2,#ddd3c0); filter:sepia(.35) saturate(.85); box-shadow:0 4px 14px -8px rgba(90,70,40,.3), 0 0 0 1px rgba(0,0,0,.05); color:#6a6151; }
@@ -251,6 +237,47 @@
             background:var(--ink); color:#fff; font-size:14px; font-weight:700; font-family:inherit; }
   .dp-save:disabled{ opacity:.45; }
   .dp-msg{ font-size:11.5px; text-align:center; margin-top:9px; min-height:1.2em; color:#9E1A3A; }
+
+  /* ============================================================
+   *  季節アニメーション（2026/9/12 追加）
+   *   その月はじめてマイページを開いたときだけ、画面全体に季節の演出を流す。
+   *   12,1,2月=雪 / 3,4月=桜 / 5月=木漏れ日 / 6月=雨
+   *   7月=陽射し / 8月=花火 / 9月=月明かり / 10,11月=紅葉
+   *   ※タップの邪魔をしないよう pointer-events:none にしてある
+   * ============================================================ */
+  /* ★重なり順：カードより上／各パネル（.sheet=50, .dp-veil=60, .dp=61）より下に置く */
+  .season-ov{ position:fixed; inset:0; pointer-events:none; z-index:45; overflow:hidden;
+              transition:opacity .9s ease; }
+  .season-ov.fade{ opacity:0; }
+  .season-ov > *{ position:absolute; }
+
+  @keyframes sFall{
+    0%  { transform:translateY(-20px) translateX(0) rotate(0deg); opacity:0; }
+    15% { opacity:1; }
+    100%{ transform:translateY(var(--fall,780px)) translateX(var(--sway,20px)) rotate(300deg); opacity:0; }
+  }
+  @keyframes sRain{
+    0%  { transform:translateY(-30px); opacity:0; }
+    10% { opacity:.8; }
+    100%{ transform:translateY(var(--fall,820px)); opacity:0; }
+  }
+  @keyframes sPulse{
+    0%,100%{ opacity:.12; transform:scale(.85); }
+    50%    { opacity:.4;  transform:scale(1.1); }
+  }
+  @keyframes sBurst{
+    0%  { transform:translate(0,0) scale(.3); opacity:1; }
+    70% { opacity:1; }
+    100%{ transform:translate(var(--dx),var(--dy)) scale(1); opacity:0; }
+  }
+  @keyframes sShine{
+    0%,100%{ transform:scale(1);     opacity:.9; }
+    50%    { transform:scale(1.066); opacity:1; }
+  }
+  @keyframes sDrift{
+    0%  { transform:translateX(0); }
+    100%{ transform:translateX(var(--drift,180px)); }
+  }
 </style>
 </head>
 <body>
@@ -669,34 +696,6 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
   }
 
-  /* ★カード右上に出す番号（例：01-02423-38）
-     末尾の数字が「そのメガネが何本目か」。丸数字は50までしか文字が無く、
-     51本目以降だけ表記が変わってしまうため、すべてハイフン＋数字で統一する。 */
-  function cardNoHtml(card){
-    var n = parseInt(card.count, 10);
-    var suffix = (!isNaN(n) && n >= 1) ? ("-" + n) : "";
-    return esc(card.memberNo) + esc(suffix);
-  }
-
-  /* ★端末が持っている等幅フォントによって、同じpx指定でも文字の大きさが変わる。
-     SF Mono（Apple製）が使える端末は文字が大きめに出るので、そちら向けの設定に切り替える。 */
-  function applyMonoClass(){
-    try{
-      var s=document.createElement("span");
-      s.style.cssText="position:absolute;left:-9999px;top:-9999px;font-size:72px;white-space:nowrap;";
-      s.textContent="mmmmmmmmmmlliWWW";
-      document.body.appendChild(s);
-      s.style.fontFamily="monospace";
-      var base=s.offsetWidth, found=false, list=["SFMono-Regular","SF Mono"];
-      for(var i=0;i<list.length;i++){
-        s.style.fontFamily='"'+list[i]+'",monospace';
-        if(s.offsetWidth!==base){ found=true; break; }
-      }
-      document.body.removeChild(s);
-      if(found) document.body.classList.add("mono-large");
-    }catch(e){ /* 判定できなければ既定（大きめ）のまま */ }
-  }
-
   /* ===== ロゴ（読めなかったら文字で代用） ===== */
   function logoHtml(isRicco){
     var src = isRicco ? IMG.ricco : IMG.six;
@@ -755,7 +754,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
         '<div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date">'+esc(card.frameEnd)+'</div></div></div>';
     }
     var html='<div class="card '+cls+'">'+
-      '<div class="card-top">'+logoHtml(isRicco)+'<div class="card-no">'+cardNoHtml(card)+'</div></div>'+
+      '<div class="card-top">'+logoHtml(isRicco)+'<div class="card-no">'+esc(card.memberNo)+'</div></div>'+
       '<div class="mid"><div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+esc(card.sub)+'</div></div>'+
         specsHtml(card.months, true, card.design, card.rowId)+'</div>'+
       '<div class="w-grid">'+ frameCell +
@@ -784,7 +783,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       : '🏆 <b>殿堂入りメガネ</b><br>'+days+
         'お疲れさま。そして、ありがとう👓🕶️<br>——調整・クリーニングは、<span class="forever-in">いつまでも</span>無料です☺️';
     return '<div class="card '+(isRicco?"ricco":"sixfour")+' archived"><div class="archived-stamp">ARCHIVE</div>'+
-      '<div class="card-top">'+logoHtml(isRicco)+'<div class="card-no">'+cardNoHtml(card)+'</div></div>'+
+      '<div class="card-top">'+logoHtml(isRicco)+'<div class="card-no">'+esc(card.memberNo)+'</div></div>'+
       '<div class="mid"><div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+esc(card.sub)+'</div></div>'+
         specsHtml(card.months, false, card.design, null)+'</div>'+
       '<div class="w-grid"><div class="w-cell"><div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date">'+esc(card.frameEnd)+'</div></div></div>'+
@@ -798,9 +797,274 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   };
 
   /* ===== 画面を描く ===== */
+  /* ============================================================
+   *  季節アニメーション（2026/9/12 追加）
+   *
+   *  ■何をするもの？
+   *    その月にはじめてマイページを開いたときだけ、画面全体に
+   *    季節の演出を数秒だけ流す。2回目以降その月は出ない。
+   *
+   *  ■月と演出の対応（変えたいときは SEASON_BY_MONTH の数字を直す）
+   *    12,1,2月=雪 / 3,4月=桜 / 5月=木漏れ日 / 6月=雨
+   *    7月=陽射し / 8月=花火 / 9月=月明かり / 10,11月=紅葉
+   *
+   *  ■止めたいとき
+   *    下の SEASON_ON を false にすると、演出は一切出なくなる。
+   *  ============================================================ */
+
+  var SEASON_ON = true;          // ★false にすると季節演出を止められる
+  var SEASON_ONCE_PER_MONTH = true;  // ★false にすると毎回出る（動作確認用）
+
+  var SEASON_BY_MONTH = {
+    1:"snow",  2:"snow",  3:"sakura", 4:"sakura",
+    5:"komorebi", 6:"rain", 7:"sun",  8:"firework",
+    9:"moon", 10:"koyo", 11:"koyo", 12:"snow"
+  };
+
+  /* 雪の結晶の絵（6方向に枝、その先に小枝が2本ずつ） */
+  function seasonSnowSVG(){
+    var lines="", a, rad, x2, y2, tx, ty, a1, a2, t1x, t1y, t2x, t2y;
+    for(a=0; a<6; a++){
+      rad = a*60*Math.PI/180;
+      x2 = 12+10*Math.cos(rad); y2 = 12+10*Math.sin(rad);
+      lines += '<line x1="12" y1="12" x2="'+x2.toFixed(2)+'" y2="'+y2.toFixed(2)+'"/>';
+      tx = 12+7*Math.cos(rad); ty = 12+7*Math.sin(rad);
+      a1 = rad+25*Math.PI/180; a2 = rad-25*Math.PI/180;
+      t1x = tx+3*Math.cos(a1); t1y = ty+3*Math.sin(a1);
+      t2x = tx+3*Math.cos(a2); t2y = ty+3*Math.sin(a2);
+      lines += '<line x1="'+tx.toFixed(2)+'" y1="'+ty.toFixed(2)+'" x2="'+t1x.toFixed(2)+'" y2="'+t1y.toFixed(2)+'"/>';
+      lines += '<line x1="'+tx.toFixed(2)+'" y1="'+ty.toFixed(2)+'" x2="'+t2x.toFixed(2)+'" y2="'+t2y.toFixed(2)+'"/>';
+    }
+    return '<svg viewBox="0 0 24 24" width="100%" height="100%"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none">'+lines+'</g></svg>';
+  }
+
+  /* 太陽の絵（まん中の丸＋二等辺三角形の光線8本） */
+  function seasonSunSVG(){
+    var polys="", a, rad, dx, dy, r1=7.2, r2=11.6, w=2.1, bx1, by1, bx2, by2, tx, ty;
+    for(a=0; a<8; a++){
+      rad = a*45*Math.PI/180;
+      dx = -Math.sin(rad); dy = Math.cos(rad);
+      bx1 = 12+r1*Math.cos(rad)+w*dx; by1 = 12+r1*Math.sin(rad)+w*dy;
+      bx2 = 12+r1*Math.cos(rad)-w*dx; by2 = 12+r1*Math.sin(rad)-w*dy;
+      tx  = 12+r2*Math.cos(rad);      ty  = 12+r2*Math.sin(rad);
+      polys += '<polygon points="'+bx1.toFixed(2)+','+by1.toFixed(2)+' '+bx2.toFixed(2)+','+by2.toFixed(2)+' '+tx.toFixed(2)+','+ty.toFixed(2)+'" fill="#F2994A"/>';
+    }
+    return '<svg viewBox="0 0 24 24" width="100%" height="100%">'+polys+'<circle cx="12" cy="12" r="7.5" fill="#FFCB3D"/></svg>';
+  }
+
+  /* 桜の花びらの絵 */
+  var SEASON_PETAL_SVG = '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12,4 L15,2 C19,6 18,17 12,22 C6,17 5,6 9,2 Z" fill="currentColor"/></svg>';
+
+  /* 雲ひとつ分の絵（丸を6つ並べてモクモクさせている） */
+  function seasonCloudHTML(color, opacity){
+    return '<div style="position:absolute;left:8px;top:20px;width:68px;height:20px;border-radius:10px;background:'+color+';opacity:'+opacity+';"></div>'
+      + '<div style="position:absolute;left:2px;top:12px;width:20px;height:20px;border-radius:50%;background:'+color+';opacity:'+opacity+';"></div>'
+      + '<div style="position:absolute;left:14px;top:2px;width:28px;height:28px;border-radius:50%;background:'+color+';opacity:'+opacity+';"></div>'
+      + '<div style="position:absolute;left:34px;top:-6px;width:34px;height:34px;border-radius:50%;background:'+color+';opacity:'+opacity+';"></div>'
+      + '<div style="position:absolute;left:56px;top:2px;width:26px;height:26px;border-radius:50%;background:'+color+';opacity:'+opacity+';"></div>'
+      + '<div style="position:absolute;left:70px;top:14px;width:18px;height:18px;border-radius:50%;background:'+color+';opacity:'+opacity+';"></div>';
+  }
+
+  var SEASON_SNOW_COLORS   = ["#4A90D9","#8E8E93"];
+  var SEASON_SAKURA_COLORS = ["#F4C0D1","#ED93B1","#FBEAF0"];
+  var SEASON_KOYO_EMOJI    = ["\uD83C\uDF41","\uD83C\uDF42","\uD83C\uDF3F"];  /* 🍁 🍂 🌿 */
+  var SEASON_CHESTNUT      = "\uD83C\uDF30";                                  /* 🌰 */
+  var SEASON_CLOUD_BACK    = "#C7C7CB";
+  var SEASON_CLOUD_FRONT   = "#8F8F93";
+
+  /* 演出ごとの設定
+   *   spawn … くり返し出すもの（間隔ミリ秒・最初に出す数）
+   *   life  … 演出をつづける長さ（ミリ秒）
+   */
+  var SEASON_CONF = {
+    snow:     { every:150, first:4, life:5000 },
+    sakura:   { every:170, first:4, life:5000 },
+    komorebi: { every:0,   first:0, life:4000 },
+    rain:     { every:43,  first:8, life:5000 },
+    sun:      { every:0,   first:0, life:4500 },
+    firework: { every:0,   first:0, life:4000 },
+    moon:     { every:0,   first:0, life:10500 },
+    koyo:     { every:190, first:4, life:5000 }
+  };
+
+  var seasonTimer = null, seasonEndTimer = null, seasonFadeTimer = null;
+
+  /* 画面のいちばん下まで落ちる距離 */
+  function seasonFallPx(){ return (window.innerHeight || 700) + 80; }
+
+  function seasonSpawnSnow(box){
+    var size = 5.2+Math.random()*5.2, dur = 3.2+Math.random()*1.0;
+    var el = document.createElement("div");
+    el.style.cssText = "width:"+size+"px;height:"+size+"px;left:"+(Math.random()*92)+"%;top:-"+(size+12)+"px;color:"
+      + SEASON_SNOW_COLORS[Math.floor(Math.random()*2)]
+      + ";--sway:"+(Math.random()*30-15)+"px;--fall:"+seasonFallPx()+"px;animation:sFall "+dur+"s linear 1;";
+    el.innerHTML = seasonSnowSVG();
+    el.addEventListener("animationend", function(){ if(el.parentNode) el.parentNode.removeChild(el); });
+    box.appendChild(el);
+  }
+
+  function seasonSpawnPetal(box){
+    var size = 9.1+Math.random()*5.2, dur = 2.4+Math.random()*0.8;
+    var el = document.createElement("div");
+    el.style.cssText = "width:"+size+"px;height:"+size+"px;left:"+(Math.random()*92)+"%;top:-"+(size+12)+"px;color:"
+      + SEASON_SAKURA_COLORS[Math.floor(Math.random()*3)]
+      + ";--sway:"+(Math.random()*70-35)+"px;--fall:"+seasonFallPx()+"px;animation:sFall "+dur+"s ease-in 1;";
+    el.innerHTML = SEASON_PETAL_SVG;
+    el.addEventListener("animationend", function(){ if(el.parentNode) el.parentNode.removeChild(el); });
+    box.appendChild(el);
+  }
+
+  function seasonSpawnKoyo(box){
+    /* 葉っぱ3に対して栗1の割合で混ぜる */
+    var r = Math.floor(Math.random()*4);
+    var emoji = (r===3) ? SEASON_CHESTNUT : SEASON_KOYO_EMOJI[Math.floor(Math.random()*3)];
+    var size = 13.9+Math.random()*6.9, dur = 2.8+Math.random()*0.8;
+    var el = document.createElement("div");
+    el.style.cssText = "font-size:"+size+"px;line-height:1;left:"+(Math.random()*92)+"%;top:-"+(size+12)+"px;"
+      + "--sway:"+(Math.random()*30-15)+"px;--fall:"+seasonFallPx()+"px;animation:sFall "+dur+"s ease-in 1;";
+    el.textContent = emoji;
+    el.addEventListener("animationend", function(){ if(el.parentNode) el.parentNode.removeChild(el); });
+    box.appendChild(el);
+  }
+
+  function seasonSpawnRain(box){
+    var h = 14.4+Math.random()*9, dur = 0.91+Math.random()*0.39;
+    var el = document.createElement("div");
+    el.style.cssText = "width:2px;height:"+h+"px;border-radius:2px;left:"+(Math.random()*96)+"%;top:-24px;"
+      + "background:#85B7EB;--fall:"+seasonFallPx()+"px;animation:sRain "+dur+"s linear 1;";
+    el.addEventListener("animationend", function(){ if(el.parentNode) el.parentNode.removeChild(el); });
+    box.appendChild(el);
+  }
+
+  function seasonDrawKomorebi(box){
+    var i, el, size, dur, delay;
+    for(i=0; i<10; i++){
+      el = document.createElement("div");
+      size  = 30+Math.random()*30;
+      dur   = 2.42+Math.random()*1.1;
+      delay = Math.random()*1.2;
+      el.style.cssText = "width:"+size+"px;height:"+size+"px;border-radius:50%;left:"+(Math.random()*82)+"%;top:"
+        + (Math.random()*75)+"%;background:#FAC775;animation:sPulse "+dur+"s ease-in-out "+delay+"s 1;";
+      box.appendChild(el);
+    }
+  }
+
+  function seasonDrawSun(box){
+    var el = document.createElement("div");
+    el.style.cssText = "width:112px;height:112px;right:6%;top:7%;animation:sShine 2.4s ease-in-out infinite;";
+    el.innerHTML = seasonSunSVG();
+    box.appendChild(el);
+  }
+
+  function seasonDrawFirework(box){
+    var centers = [[26,26],[64,40],[42,16]];
+    var layers = [
+      { n:8,  radius:26, delay:0,    colors:["#FAC775","#FAEEDA"] },
+      { n:10, radius:52, delay:0.15, colors:["#EF9F27","#F0997B"] },
+      { n:12, radius:78, delay:0.3,  colors:["#D85A30","#ED93B1"] }
+    ];
+    var ci, li, i, c, layer, angle, dx, dy, el;
+    for(ci=0; ci<centers.length; ci++){
+      c = centers[ci];
+      for(li=0; li<layers.length; li++){
+        layer = layers[li];
+        for(i=0; i<layer.n; i++){
+          angle = (i/layer.n)*Math.PI*2;          /* 角度を等分＝きれいな真円になる */
+          dx = Math.cos(angle)*layer.radius;
+          dy = Math.sin(angle)*layer.radius;
+          el = document.createElement("div");
+          el.style.cssText = "width:5px;height:5px;border-radius:50%;left:"+c[0]+"%;top:"+c[1]+"%;background:"
+            + layer.colors[i%layer.colors.length]
+            + ";--dx:"+dx+"px;--dy:"+dy+"px;animation:sBurst 1s ease-out "+(ci*0.5+layer.delay)+"s 1;";
+          box.appendChild(el);
+        }
+      }
+    }
+  }
+
+  function seasonDrawMoon(box){
+    /* 満月 */
+    var moon = document.createElement("div");
+    moon.style.cssText = "width:112px;height:112px;border-radius:50%;right:8%;top:7%;background:#F5E050;";
+    box.appendChild(moon);
+    /* 雲（2枚を重ねて、月の下のほうにかかった状態からスタート→ゆっくり流れて満月が現れる） */
+    var startLeft = (window.innerWidth || 380) * 0.52;
+    var cloud = document.createElement("div");
+    cloud.style.cssText = "width:150px;height:66px;top:92px;left:"+startLeft+"px;"
+      + "--drift:200px;animation:sDrift 9s ease-out 1 forwards;";
+    var back = document.createElement("div");
+    back.style.cssText = "position:absolute;left:0;top:0;width:90px;height:46px;";
+    back.innerHTML = seasonCloudHTML(SEASON_CLOUD_BACK, 0.8);
+    var front = document.createElement("div");
+    front.style.cssText = "position:absolute;left:42px;top:20px;width:90px;height:46px;transform:scale(.75);transform-origin:top left;";
+    front.innerHTML = seasonCloudHTML(SEASON_CLOUD_FRONT, 0.9);
+    cloud.appendChild(back);
+    cloud.appendChild(front);
+    box.appendChild(cloud);
+  }
+
+  var SEASON_SPAWNER = {
+    snow: seasonSpawnSnow, sakura: seasonSpawnPetal,
+    rain: seasonSpawnRain, koyo: seasonSpawnKoyo
+  };
+  var SEASON_ONESHOT = {
+    komorebi: seasonDrawKomorebi, sun: seasonDrawSun,
+    firework: seasonDrawFirework, moon: seasonDrawMoon
+  };
+
+  /* その月にもう見せたかどうかを、スマホの中だけに覚えておく
+   *（お客様の情報はサーバーに送っていない） */
+  function seasonAlreadyShown(key){
+    if(!SEASON_ONCE_PER_MONTH) return false;
+    try{ return window.localStorage.getItem("sf_season") === key; }
+    catch(e){ return false; }   /* 保存が使えない端末では毎回出る（害はない） */
+  }
+  function seasonMarkShown(key){
+    try{ window.localStorage.setItem("sf_season", key); }catch(e){}
+  }
+
+  function playSeason(){
+    if(!SEASON_ON) return;
+    /* 動きを減らす設定にしている端末では出さない（酔い・まぶしさ対策） */
+    try{
+      if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    }catch(e){}
+
+    var now = new Date();
+    var key = now.getFullYear()+"-"+(now.getMonth()+1);
+    if(seasonAlreadyShown(key)) return;
+
+    var kind = SEASON_BY_MONTH[now.getMonth()+1];
+    var conf = SEASON_CONF[kind];
+    if(!kind || !conf) return;
+
+    seasonMarkShown(key);
+
+    var box = document.createElement("div");
+    box.className = "season-ov";
+    document.body.appendChild(box);
+
+    var i;
+    if(SEASON_ONESHOT[kind]){
+      SEASON_ONESHOT[kind](box);
+    } else {
+      var spawn = SEASON_SPAWNER[kind];
+      for(i=0; i<conf.first; i++){ spawn(box); }
+      seasonTimer = setInterval(function(){ spawn(box); }, conf.every);
+    }
+
+    /* 時間が来たら、出すのをやめて→そっと消す */
+    seasonEndTimer = setTimeout(function(){
+      if(seasonTimer){ clearInterval(seasonTimer); seasonTimer = null; }
+      box.className = "season-ov fade";
+      seasonFadeTimer = setTimeout(function(){
+        if(box.parentNode) box.parentNode.removeChild(box);
+      }, 1000);
+    }, conf.life);
+  }
+
   function render(){
     if(!PAGE_DATA || !imgDone) return;   // データと絵の準備が両方そろってから
-    applyMonoClass();                    // ★端末のフォントに合わせて文字の大きさを決める
     fillFoot();                          // ★フッターの店名（ロゴ）を入れる
     var d=PAGE_DATA;
     var cards=d.cards||[];
@@ -815,7 +1079,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     document.getElementById("whoNo").textContent=d.no||"";
     if(d.rank){
       var rk=rankStyle(d.rank);
-      var totalTxt = d.total ? '<span class="dot"></span><span class="total-txt">通算 <b>'+d.total+'本</b></span>' : '';
+      var totalTxt = d.total ? '<span class="dot"></span><span>通算 <b>'+d.total+'本</b></span>' : '';
       document.getElementById("tenureWrap").innerHTML=
         '<div class="rank-badge" style="background:'+rk.grad+'; color:'+rk.text+'">'+
           badgeGlasses(rk.icon)+'<span class="rk">'+rk.name+'</span>'+totalTxt+'</div>';
@@ -850,6 +1114,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     }
     document.getElementById("app").innerHTML=html;
     showActions();
+    playSeason();                        // ★季節アニメーション（その月の初回表示時のみ）
   }
 
   /* ===== 会員証がまだない人（★2026/8/30 3通りに分岐）=====
