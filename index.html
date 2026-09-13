@@ -273,6 +273,10 @@
   .mm-count{ text-align:right; font-size:10.5px; color:var(--sub); margin-top:4px; }
   .mm-save{ width:100%; margin-top:10px; padding:13px; border:none; border-radius:10px;
             background:var(--ink); color:#fff; font-size:14px; font-weight:700; font-family:inherit; }
+  /* ★2026/9/13：保存した実感が出るように、押した直後だけ緑＋「✓ 保存しました」に変える。
+     disabled でも薄くしないのは、この表示こそ見せたいため（絵柄選びの「保存しています…」とは逆の意図）。 */
+  .mm-save.saved{ background:#1f7a4d; }
+  .mm-save:disabled{ opacity:1; }
   .mm-del{ width:100%; margin-top:8px; padding:11px; border:none; border-radius:10px;
            background:#f2efe9; color:#8a8578; font-size:12px; font-family:inherit; }
 
@@ -348,7 +352,7 @@
     </div>
     <div class="dp-lead" id="dpLead"></div>
     <div class="dp-grid" id="dpGrid"></div>
-    <button class="dp-save" id="dpSave" onclick="saveDesign()">これにする</button>
+    <button class="dp-save" id="dpSave" onclick="saveDesign()">保存する</button>
     <div class="dp-msg" id="dpMsg"></div>
   </div>
 
@@ -363,7 +367,7 @@
     <div class="mm-ex">例）ランニング用メガネ(T_T)<br>　　なくしたと思って買った2本目<br>　　寝落ち用(意外と丈夫)</div>
     <input class="mm-input" id="mmInput" type="text" maxlength="30" placeholder="メモを入力">
     <div class="mm-count" id="mmCount">0/30</div>
-    <button class="mm-save" onclick="saveMemo()">保存する</button>
+    <button class="mm-save" id="mmSave" onclick="saveMemo()">保存する</button>
     <button class="mm-del" id="mmDel" onclick="deleteMemo()" style="display:none;">メモを消す</button>
   </div>
 </div>
@@ -871,11 +875,28 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     document.getElementById('mm').style.display = 'none';
   };
 
+  /* ★2026/9/13 改修：押した瞬間に画面が切り替わって「保存された実感がない」問題への対応。
+     保存自体はスマホの中なので一瞬で終わるが、あえて 0.8 秒だけ「✓ 保存しました」を見せてから閉じる。
+     その 0.8 秒は二重タップできないよう disabled にする（絵柄選びの「保存しています…」と同じ考え方）。 */
   window.saveMemo = function(){
+    var btn = document.getElementById('mmSave');
+    if(btn && btn.disabled) return;          /* 連打で二重に走らせない */
     var t = (document.getElementById('mmInput').value || '').replace(/^\s+|\s+$/g, '');
     memoSet(MEMO_ROW, t);
-    closeMemo();
-    render();          /* カード下のメモ表示をその場で更新する */
+    if(btn){
+      btn.disabled = true;
+      btn.classList.add('saved');
+      btn.textContent = '✓ 保存しました';
+    }
+    setTimeout(function(){
+      if(btn){
+        btn.disabled = false;
+        btn.classList.remove('saved');
+        btn.textContent = '保存する';        /* 次に開いたとき元に戻っているように */
+      }
+      closeMemo();
+      render();        /* カード下のメモ表示をその場で更新する */
+    }, 800);
   };
 
   window.deleteMemo = function(){
@@ -1617,14 +1638,14 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var cbName = 'dpcb_' + Date.now();
     var timer = setTimeout(function(){
       cleanupDp(cbName);
-      btn.disabled=false; btn.textContent='これにする';
+      btn.disabled=false; btn.textContent='保存する';
       msg.textContent = '通信に時間がかかっています。もう一度お試しください';
     }, 15000);
 
     window[cbName] = function(json){
       clearTimeout(timer);
       cleanupDp(cbName);
-      btn.disabled=false; btn.textContent='これにする';
+      btn.disabled=false; btn.textContent='保存する';
       if(json && json.ok){
         // 画面のデータも書き換えて、その場で反映する
         if(PAGE_DATA && PAGE_DATA.cards){
@@ -1649,7 +1670,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     sc.id = cbName; sc.src = url;
     sc.onerror = function(){
       clearTimeout(timer); cleanupDp(cbName);
-      btn.disabled=false; btn.textContent='これにする';
+      btn.disabled=false; btn.textContent='保存する';
       msg.textContent = 'サーバーに接続できませんでした';
     };
     document.body.appendChild(sc);
