@@ -876,8 +876,9 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   };
 
   /* ★2026/9/13 改修：押した瞬間に画面が切り替わって「保存された実感がない」問題への対応。
-     保存自体はスマホの中なので一瞬で終わるが、あえて 0.8 秒だけ「✓ 保存しました」を見せてから閉じる。
-     その 0.8 秒は二重タップできないよう disabled にする（絵柄選びの「保存しています…」と同じ考え方）。 */
+     保存自体はスマホの中なので一瞬で終わるが、あえて 1.0 秒だけ「✓ 保存しました」を見せてから閉じる。
+     その 1.0 秒は二重タップできないよう disabled にする（絵柄選びの「保存しています…」と同じ考え方）。
+     ※2026/9/13：当初0.8秒にしていたが「忙しなく感じる」とのことで1.0秒に調整。 */
   window.saveMemo = function(){
     var btn = document.getElementById('mmSave');
     if(btn && btn.disabled) return;          /* 連打で二重に走らせない */
@@ -896,7 +897,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       }
       closeMemo();
       render();        /* カード下のメモ表示をその場で更新する */
-    }, 800);
+    }, 1000);
   };
 
   window.deleteMemo = function(){
