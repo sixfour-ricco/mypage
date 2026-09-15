@@ -1750,63 +1750,87 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       if(msg) msg.textContent = text;
     };
 
-    var cbName = "__rxreq_" + Date.now();
-    var timer = setTimeout(function(){
-      cleanup();
-      done(false, "通信がタイムアウトしました。もう一度お試しください。");
-    }, 20000);
+    var idToken = liff.getIDToken() || "";
 
-    function cleanup(){
-      try{ delete window[cbName]; }catch(e){ window[cbName] = undefined; }
-      var sc = document.getElementById(cbName);
-      if(sc && sc.parentNode) sc.parentNode.removeChild(sc);
+    /* ★2026/9/15 追加：こちらも同じ理由（4G回線の不安定さ）で、1回失敗しても
+       お客様には見せずに自動でもう1回だけ静かにやり直す。 */
+    function attemptSend(attempt){
+      var isRetry = attempt > 1;
+      var cbName = "__rxreq_" + Date.now() + "_" + attempt;
+      var timeoutMs = isRetry ? 20000 : 8000;
+
+      var timer = setTimeout(function(){
+        cleanup();
+        if (!isRetry) { attemptSend(attempt + 1); return; }
+        done(false, "通信がタイムアウトしました。もう一度お試しください。");
+      }, timeoutMs);
+
+      function cleanup(){
+        try{ delete window[cbName]; }catch(e){ window[cbName] = undefined; }
+        var sc = document.getElementById(cbName);
+        if(sc && sc.parentNode) sc.parentNode.removeChild(sc);
+      }
+
+      window[cbName] = function(json){
+        clearTimeout(timer);
+        cleanup();
+        if(!json || json.ok !== true){
+          if (!isRetry) { attemptSend(attempt + 1); return; }
+          done(false, (json && json.error) ? json.error : "送信に失敗しました。もう一度お試しください。");
+          return;
+        }
+        /* ②お店のトークにも流す。ここが失敗しても受付自体は済んでいるので、
+             お客様には成功として伝える（スタッフ画面には確実に出ている）。 */
+        try{
+          liff.sendMessages([{ type:"text", text:"度数のお問い合わせ（"+purpose+"）" }])
+            .then(function(){}).catch(function(){});
+        }catch(e){}
+
+        done(true, "承りました。お調べしてご連絡いたします🙇‍♂️");
+        setTimeout(function(){
+          closeRxAsk();
+          if(PAGE_DATA){ PAGE_DATA.rxPending = true; render(); }
+        }, 1600);
+      };
+
+      var url = API_URL
+        + "?action=requestRx"
+        + "&idToken=" + encodeURIComponent(idToken)
+        + "&purpose=" + encodeURIComponent(purpose)
+        + "&callback=" + cbName;
+
+      var sc = document.createElement("script");
+      sc.id = cbName;
+      sc.src = url;
+      sc.onerror = function(){
+        clearTimeout(timer); cleanup();
+        if (!isRetry) { attemptSend(attempt + 1); return; }
+        done(false, "通信に失敗しました。もう一度お試しください。");
+      };
+      document.body.appendChild(sc);
     }
 
-    window[cbName] = function(json){
-      clearTimeout(timer);
-      cleanup();
-      if(!json || json.ok !== true){
-        done(false, (json && json.error) ? json.error : "送信に失敗しました。もう一度お試しください。");
-        return;
-      }
-      /* ②お店のトークにも流す。ここが失敗しても受付自体は済んでいるので、
-           お客様には成功として伝える（スタッフ画面には確実に出ている）。 */
-      try{
-        liff.sendMessages([{ type:"text", text:"度数のお問い合わせ（"+purpose+"）" }])
-          .then(function(){}).catch(function(){});
-      }catch(e){}
-
-      done(true, "承りました。お調べしてご連絡いたします🙇‍♂️");
-      setTimeout(function(){
-        closeRxAsk();
-        if(PAGE_DATA){ PAGE_DATA.rxPending = true; render(); }
-      }, 1600);
-    };
-
-    var url = API_URL
-      + "?action=requestRx"
-      + "&idToken=" + encodeURIComponent(liff.getIDToken() || "")
-      + "&purpose=" + encodeURIComponent(purpose)
-      + "&callback=" + cbName;
-
-    var sc = document.createElement("script");
-    sc.id = cbName;
-    sc.src = url;
-    sc.onerror = function(){
-      clearTimeout(timer); cleanup();
-      done(false, "通信に失敗しました。もう一度お試しください。");
-    };
-    document.body.appendChild(sc);
+    attemptSend(1);
   };
 
-  /* ===== GASにデータを取りに行く ===== */
-  function fetchCards(idToken){
-    // GASはPOSTだと転送の途中でHTMLを返してしまうため、GET（JSONP）で受け取る
-    var cbName = "__cards_" + Date.now();
+  /* ===== GASにデータを取りに行く =====
+   * ★2026/9/15 追加：4G回線でGoogleサーバーへの通信そのものが時々失敗する
+   *   （GAS側の処理は1〜2秒台で正常終了していることを実行ログで確認済み）ことが分かったため、
+   *   1回目が失敗しても、お客様には見せずに自動でもう1回だけ静かにやり直す。
+   *   1回目のタイムアウトは20秒→8秒に短縮（失敗ならさっさと2回目に切り替えたいため）。
+   *   2回とも失敗したときだけ、今までのエラー画面を出す。 */
+  function fetchCards(idToken, attempt){
+    attempt = attempt || 1;
+    var isRetry = attempt > 1;
+
+    var cbName = "__cards_" + Date.now() + "_" + attempt;
+    var timeoutMs = isRetry ? 20000 : 8000;   // 1回目は短く切って、2回目（最終）はしっかり待つ
+
     var timer = setTimeout(function(){
-      renderError("通信がタイムアウトしました");
       cleanup();
-    }, 20000);
+      if (!isRetry) { fetchCards(idToken, attempt + 1); return; }
+      renderError("通信がタイムアウトしました");
+    }, timeoutMs);
 
     function cleanup(){
       try{ delete window[cbName]; }catch(e){ window[cbName] = undefined; }
@@ -1818,6 +1842,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       clearTimeout(timer);
       cleanup();
       if(!json || json.ok !== true){
+        if (!isRetry) { fetchCards(idToken, attempt + 1); return; }
         renderError(json && json.error ? json.error : "データ取得に失敗しました");
         return;
       }
@@ -1836,6 +1861,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     sc.onerror = function(){
       clearTimeout(timer);
       cleanup();
+      if (!isRetry) { fetchCards(idToken, attempt + 1); return; }
       renderError("サーバーに接続できませんでした");
     };
     document.body.appendChild(sc);
