@@ -118,6 +118,44 @@
   .actions .btn-consult{ background:#06c755; color:#fff; box-shadow:0 6px 16px -8px rgba(6,199,85,.6); }
 
   /* ===== 保証・修理の説明（マイページ内蔵） ===== */
+  /* ===== ★2026/9/15 My度数情報 ===== */
+  /* ランクと「今月のひとこと」の間に、1行だけのコンパクトなボタンを中央に置く */
+  .rx-bar{ text-align:center; margin:2px 2px 16px; }
+  .rx-bar button{ display:inline-flex; align-items:center; gap:7px; cursor:pointer;
+      font-family:inherit; font-size:12px; font-weight:700; letter-spacing:.02em;
+      padding:9px 16px; border-radius:20px; border:1px solid rgba(0,0,0,.12);
+      background:rgba(255,255,255,.78); color:var(--ink);
+      box-shadow:0 2px 8px -4px rgba(90,70,40,.35); }
+  .rx-bar button:active{ transform:translateY(1px); }
+  .rx-bar .rx-when{ font-weight:500; font-size:10.5px; color:var(--sub); }
+  .rx-bar .rx-wait{ display:inline-block; font-size:11.5px; color:var(--sub);
+      background:rgba(255,255,255,.6); border:1px dashed rgba(0,0,0,.14);
+      border-radius:20px; padding:9px 16px; }
+
+  /* 度数の表。見出しは縦2段（S ／(球面)）にして横幅を抑える */
+  .rx-table{ width:100%; border-collapse:collapse; margin-top:4px; }
+  .rx-table th, .rx-table td{ padding:9px 4px; text-align:center; font-size:13px; }
+  .rx-table thead th{ font-size:10.5px; color:var(--sub); font-weight:700; line-height:1.45;
+      border-bottom:1px solid rgba(0,0,0,.1); }
+  .rx-table thead th small{ display:block; font-size:9.5px; font-weight:500; opacity:.8; }
+  .rx-table tbody td{ border-bottom:1px solid rgba(0,0,0,.06); font-variant-numeric:tabular-nums; }
+  .rx-table .rx-eye{ font-size:12px; font-weight:800; color:#4a4436; width:34px; }
+  .rx-meta{ display:flex; flex-wrap:wrap; gap:6px; margin:2px 0 12px; }
+  .rx-chip{ font-size:11px; font-weight:700; color:#4a4436; background:rgba(0,0,0,.045);
+      border-radius:14px; padding:5px 11px; }
+  .rx-remarks{ font-size:12px; line-height:1.8; color:#4a4436; margin-top:12px;
+      background:rgba(0,0,0,.035); border-radius:10px; padding:10px 12px; }
+  .rx-caution{ font-size:11px; line-height:1.85; color:var(--sub); margin-top:14px; }
+
+  /* ご用途の選択（コピー集シーン6） */
+  .rx-pick{ display:block; width:100%; text-align:left; cursor:pointer; font-family:inherit;
+      font-size:13.5px; color:var(--ink); background:#fff; border:1px solid rgba(0,0,0,.14);
+      border-radius:11px; padding:13px 15px; margin-bottom:9px; }
+  .rx-pick:active{ background:#f6f4ef; }
+  .rx-tip{ font-size:11.5px; line-height:1.85; color:var(--sub); margin-top:14px;
+      background:rgba(0,0,0,.035); border-radius:10px; padding:11px 13px; }
+  .rx-sending{ font-size:12px; color:var(--sub); text-align:center; padding:8px 0; }
+
   .sheet{ display:none; position:fixed; inset:0; z-index:50; }
   .sheet.open{ display:block; }
   .sheet .veil{ position:absolute; inset:0; background:rgba(30,26,18,.5); }
@@ -369,6 +407,28 @@
     <div class="mm-count" id="mmCount">0/30</div>
     <button class="mm-save" id="mmSave" onclick="saveMemo()">保存する</button>
     <button class="mm-del" id="mmDel" onclick="deleteMemo()" style="display:none;">メモを消す</button>
+  </div>
+</div>
+
+<!-- ★2026/9/15 My度数情報（お店で入力された最新の度数を表示する） -->
+<div class="sheet" id="rxSheet">
+  <div class="veil" onclick="closeRx()"></div>
+  <div class="panel">
+    <h2>My度数情報</h2>
+    <div class="lead" id="rxLead"></div>
+    <div id="rxBody"></div>
+    <button class="close" onclick="closeRx()">閉じる</button>
+  </div>
+</div>
+
+<!-- ★2026/9/15 ご用途の確認（コピー集シーン6）。選ぶだけで送れるようにしてある -->
+<div class="sheet" id="rxAskSheet">
+  <div class="veil" onclick="closeRxAsk()"></div>
+  <div class="panel">
+    <h2 id="rxAskTitle"></h2>
+    <div class="lead" id="rxAskLead"></div>
+    <div id="rxAskBody"></div>
+    <button class="close" onclick="closeRxAsk()">閉じる</button>
   </div>
 </div>
 
@@ -1280,7 +1340,8 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var active=cards.filter(function(c){return !c.archived;});
     var archived=cards.filter(function(c){return c.archived;});
 
-    var html = monthlyHtml(d.memberYears);   // ★月替わりのひとこと（カード群の上）
+    var html = rxBarHtml(d);                 // ★My度数情報（ランクと今月のひとことの間）
+    html += monthlyHtml(d.memberYears);      // ★月替わりのひとこと（カード群の上）
 
     if(active.length){
       html+='<div class="sec-label">ご利用中のメガネ</div>';
@@ -1544,6 +1605,198 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     }catch(e){
       alert(guide);
     }
+  };
+
+  /* ==========================================================
+   *  ★2026/9/15 My度数情報
+   *    ・お店で入力された「最新の1件」だけを表示する（履歴は持たない）
+   *    ・まだ入力が無い方には、ご用途をうかがってお店に依頼を送る
+   *      （8/15確定の運用フロー：スタッフ画面と店のLINEの両方に届く二重通知）
+   * ========================================================== */
+  var RX_ASKING = false;   // 二重送信よけ
+
+  function rxIsRicco(){
+    if(PAGE_DATA && PAGE_DATA.cards && PAGE_DATA.cards.length){
+      return PAGE_DATA.cards[0].brand === "RICCO";
+    }
+    return SHOP === "ricco";
+  }
+
+  /* ランクと今月のひとことの間に出す1行。状態で3通りに変わる */
+  function rxBarHtml(d){
+    if(d && d.rx && d.rx.updatedAt){
+      return '<div class="rx-bar"><button type="button" onclick="openRx()">'+
+               '👓 My度数情報<span class="rx-when">最終更新 '+d.rx.updatedAt+'</span>'+
+             '</button></div>';
+    }
+    if(d && d.rxPending){
+      return '<div class="rx-bar"><span class="rx-wait">👓 度数をお調べしています…</span></div>';
+    }
+    return '<div class="rx-bar"><button type="button" onclick="openRxAsk()">'+
+             '👓 度数を確認する'+
+           '</button></div>';
+  }
+
+  /* ===== 表示 ===== */
+  window.openRx = function(){
+    var rx = PAGE_DATA && PAGE_DATA.rx;
+    if(!rx) return;
+    var isRicco = rxIsRicco();
+
+    var chips = '';
+    if(rx.lens)  chips += '<span class="rx-chip">'+rx.lens+'</span>';
+    if(rx.index) chips += '<span class="rx-chip">'+rx.index+'</span>';
+    if(rx.made)  chips += '<span class="rx-chip">作製 '+rx.made.replace(/-/g,".")+'</span>';
+
+    /* ADDは遠用・近用だと空。空の欄は「ー」で埋めて、表がガタつかないようにする */
+    var cell = function(v){ return (v && String(v).trim()) ? v : "ー"; };
+    var row = function(label, pre){
+      return '<tr><td class="rx-eye">'+label+'</td>'+
+             '<td>'+cell(rx[pre+"S"])+'</td>'+
+             '<td>'+cell(rx[pre+"C"])+'</td>'+
+             '<td>'+cell(rx[pre+"AX"])+'</td>'+
+             '<td>'+cell(rx[pre+"ADD"])+'</td>'+
+             '<td>'+cell(rx[pre+"PD"])+'</td></tr>';
+    };
+
+    var html =
+      (chips ? '<div class="rx-meta">'+chips+'</div>' : '') +
+      '<table class="rx-table"><thead><tr>'+
+        '<th></th>'+
+        '<th>S<small>(球面)</small></th>'+
+        '<th>C<small>(乱視)</small></th>'+
+        '<th>AX<small>(軸度)</small></th>'+
+        '<th>ADD<small>(加入度)</small></th>'+
+        '<th>PD<small>(目の距離)</small></th>'+
+      '</tr></thead><tbody>'+ row("R", "r") + row("L", "l") +'</tbody></table>'+
+      (rx.remarks ? '<div class="rx-remarks">'+rx.remarks+'</div>' : '')+
+      '<div class="rx-caution">'+
+        'My度数情報は最新の'+(isRicco ? "アイウェア" : "メガネ")+'分のみを表示しています。<br>'+
+        '以前の度数は「マイページ」→「💬LINEで相談する」→「6 その他」から'+
+        'お問い合わせください🙇‍♂️'+
+      '</div>';
+
+    document.getElementById("rxLead").textContent =
+      isRicco ? "店頭で承ったお度数でございます。" : "お店でお作りしたメガネの度数です👓";
+    document.getElementById("rxBody").innerHTML = html;
+    document.getElementById("rxSheet").classList.add("open");
+    document.body.style.overflow = "hidden";
+  };
+
+  window.closeRx = function(){
+    document.getElementById("rxSheet").classList.remove("open");
+    document.body.style.overflow = "";
+  };
+
+  /* ===== ご用途をうかがう（コピー集シーン6）=====
+   *  設計の肝：①選択肢を先に出す ②「手作業でお探しします」で待つ前提を伝える
+   *           ③コンタクトの度数差は“用途を選ぶ時点で”伝える（渡す時では遅い） */
+  var RX_PURPOSES_SIX = ["最近の見え方が気になる", "自分の度数、記録しておきたい", "他店・ネットでメガネを作りたい"];
+  var RX_PURPOSES_RIC = ["見え方のご確認に", "記録として、お手元に", "他店・ネットでのご購入に"];
+
+  window.openRxAsk = function(){
+    var isRicco = rxIsRicco();
+    var list = isRicco ? RX_PURPOSES_RIC : RX_PURPOSES_SIX;
+
+    var body = "";
+    list.forEach(function(t){
+      body += '<button type="button" class="rx-pick" onclick="sendRxRequest(this,\''+
+              t.replace(/'/g, "\\'")+'\')">'+t+'</button>';
+    });
+    body += '<div class="rx-tip">'+
+      (isRicco
+        ? '※スタッフがカルテを確認し、のちほどご連絡いたします。'
+        : '※手作業でカルテをお探ししますので、お返事まで少しだけお待ちを☺️')+
+      '<br><br>💡コンタクト購入で度数を知りたい方へ<br>'+
+      'メガネとは度数が異なります。(目とレンズの距離が違うため)<br>'+
+      (isRicco
+        ? '眼科さんやご購入先での測定をおすすめいたします。'
+        : '眼科さんやご購入先での測定が安心です👀')+
+      '</div>';
+    body += '<div class="rx-sending" id="rxAskMsg"></div>';
+
+    document.getElementById("rxAskTitle").textContent =
+      isRicco ? "👓度数のお問い合わせ" : "👓度数、お調べします!";
+    document.getElementById("rxAskLead").textContent =
+      isRicco ? "ご用途をお聞かせください。" : "ご用途を教えてください。";
+    document.getElementById("rxAskBody").innerHTML = body;
+    document.getElementById("rxAskSheet").classList.add("open");
+    document.body.style.overflow = "hidden";
+  };
+
+  window.closeRxAsk = function(){
+    document.getElementById("rxAskSheet").classList.remove("open");
+    document.body.style.overflow = "";
+  };
+
+  /* 依頼を送る。
+     ①GASに受付を記録（スタッフ画面「My度数情報ご希望のお客様」に並ぶ）
+     ②お店のLINEにもメッセージを送る（片方を見落としても拾える二重通知） */
+  window.sendRxRequest = function(btn, purpose){
+    if(RX_ASKING) return;
+    RX_ASKING = true;
+
+    var msg = document.getElementById("rxAskMsg");
+    var picks = document.querySelectorAll(".rx-pick");
+    for(var i=0;i<picks.length;i++){ picks[i].disabled = true; picks[i].style.opacity = ".45"; }
+    if(btn) btn.style.opacity = "1";
+    if(msg) msg.textContent = "お店に送っています…";
+
+    var done = function(ok, text){
+      RX_ASKING = false;
+      if(!ok){
+        for(var i=0;i<picks.length;i++){ picks[i].disabled = false; picks[i].style.opacity = "1"; }
+      }
+      if(msg) msg.textContent = text;
+    };
+
+    var cbName = "__rxreq_" + Date.now();
+    var timer = setTimeout(function(){
+      cleanup();
+      done(false, "通信がタイムアウトしました。もう一度お試しください。");
+    }, 20000);
+
+    function cleanup(){
+      try{ delete window[cbName]; }catch(e){ window[cbName] = undefined; }
+      var sc = document.getElementById(cbName);
+      if(sc && sc.parentNode) sc.parentNode.removeChild(sc);
+    }
+
+    window[cbName] = function(json){
+      clearTimeout(timer);
+      cleanup();
+      if(!json || json.ok !== true){
+        done(false, (json && json.error) ? json.error : "送信に失敗しました。もう一度お試しください。");
+        return;
+      }
+      /* ②お店のトークにも流す。ここが失敗しても受付自体は済んでいるので、
+           お客様には成功として伝える（スタッフ画面には確実に出ている）。 */
+      try{
+        liff.sendMessages([{ type:"text", text:"度数のお問い合わせ（"+purpose+"）" }])
+          .then(function(){}).catch(function(){});
+      }catch(e){}
+
+      done(true, "承りました。お調べしてご連絡いたします🙇‍♂️");
+      setTimeout(function(){
+        closeRxAsk();
+        if(PAGE_DATA){ PAGE_DATA.rxPending = true; render(); }
+      }, 1600);
+    };
+
+    var url = API_URL
+      + "?action=requestRx"
+      + "&idToken=" + encodeURIComponent(liff.getIDToken() || "")
+      + "&purpose=" + encodeURIComponent(purpose)
+      + "&callback=" + cbName;
+
+    var sc = document.createElement("script");
+    sc.id = cbName;
+    sc.src = url;
+    sc.onerror = function(){
+      clearTimeout(timer); cleanup();
+      done(false, "通信に失敗しました。もう一度お試しください。");
+    };
+    document.body.appendChild(sc);
   };
 
   /* ===== GASにデータを取りに行く ===== */
