@@ -25,17 +25,30 @@
   .sec-label::after{ content:""; flex:1; height:1px; background:rgba(0,0,0,.09); }
   .card{ position:relative; border-radius:16px; padding:18px 20px 26px; margin-bottom:14px; overflow:hidden; isolation:isolate; transition:transform .18s ease; }
   .card:active{ transform:scale(.99); }
-  .card-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  /* ★2026/9/15夜 再修正：以前の「1fr auto」グリッドの2行構成では、会員No.とイラスト
+     （＋「買ったばかり」タグ＋ボタン列）がそれぞれ別々のグリッド行のtext-align:centerに
+     頼っていたため、実機では中心がそろわず、会員No.がイラストより右にズレて見えていた。
+     会員No.〜ボタン列までを1つのdiv（.card-right）にまとめ、flexboxのcolumn＋
+     align-items:centerで直接そろえる方式に変更。これなら中身の横幅がどう変わっても
+     必ず同じ中心線に乗る。.card-rightの列全体は、名前側（1fr）が残りスペースを
+     取る分だけ、カードの右側に寄る。 */
+  .card-headgrid{ display:grid; grid-template-columns:1fr auto; grid-template-rows:auto auto; align-items:center; column-gap:10px; row-gap:10px; margin-bottom:14px; }
+  /* ★2026/9/15夜 再修正②：align-items:centerだけだと、.specs内の.pick-row（display:flex
+     の横並びボタン）が幅の計算に絡んで、実機で.card-noとの中心がわずかにズレて見える
+     現象が確認された。原因の特定に自信が持てなかったため、幅そのものを180pxに固定し、
+     中の要素は全部その180px基準でtext-align:centerさせる、より確実な方式に変えた。
+     あわせて、ご要望のとおりブロック全体を少し右へ寄せてある（margin-right）。 */
+  .card-right{ grid-column:2; grid-row:1 / 3; display:flex; flex-direction:column;
+               align-items:stretch; width:180px; text-align:center; margin-right:-6px; }
   .brand-logo{ width:auto; display:block; }
   .ricco .brand-logo{ height:18px; }
   .sixfour .brand-logo{ height:25px; }
   .logo-text{ font-size:13px; font-weight:700; letter-spacing:.22em; opacity:.75; }
   .card-no{ font-family:"SFMono-Regular",Consolas,"Courier New",monospace; font-size:22px; font-weight:600; letter-spacing:.12em; opacity:.92; }
-  .mid{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:10px; }
   .mid-left{ min-width:0; }
   .card-name{ font-size:30px; font-weight:600; letter-spacing:.03em; line-height:1.05; margin-bottom:4px; }
   .card-sub{ font-size:13.8px; opacity:.82; }
-  .specs{ text-align:center; flex:none; }
+  .specs{ text-align:center; flex:none; width:100%; }
   .specs .gimg{ display:block; width:84px; height:auto; margin:0 auto; }
   .aging-tag{ font-size:10.5px; opacity:.6; margin-top:6px; letter-spacing:.02em; }
   /* ★2026/9/12：保証リングとラベルが詰まって見えたため、すき間を少し広げた */
@@ -249,7 +262,7 @@
   /* ★2026/9/3：下線リンクだと「押せる」と気づかれないため、枠付きのボタンにした */
   /* ★2026/9/12：メモボタンが増えたため横並びにした。
      縦積みにするとカードの高さが伸びて保証欄の線とぶつかるため。 */
-  .pick-row{ display:flex; gap:5px; justify-content:center; margin-top:7px; }
+  .pick-row{ display:flex; flex-wrap:wrap; gap:5px; justify-content:center; margin-top:7px; }
   .pick-btn{ display:inline-block; font-size:9.5px;
              color:var(--ink); background:rgba(255,255,255,.72);
              border:1px solid rgba(0,0,0,.16); border-radius:999px;
@@ -919,7 +932,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     document.getElementById('mmNote').innerHTML =
       'このメモは、あなたのスマホの中だけに保存されます。<br>'+
       'お店からは全く見えませんので、ご自由にどうぞ☺️<br>'+
-      '※なのでスマホを機種変更すると消えます。あしからず。';
+      '※なのでスマホを機種変更すると消えます。ご了承ください🙏';
     var cur = memoGet(rowId);
     var inp = document.getElementById('mmInput');
     inp.value = cur;
@@ -999,9 +1012,13 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
         '<div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date">'+esc(card.frameEnd)+'</div></div></div>';
     }
     var html='<div class="card '+cls+'">'+
-      '<div class="card-top">'+logoHtml(isRicco)+'<div class="card-no">'+esc(card.memberNo)+'</div></div>'+
-      '<div class="mid"><div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+subHtml(card.sub)+'</div></div>'+
-        specsHtml(card.months, true, card.design, card.rowId, card.rowId)+'</div>'+
+      '<div class="card-headgrid">'+
+        logoHtml(isRicco) +
+        '<div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+subHtml(card.sub)+'</div></div>' +
+        '<div class="card-right"><div class="card-no">'+esc(card.memberNo)+'</div>' +
+          specsHtml(card.months, true, card.design, card.rowId, card.rowId) +
+        '</div>' +
+      '</div>'+
       '<div class="w-grid">'+ frameCell +
         '<div class="w-cell">'+ring(card.visionActive,card.visionRatio,card.visionDays,isRicco)+
           '<div class="w-texts"><div class="w-label">見え方保証'+u15+'</div><div class="w-date">'+esc(card.visionEnd)+'</div></div></div>'+
@@ -1029,9 +1046,13 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       : '🏆 <b>殿堂入りメガネ</b><br>'+days+
         'お疲れさま。そして、ありがとう👓🕶️<br>——調整・クリーニングは、<span class="forever-in">いつまでも</span>無料です☺️';
     return '<div class="card '+(isRicco?"ricco":"sixfour")+' archived"><div class="archived-stamp">ARCHIVE</div>'+
-      '<div class="card-top">'+logoHtml(isRicco)+'<div class="card-no">'+esc(card.memberNo)+'</div></div>'+
-      '<div class="mid"><div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+subHtml(card.sub)+'</div></div>'+
-        specsHtml(card.months, false, card.design, null, card.rowId)+'</div>'+
+      '<div class="card-headgrid">'+
+        logoHtml(isRicco) +
+        '<div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+subHtml(card.sub)+'</div></div>' +
+        '<div class="card-right"><div class="card-no">'+esc(card.memberNo)+'</div>' +
+          specsHtml(card.months, false, card.design, null, card.rowId) +
+        '</div>' +
+      '</div>'+
       '<div class="w-grid"><div class="w-cell"><div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date">'+esc(card.frameEnd)+'</div></div></div>'+
         '<div class="w-cell"><div class="w-texts"><div class="w-label">見え方保証</div><div class="w-date">'+esc(card.visionEnd)+'</div></div></div></div>'+
       '<div class="archived-msg">'+msg+'</div>'+
@@ -1754,14 +1775,16 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
 
     /* ★2026/9/15 追加：こちらも同じ理由（4G回線の不安定さ）で、1回失敗しても
        お客様には見せずに自動でもう1回だけ静かにやり直す。 */
+    var RX_MAX_ATTEMPTS = 3;   // ★2026/9/15：2回→3回に増強（4G回線の不安定さ対策）
+
     function attemptSend(attempt){
-      var isRetry = attempt > 1;
+      var isLast = attempt >= RX_MAX_ATTEMPTS;
       var cbName = "__rxreq_" + Date.now() + "_" + attempt;
-      var timeoutMs = isRetry ? 20000 : 8000;
+      var timeoutMs = isLast ? 20000 : 8000;
 
       var timer = setTimeout(function(){
         cleanup();
-        if (!isRetry) { attemptSend(attempt + 1); return; }
+        if (!isLast) { attemptSend(attempt + 1); return; }
         done(false, "通信がタイムアウトしました。もう一度お試しください。");
       }, timeoutMs);
 
@@ -1775,7 +1798,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
         clearTimeout(timer);
         cleanup();
         if(!json || json.ok !== true){
-          if (!isRetry) { attemptSend(attempt + 1); return; }
+          if (!isLast) { attemptSend(attempt + 1); return; }
           done(false, (json && json.error) ? json.error : "送信に失敗しました。もう一度お試しください。");
           return;
         }
@@ -1804,7 +1827,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       sc.src = url;
       sc.onerror = function(){
         clearTimeout(timer); cleanup();
-        if (!isRetry) { attemptSend(attempt + 1); return; }
+        if (!isLast) { attemptSend(attempt + 1); return; }
         done(false, "通信に失敗しました。もう一度お試しください。");
       };
       document.body.appendChild(sc);
@@ -1819,16 +1842,18 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
    *   1回目が失敗しても、お客様には見せずに自動でもう1回だけ静かにやり直す。
    *   1回目のタイムアウトは20秒→8秒に短縮（失敗ならさっさと2回目に切り替えたいため）。
    *   2回とも失敗したときだけ、今までのエラー画面を出す。 */
+  var FETCH_MAX_ATTEMPTS = 3;   // ★2026/9/15：2回→3回に増強（4G回線の不安定さ対策）
+
   function fetchCards(idToken, attempt){
     attempt = attempt || 1;
-    var isRetry = attempt > 1;
+    var isLast = attempt >= FETCH_MAX_ATTEMPTS;
 
     var cbName = "__cards_" + Date.now() + "_" + attempt;
-    var timeoutMs = isRetry ? 20000 : 8000;   // 1回目は短く切って、2回目（最終）はしっかり待つ
+    var timeoutMs = isLast ? 20000 : 8000;   // 最後の1回だけしっかり待つ。それ以外は短く切って次へ
 
     var timer = setTimeout(function(){
       cleanup();
-      if (!isRetry) { fetchCards(idToken, attempt + 1); return; }
+      if (!isLast) { fetchCards(idToken, attempt + 1); return; }
       renderError("通信がタイムアウトしました");
     }, timeoutMs);
 
@@ -1842,7 +1867,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       clearTimeout(timer);
       cleanup();
       if(!json || json.ok !== true){
-        if (!isRetry) { fetchCards(idToken, attempt + 1); return; }
+        if (!isLast) { fetchCards(idToken, attempt + 1); return; }
         renderError(json && json.error ? json.error : "データ取得に失敗しました");
         return;
       }
@@ -1861,7 +1886,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     sc.onerror = function(){
       clearTimeout(timer);
       cleanup();
-      if (!isRetry) { fetchCards(idToken, attempt + 1); return; }
+      if (!isLast) { fetchCards(idToken, attempt + 1); return; }
       renderError("サーバーに接続できませんでした");
     };
     document.body.appendChild(sc);
