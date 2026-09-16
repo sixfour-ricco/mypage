@@ -182,7 +182,13 @@
   .sheet .w-item{ padding:14px 0; border-top:1px solid rgba(0,0,0,.08); }
   .sheet .w-item h3{ font-size:13px; margin:0 0 6px; letter-spacing:.03em; }
   .sheet .w-item p{ font-size:12px; line-height:1.85; margin:0; color:#4a4436; }
-  .sheet .w-icon{ font-size:14px; margin-right:4px; }
+  .sheet .w-icon{ font-size:14px; margin-left:4px; }
+  /* ★2026/9/16夜：両ブランドをお持ちの方だけ出すタブ */
+  .sheet .w-tabs{ display:flex; gap:8px; margin-bottom:10px; }
+  .sheet .w-tab{ flex:1; padding:8px; border-radius:20px; border:1px solid rgba(0,0,0,.15);
+      background:#fff; font-family:inherit; font-size:12px; font-weight:700;
+      color:var(--ink); cursor:pointer; }
+  .sheet .w-tab.active{ background:var(--ink); color:#fff; border-color:var(--ink); }
   .sheet .term{ display:inline-block; font-size:11px; font-weight:700; letter-spacing:.04em;
     background:#efece2; color:#6b6250; border-radius:5px; padding:3px 8px; margin-bottom:7px; }
   .sheet .forever{ font-weight:700; font-size:13px; color:#a8452c; }
@@ -456,7 +462,7 @@
     <div class="lead">お渡し日から下記の期間、無料で対応いたします。</div>
 
     <div class="w-item">
-      <span class="w-icon">👀</span><span class="term">見え方保証 ／ 90日</span>
+      <span class="term">見え方保証 ／ 90日</span><span class="w-icon">👀</span>
       <h3>度数が合わないとき</h3>
       <p>お渡し日から90日間は見え方保証いたします。<br>
       また15歳以下のお客様は、成長で度数も変わりやすいため180日間となりますのでご安心ください。<br>
@@ -466,9 +472,16 @@
       <span class="forever">※眼科さんの処方箋でメガネ作製の場合は、再度眼科さんの処方箋が必要となります。</span></p>
     </div>
 
-    <!-- ★2026/9/16：フレーム・レンズの保証だけブランドで見出し・本文とも出し分け。表示切替は showActions() で行う -->
-    <div class="w-item" id="frameItemSix">
-      <span class="w-icon">👓</span><span class="term">メガネ・サングラス保証 ／ 1年</span>
+    <!-- ★2026/9/16：フレーム・レンズの保証はお持ちの商品のブランドで出し分け。
+         両ブランドをお持ちの方だけタブを出し、最新のお渡し日のブランドを最初に表示する。
+         表示の組み立ては setupFrameWarranty() で行う -->
+    <div class="w-item">
+      <div class="w-tabs" id="frameTabs" style="display:none;">
+        <button type="button" class="w-tab" id="tabBtnSix" onclick="showFrameTab('sixfour')">Sixfourの保証</button>
+        <button type="button" class="w-tab" id="tabBtnRicco" onclick="showFrameTab('ricco')">RICCOの保証</button>
+      </div>
+    <div id="frameItemSix">
+      <span class="term">メガネ・サングラス保証 ／ 1年</span><span class="w-icon">👓</span>
       <h3>フレームやレンズに不具合が生じたとき</h3>
       <p>お渡し日より1年間はフレーム・レンズの品質保証いたします。<br>
       日常の使用でフレーム・レンズに不具合が生じた場合、無料で交換・修理いたしますのでご相談ください。<br>
@@ -476,24 +489,25 @@
       <span class="forever">※過失の場合でも1年間は破損保証（通常価格の50％で交換）もございますので、スタッフにご相談ください。</span></p>
     </div>
 
-    <div class="w-item" id="frameItemRicco" style="display:none;">
-      <span class="w-icon">🕶️</span><span class="term">アイウェア保証 ／ 各ブランドに準ずる</span>
+    <div id="frameItemRicco" style="display:none;">
+      <span class="term">アイウェア保証 ／ 各ブランドに準ずる</span><span class="w-icon">🕶️</span>
       <h3>フレームやレンズに不具合が生じたとき</h3>
       <p>フレームは各ブランドの保証内容に準じます。<br>
-      初期不良はメーカー在庫がある限り交換対応いたします。<br>
+      初期不良はメーカー在庫がある場合、交換対応いたします。<br>
       レンズはお渡し日より1年間は品質保証いたします。<br>
       経年劣化・過失（落としたり、車内放置、サウナ・入浴等）による傷・破損は有償修理・交換のご対応となります。</p>
     </div>
+    </div>
 
     <div class="w-item">
-      <span class="w-icon">🧼</span><span class="term">クリーニング・視力検査・調整 ／ 無期限</span>
+      <span class="term">クリーニング・視力検査・調整 ／ 無期限</span><span class="w-icon">🧼</span>
       <h3>ゆるみ・ズレ・汚れが気になったとき</h3>
-      <p>ネジの締め直し、掛け具合の調整、超音波洗浄、視力検査はいつでも、いつまでも無料です。<br>
+      <p>ネジの締め直し、掛け具合の調整、超音波洗浄、視力検査は<span class="forever">いつでも、いつまでも無料です</span>。<br>
       保証期間が過ぎた後でも、無期限で承っておりますのでお気軽にお立ち寄りください。</p>
     </div>
 
     <div class="w-item">
-      <span class="w-icon">📱</span><span class="term">お手続き</span>
+      <span class="term">お手続き</span><span class="w-icon">📱</span>
       <h3>ご来店のとき</h3>
       <p>この会員証のマイページをスタッフにお見せいただき、ご用件をお伝えいただくだけで大丈夫です。<br>
       <span class="forever">※保証書やレシートのご持参は不要です。</span></p>
@@ -1613,11 +1627,37 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
        RICCO側の画面ではSixfourの表記を一切出さない方針のため、
        「今どちらの画面を開いているか（SHOP）」で判定する方式に変更した。 */
     document.getElementById("warrantyMore").style.display = (SHOP === "ricco") ? "none" : "block";
+    setupFrameWarranty();
+  }
 
-    /* ★2026/9/16：フレーム・レンズ保証の見出し・本文をブランドで出し分け */
-    var isRiccoBrand = (SHOP === "ricco");
-    document.getElementById("frameItemSix").style.display   = isRiccoBrand ? "none" : "block";
-    document.getElementById("frameItemRicco").style.display = isRiccoBrand ? "block" : "none";
+  /* ★2026/9/16夜 修正：フレーム・レンズ保証は「今どちらの画面を開いているか（SHOP）」ではなく
+     「実際にお持ちの商品のブランド」で決める。SHOP基準だと、両ブランドをお持ちの方が
+     一方の画面から開くと、もう一方の商品の保証内容が出てしまう不具合があったため。
+     両ブランドをお持ちの方だけタブを出し、お渡し日が最新の方のブランドを最初に開く。 */
+  function setupFrameWarranty(){
+    var cards = (PAGE_DATA && PAGE_DATA.cards) || [];
+    var hasRicco = cards.some(function(c){ return c.brand === "RICCO"; });
+    var hasSix   = cards.some(function(c){ return c.brand !== "RICCO"; });
+    var tabs = document.getElementById("frameTabs");
+
+    if(hasRicco && hasSix){
+      tabs.style.display = "flex";
+      var sorted = cards.slice().sort(function(a, b){
+        return (b.delivery || "").localeCompare(a.delivery || "");
+      });
+      showFrameTab(sorted.length && sorted[0].brand === "RICCO" ? "ricco" : "sixfour");
+    } else {
+      tabs.style.display = "none";
+      document.getElementById("frameItemSix").style.display   = hasSix   ? "block" : "none";
+      document.getElementById("frameItemRicco").style.display = hasRicco ? "block" : "none";
+    }
+  }
+
+  function showFrameTab(which){
+    document.getElementById("frameItemSix").style.display   = (which === "sixfour") ? "block" : "none";
+    document.getElementById("frameItemRicco").style.display = (which === "ricco")   ? "block" : "none";
+    document.getElementById("tabBtnSix").classList.toggle("active", which === "sixfour");
+    document.getElementById("tabBtnRicco").classList.toggle("active", which === "ricco");
   }
 
   window.openWarranty = function(){
@@ -1730,9 +1770,12 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
 
     /* ★2026/9/16：作製日を独立チップから外して、リード文に合体させた
        （「作製2026.08.31」単独だと何のことか分かりにくいとのご指摘のため） */
-    document.getElementById("rxLead").textContent = madeNice
-      ? (isRicco ? "店頭で"+madeNice+"に作製を承ったお度数でございます。"
-                 : "お店で"+madeNice+"に作製したメガネの度数です👓")
+    /* ★2026/9/16夜：作製日を、レンズ種類・屈折率のチップと全く同じ見た目（.rx-chip）で
+       文中に埋め込む。地の文と同じ太さ・色にならないよう、あえてタグごと差し込んでいる */
+    var madeChip = madeNice ? '<span class="rx-chip">'+madeNice+'</span>' : '';
+    document.getElementById("rxLead").innerHTML = madeNice
+      ? (isRicco ? "店頭で"+madeChip+"に作製を承ったお度数でございます。"
+                 : "お店で"+madeChip+"に作製したメガネの度数です👓")
       : (isRicco ? "店頭で承ったお度数でございます。" : "お店でお作りしたメガネの度数です👓");
     document.getElementById("rxBody").innerHTML = html;
     document.getElementById("rxSheet").classList.add("open");
