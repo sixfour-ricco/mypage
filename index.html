@@ -182,6 +182,7 @@
   .sheet .w-item{ padding:14px 0; border-top:1px solid rgba(0,0,0,.08); }
   .sheet .w-item h3{ font-size:13px; margin:0 0 6px; letter-spacing:.03em; }
   .sheet .w-item p{ font-size:12px; line-height:1.85; margin:0; color:#4a4436; }
+  .sheet .w-icon{ font-size:14px; margin-right:4px; }
   .sheet .term{ display:inline-block; font-size:11px; font-weight:700; letter-spacing:.04em;
     background:#efece2; color:#6b6250; border-radius:5px; padding:3px 8px; margin-bottom:7px; }
   .sheet .forever{ font-weight:700; font-size:13px; color:#a8452c; }
@@ -319,8 +320,10 @@
   /* ★入力例はプレースホルダーに入れると1つしか見えないため、独立した枠で常に3つ見せる */
   .mm-ex{ font-size:11px; color:#a39d8c; line-height:1.8; margin-bottom:10px;
           background:#fbfaf8; border:1px solid #ece8e1; border-radius:8px; padding:8px 10px; }
+  /* ★2026/9/16：1行入力→2行のtextareaに変更。resizeは邪魔になるので固定 */
   .mm-input{ width:100%; padding:11px; font-size:15px; border:1px solid #d5d0c7;
-             border-radius:8px; box-sizing:border-box; font-family:inherit; color:var(--ink); }
+             border-radius:8px; box-sizing:border-box; font-family:inherit; color:var(--ink);
+             min-height:64px; resize:none; line-height:1.5; }
   .mm-count{ text-align:right; font-size:10.5px; color:var(--sub); margin-top:4px; }
   .mm-save{ width:100%; margin-top:10px; padding:13px; border:none; border-radius:10px;
             background:var(--ink); color:#fff; font-size:14px; font-weight:700; font-family:inherit; }
@@ -415,8 +418,8 @@
       <button class="mm-close" onclick="closeMemo()">閉じる</button>
     </div>
     <div class="mm-note" id="mmNote"></div>
-    <div class="mm-ex">例）ランニング用メガネ(T_T)<br>　　なくしたと思って買った2本目<br>　　寝落ち用(意外と丈夫)</div>
-    <input class="mm-input" id="mmInput" type="text" maxlength="30" placeholder="メモを入力">
+    <div class="mm-ex">例）なくした💦と思って買った2本目<br>　　寝落ち用(意外と丈夫)</div>
+    <textarea class="mm-input" id="mmInput" maxlength="30" placeholder="メモを入力"></textarea>
     <div class="mm-count" id="mmCount">0/30</div>
     <button class="mm-save" id="mmSave" onclick="saveMemo()">保存する</button>
     <button class="mm-del" id="mmDel" onclick="deleteMemo()" style="display:none;">メモを消す</button>
@@ -453,32 +456,47 @@
     <div class="lead">お渡し日から下記の期間、無料で対応いたします。</div>
 
     <div class="w-item">
-      <span class="term">見え方保証 ／ 90日</span>
-      <h3>度数が合わないと感じたとき</h3>
-      <p>お渡し日から90日以内であれば、レンズを無料でお作り直しします。<br>
-      15歳以下のお客様は、成長で度数が変わりやすいため<b>180日</b>とさせていただいております。<br>
-      期間を過ぎた後のレンズ交換は有料になりますが、<span class="forever">見え方の確認はいつまでも無料</span>です。</p>
+      <span class="w-icon">👀</span><span class="term">見え方保証 ／ 90日</span>
+      <h3>度数が合わないとき</h3>
+      <p>お渡し日から90日間は見え方保証いたします。<br>
+      また15歳以下のお客様は、成長で度数も変わりやすいため180日間となりますのでご安心ください。<br>
+      期間中、見え方の不具合（度数が強い・弱い等）や慣れない場合、無料交換いたします。<br>
+      レンズカラーの濃度変更も期間中は1回限り無料交換いたします。<br>
+      <span class="forever">※目の疾患（白内障・緑内障等）、レーシック手術等による視力変化は保証対象外となります。</span><br>
+      <span class="forever">※眼科さんの処方箋でメガネ作製の場合は、再度眼科さんの処方箋が必要となります。</span></p>
+    </div>
+
+    <!-- ★2026/9/16：フレーム・レンズの保証だけブランドで見出し・本文とも出し分け。表示切替は showActions() で行う -->
+    <div class="w-item" id="frameItemSix">
+      <span class="w-icon">👓</span><span class="term">メガネ・サングラス保証 ／ 1年</span>
+      <h3>フレームやレンズに不具合が生じたとき</h3>
+      <p>お渡し日より1年間はフレーム・レンズの品質保証いたします。<br>
+      日常の使用でフレーム・レンズに不具合が生じた場合、無料で交換・修理いたしますのでご相談ください。<br>
+      お客様の過失（落としたり、車内放置、サウナ・入浴時など）は保証対象外となりますのでご注意ください。<br>
+      <span class="forever">※過失の場合でも1年間は破損保証（通常価格の50％で交換）もございますので、スタッフにご相談ください。</span></p>
+    </div>
+
+    <div class="w-item" id="frameItemRicco" style="display:none;">
+      <span class="w-icon">🕶️</span><span class="term">アイウェア保証 ／ 各ブランドに準ずる</span>
+      <h3>フレームやレンズに不具合が生じたとき</h3>
+      <p>フレームは各ブランドの保証内容に準じます。<br>
+      初期不良はメーカー在庫がある限り交換対応いたします。<br>
+      レンズはお渡し日より1年間は品質保証いたします。<br>
+      経年劣化・過失（落としたり、車内放置、サウナ・入浴等）による傷・破損は有償修理・交換のご対応となります。</p>
     </div>
 
     <div class="w-item">
-      <span class="term">メガネ・サングラス保証 ／ 1年</span>
-      <h3>フレームやレンズに不具合が出たとき</h3>
-      <p>お渡し日から1年以内の、通常のご使用による不具合は無料で修理・交換いたします。<br>
-      落下・踏みつけなど、お客様の過失による破損は対象外となりますが、その場合もできる限り安価な方法をご提案いたします。</p>
-    </div>
-
-    <div class="w-item">
-      <span class="term">点検・調整 ／ 期限なし</span>
+      <span class="w-icon">🧼</span><span class="term">クリーニング・視力検査・調整 ／ 無期限</span>
       <h3>ゆるみ・ズレ・汚れが気になったとき</h3>
-      <p>かけ具合の調整、ネジの締め直し、超音波洗浄は<span class="forever">いつまでも無料</span>です。<br>
-      保証期間が終わった後も、何年経っても承ります。お気軽にお立ち寄りください。</p>
+      <p>ネジの締め直し、掛け具合の調整、超音波洗浄、視力検査はいつでも、いつまでも無料です。<br>
+      保証期間が過ぎた後でも、無期限で承っておりますのでお気軽にお立ち寄りください。</p>
     </div>
 
     <div class="w-item">
-      <span class="term">お手続き</span>
+      <span class="w-icon">📱</span><span class="term">お手続き</span>
       <h3>ご来店のとき</h3>
-      <p>この会員証の画面をスタッフにお見せいただければ、それだけで確認できます。<br>
-      保証書やレシートのご持参は不要です。</p>
+      <p>この会員証のマイページをスタッフにお見せいただき、ご用件をお伝えいただくだけで大丈夫です。<br>
+      <span class="forever">※保証書やレシートのご持参は不要です。</span></p>
     </div>
 
     <a class="more" id="warrantyMore" href="https://www.6666mega.net/guarantee-repair/" target="_blank" rel="noopener">Sixfour公式サイトでさらに詳しく</a>
@@ -821,7 +839,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     if(card.archived){
       return n + (isRicco ? "共に時を過ごしてまいりました" : "たくさんの景色を一緒に見てきました");
     }
-    return n + (isRicco ? "共に時を過ごしております" : "毎日一緒に見ています👓");
+    return n + (isRicco ? "共に時を過ごしております" : "いつも一緒に同じ景色を見ています👓");
   }
 
   /* ===== 文字を安全に表示する ===== */
@@ -1589,12 +1607,17 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
    * ============================================================ */
   function showActions(){
     document.getElementById("actions").style.display = "flex";
-    // Sixfourのカードを1枚でも持っている人にだけ、公式サイトへの導線を出す
-    var hasSix = true;
-    if(PAGE_DATA && PAGE_DATA.cards && PAGE_DATA.cards.length){
-      hasSix = PAGE_DATA.cards.some(function(c){ return c.brand !== "RICCO"; });
-    }
-    document.getElementById("warrantyMore").style.display = hasSix ? "block" : "none";
+    /* ★2026/9/16 修正：以前は「Sixfourのカードを1枚でも持っているか」で判定していたが、
+       Sixfourの方とRICCOの方、両方のカードを持つお客様がRICCO側（?shop=ricco）を
+       開いたときにもSixfourの外部リンクが出てしまっていた。
+       RICCO側の画面ではSixfourの表記を一切出さない方針のため、
+       「今どちらの画面を開いているか（SHOP）」で判定する方式に変更した。 */
+    document.getElementById("warrantyMore").style.display = (SHOP === "ricco") ? "none" : "block";
+
+    /* ★2026/9/16：フレーム・レンズ保証の見出し・本文をブランドで出し分け */
+    var isRiccoBrand = (SHOP === "ricco");
+    document.getElementById("frameItemSix").style.display   = isRiccoBrand ? "none" : "block";
+    document.getElementById("frameItemRicco").style.display = isRiccoBrand ? "block" : "none";
   }
 
   window.openWarranty = function(){
@@ -1659,15 +1682,23 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   }
 
   /* ===== 表示 ===== */
+  /* ★2026/9/16 追加：「2026-08-31」→「2026.8.31」（月日の頭の0を消す）。
+     既存の他の日付表示（お渡し日等）と表記を揃えるため。 */
+  function rxDateNice(iso){
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || '');
+    if(!m) return String(iso || '').replace(/-/g, '.');
+    return m[1] + '.' + parseInt(m[2], 10) + '.' + parseInt(m[3], 10);
+  }
+
   window.openRx = function(){
     var rx = PAGE_DATA && PAGE_DATA.rx;
     if(!rx) return;
     var isRicco = rxIsRicco();
+    var madeNice = rx.made ? rxDateNice(rx.made) : '';
 
     var chips = '';
     if(rx.lens)  chips += '<span class="rx-chip">'+rx.lens+'</span>';
     if(rx.index) chips += '<span class="rx-chip">'+rx.index+'</span>';
-    if(rx.made)  chips += '<span class="rx-chip">作製 '+rx.made.replace(/-/g,".")+'</span>';
 
     /* ADDは遠用・近用だと空。空の欄は「ー」で埋めて、表がガタつかないようにする */
     var cell = function(v){ return (v && String(v).trim()) ? v : "ー"; };
@@ -1697,8 +1728,12 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
         'お問い合わせください🙇‍♂️'+
       '</div>';
 
-    document.getElementById("rxLead").textContent =
-      isRicco ? "店頭で承ったお度数でございます。" : "お店でお作りしたメガネの度数です👓";
+    /* ★2026/9/16：作製日を独立チップから外して、リード文に合体させた
+       （「作製2026.08.31」単独だと何のことか分かりにくいとのご指摘のため） */
+    document.getElementById("rxLead").textContent = madeNice
+      ? (isRicco ? "店頭で"+madeNice+"に作製を承ったお度数でございます。"
+                 : "お店で"+madeNice+"に作製したメガネの度数です👓")
+      : (isRicco ? "店頭で承ったお度数でございます。" : "お店でお作りしたメガネの度数です👓");
     document.getElementById("rxBody").innerHTML = html;
     document.getElementById("rxSheet").classList.add("open");
     document.body.style.overflow = "hidden";
