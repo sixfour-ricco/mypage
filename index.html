@@ -182,7 +182,7 @@
   .sheet .w-item{ padding:14px 0; border-top:1px solid rgba(0,0,0,.08); }
   .sheet .w-item h3{ font-size:13px; margin:0 0 6px; letter-spacing:.03em; }
   .sheet .w-item p{ font-size:12px; line-height:1.85; margin:0; color:#4a4436; }
-  .sheet .w-icon{ font-size:14px; margin-left:4px; }
+  .sheet .w-icon{ font-size:14px; margin-right:4px; }
   /* ★2026/9/16夜：両ブランドをお持ちの方だけ出すタブ */
   .sheet .w-tabs{ display:flex; gap:8px; margin-bottom:10px; }
   .sheet .w-tab{ flex:1; padding:8px; border-radius:20px; border:1px solid rgba(0,0,0,.15);
@@ -462,7 +462,7 @@
     <div class="lead">お渡し日から下記の期間、無料で対応いたします。</div>
 
     <div class="w-item">
-      <span class="term">見え方保証 ／ 90日</span><span class="w-icon">👀</span>
+      <span class="w-icon">👀</span><span class="term">見え方保証 ／ 90日</span>
       <h3>度数が合わないとき</h3>
       <p>お渡し日から90日間は見え方保証いたします。<br>
       また15歳以下のお客様は、成長で度数も変わりやすいため180日間となりますのでご安心ください。<br>
@@ -481,7 +481,7 @@
         <button type="button" class="w-tab" id="tabBtnRicco" onclick="showFrameTab('ricco')">RICCOの保証</button>
       </div>
     <div id="frameItemSix">
-      <span class="term">メガネ・サングラス保証 ／ 1年</span><span class="w-icon">👓</span>
+      <span class="w-icon">👓</span><span class="term">メガネ・サングラス保証 ／ 1年</span>
       <h3>フレームやレンズに不具合が生じたとき</h3>
       <p>お渡し日より1年間はフレーム・レンズの品質保証いたします。<br>
       日常の使用でフレーム・レンズに不具合が生じた場合、無料で交換・修理いたしますのでご相談ください。<br>
@@ -490,7 +490,7 @@
     </div>
 
     <div id="frameItemRicco" style="display:none;">
-      <span class="term">アイウェア保証 ／ 各ブランドに準ずる</span><span class="w-icon">🕶️</span>
+      <span class="w-icon">🕶️</span><span class="term">アイウェア保証 ／ 各ブランドに準ずる</span>
       <h3>フレームやレンズに不具合が生じたとき</h3>
       <p>フレームは各ブランドの保証内容に準じます。<br>
       初期不良はメーカー在庫がある場合、交換対応いたします。<br>
@@ -500,14 +500,14 @@
     </div>
 
     <div class="w-item">
-      <span class="term">クリーニング・視力検査・調整 ／ 無期限</span><span class="w-icon">🧼</span>
+      <span class="w-icon">🧼</span><span class="term">クリーニング・視力検査・調整 ／ 無期限</span>
       <h3>ゆるみ・ズレ・汚れが気になったとき</h3>
       <p>ネジの締め直し、掛け具合の調整、超音波洗浄、視力検査は<span class="forever">いつでも、いつまでも無料です</span>。<br>
       保証期間が過ぎた後でも、無期限で承っておりますのでお気軽にお立ち寄りください。</p>
     </div>
 
     <div class="w-item">
-      <span class="term">お手続き</span><span class="w-icon">📱</span>
+      <span class="w-icon">📱</span><span class="term">お手続き</span>
       <h3>ご来店のとき</h3>
       <p>この会員証のマイページをスタッフにお見せいただき、ご用件をお伝えいただくだけで大丈夫です。<br>
       <span class="forever">※保証書やレシートのご持参は不要です。</span></p>
@@ -1286,13 +1286,22 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   function seasonDrawMoon(box){
     /* 満月 ★2026/9/12：会員番号・お名前に重なって読めなくなったため8割に縮小（112→90px） */
     var moon = document.createElement("div");
-    moon.style.cssText = "width:90px;height:90px;border-radius:50%;right:8%;top:7%;background:#F5E050;";
+    /* ★2026/9/16 修正：月はvh基準(%)・雲はpx固定、という別基準だったため、
+       画面の高さによって雲が月のどの高さにかかるかズレていた
+       （狙いは下1/3、実機では上1/3にかかってしまっていた）。
+       月の実際のpx位置を先に計算し、雲の位置をそこからの相対値にすることで、
+       画面の高さが変わっても同じかかり方になるようにした。 */
+    var vh = window.innerHeight || 800;
+    var moonTop = vh * 0.07;
+    moon.style.cssText = "width:90px;height:90px;border-radius:50%;right:8%;top:"+moonTop+"px;background:#F5E050;";
     box.appendChild(moon);
     /* 雲（2枚を重ねて、月の下のほうにかかった状態からスタート→ゆっくり流れて満月が現れる）
-       ★雲は sDrift80 で流す（動きながら8割の大きさを保つキーフレーム） */
+       ★雲は sDrift80 で流す（動きながら8割の大きさを保つキーフレーム）
+       ★月の上から約半分より少し手前〜下端にかけて雲の本体がくるよう、月基準で計算 */
+    var cloudTop = moonTop + 90 * 0.45;
     var startLeft = (window.innerWidth || 380) * 0.55;
     var cloud = document.createElement("div");
-    cloud.style.cssText = "width:150px;height:66px;top:76px;left:"+startLeft+"px;"
+    cloud.style.cssText = "width:150px;height:66px;top:"+cloudTop+"px;left:"+startLeft+"px;"
       + "transform-origin:top left;"
       + "--drift:200px;animation:sDrift80 9s ease-out 1 forwards;";
     var back = document.createElement("div");
@@ -1334,7 +1343,8 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     }catch(e){}
 
     var now = new Date();
-    var key = now.getFullYear()+"-"+(now.getMonth()+1);
+    /* ★2026/9/16：月1回→1日1回に変更 */
+    var key = now.getFullYear()+"-"+(now.getMonth()+1)+"-"+now.getDate();
     if(seasonAlreadyShown(key)) return;
 
     var kind = SEASON_BY_MONTH[now.getMonth()+1];
