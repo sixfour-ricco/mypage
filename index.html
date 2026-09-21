@@ -524,10 +524,16 @@
  *  ★ナオユキさんが書き換えるのは、この下の2行だけ★
  * ============================================================ */
 
-// ① LIFF ID（★2026/8/18 本番用に切り替え済み）
-//    開発用に戻すとき → 2010645044-u3myZwCm
-//    審査用           → 2010645045-liO4OLYM
-var LIFF_ID = "2010645046-1nZwiX2R";
+// ① LIFF ID（★2026/9/22 「開かれた入口に合わせて自動で選ぶ」方式に変更）
+//    入口（本番用・審査用・開発用）ごとにLIFF IDが違うため、1つだけ書くと、
+//    別の入口から開いたときに「Invalid LIFF ID」で読み込めなくなる
+//    （2026/9/18 LINEの審査で「会員証を読み込めませんでした」と却下された原因）。
+//    そこで、下の3つを上から順に試す。★ここは書き換え不要（3つの入口すべてに対応済み）
+var LIFF_IDS = [
+  "2010645046-1nZwiX2R",   // 本番用（お客様はここで1回で通る）
+  "2010645045-liO4OLYM",   // 審査用（LINEの審査員が開く入口）
+  "2010645044-u3myZwCm"    // 開発用（テスト用）
+];
 
   /* ★2026/8/30 追加：どちらのブランドから開かれたかを判定する。
      リッチメニューのURLに ?shop=ricco / ?shop=sixfour を付けておく。
@@ -2086,8 +2092,58 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     });
   })();
 
-  liff.init({ liffId: LIFF_ID })
+  /*LIFF_FALLBACK_START*/
+  /* ★2026/9/22 追加：LIFF IDを「開かれた入口」に合わせて自動で選ぶ。
+   *  ・LIFF_IDS（本番→審査用→開発用）を上から順に試す。
+   *  ・liff.init() が失敗したときだけ、次のIDでページを開き直す（最大3回）。
+   *    会員証データの読み込み（fetchCards）などの失敗では、切り替えない。
+   *  ・いま何番目を試しているかは sessionStorage に「番号:時刻」で覚える。
+   *    ＝開き直しても続きから試せる。60秒より古い記録は無視（次回は本番から）。
+   *  ・成功したら記録を消す＝次にアプリを開くときは、また本番から始まる。
+   *  ・記録を保存できない端末では、開き直しをしない（無限ループ防止）。
+   *  ・全部失敗したときは「最初に出たエラー」を表示する
+   *    （通信エラーなど本当の原因が、後ろのIDのエラーで隠れないように）。 */
+  var LIFF_TRY_KEY = "sf_liff_try", LIFF_ERR_KEY = "sf_liff_err1";
+  function liffStore(op, key, val){
+    try{
+      if(op === "get") return window.sessionStorage.getItem(key);
+      if(op === "set") window.sessionStorage.setItem(key, val);
+      if(op === "del") window.sessionStorage.removeItem(key);
+    }catch(e){}
+    return null;
+  }
+  function liffTryIndex(){
+    var raw = liffStore("get", LIFF_TRY_KEY);
+    if(!raw) return 0;
+    var p = String(raw).split(":");
+    var n = parseInt(p[0], 10), t = parseInt(p[1], 10);
+    if(isNaN(n) || isNaN(t) || n < 0 || n >= LIFF_IDS.length) return 0;
+    if(Date.now() - t > 60000) return 0;      // 古い記録は使わない
+    return n;
+  }
+  function liffMsg(err){ return (err && err.message) ? err.message : String(err); }
+
+  var liffTry = liffTryIndex();
+  liff.init({ liffId: LIFF_IDS[liffTry] })
     .then(function(){
+      liffStore("del", LIFF_TRY_KEY); liffStore("del", LIFF_ERR_KEY);   // 成功＝次回は本番から
+      return "ok";
+    }, function(initErr){
+      var first = liffStore("get", LIFF_ERR_KEY);
+      if(first === null){ first = liffMsg(initErr); liffStore("set", LIFF_ERR_KEY, first); }
+      if(liffTry + 1 < LIFF_IDS.length){
+        var stamp = (liffTry + 1) + ":" + Date.now();
+        liffStore("set", LIFF_TRY_KEY, stamp);
+        if(liffStore("get", LIFF_TRY_KEY) === stamp){   // 記録できたときだけ開き直す
+          location.reload();
+          return "reloading";
+        }
+      }
+      liffStore("del", LIFF_TRY_KEY); liffStore("del", LIFF_ERR_KEY);
+      throw new Error(first);                          // 全部だめ → 最初のエラーを表示
+    })
+    .then(function(state){
+      if(state === "reloading") return;                // 次のIDで開き直し中
       if(!liff.isLoggedIn()){ liff.login(); return; }
       var idToken = liff.getIDToken();
       if(!idToken){ renderError("ログイン情報を取得できませんでした"); return; }
@@ -2096,6 +2152,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     .catch(function(err){
       renderError("LIFF: " + (err && err.message ? err.message : err));
     });
+  /*LIFF_FALLBACK_END*/
 </script>
 </body>
 </html>
