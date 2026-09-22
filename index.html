@@ -71,6 +71,8 @@
             letter-spacing:0; opacity:.92; white-space:nowrap; }   /* 色はブランド別のまま（Sixfour＝カードの文字色） */
   .mid-left{ min-width:0; }
   .card-name{ font-size:30px; font-weight:600; letter-spacing:.03em; line-height:1.05; margin-bottom:4px; }
+  /* ★2026/9/22 ②：姓・名それぞれは途中で折り返さない。改行できるのは姓と名の間だけ */
+  .card-name .nm{ white-space:nowrap; }
   .card-sub{ font-size:13.8px; opacity:.82; }
   .specs{ text-align:center; flex:none; width:100%; }
   .specs .gimg{ display:block; width:84px; height:auto; margin:0 auto; }
@@ -1084,6 +1086,14 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       (withLabel ? '<div class="aging-tag">'+agingLabel(months, isRicco)+'</div>' : '')+ row +'</div>';
   }
 
+  /* ★2026/9/22 ②：名前を姓・名のかたまりに分ける（半角・全角スペースで区切る）。
+   *   スペースが無い名前は、そのまま1つのかたまりとして出す。 */
+  function nameHtml(name){
+    var parts = String(name || '').trim().split(/[ \u3000]+/).filter(function(p){ return p; });
+    if(parts.length < 2) return esc(String(name || ''));
+    return parts.map(function(p){ return '<span class="nm">'+esc(p)+'</span>'; }).join(' ');
+  }
+
   /* ★2026/9/22 ⑦：カードの番号＝会員No.＋枝番（そのメガネが何本目か）。例 01-02423-38
    *   本数が未登録（空・0）のカードは枝番を付けない（01-02423- のような中途半端な表示にしない）。 */
   function cardNoText(card){
@@ -1106,7 +1116,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var html='<div class="card '+cls+'">'+
       '<div class="card-headgrid">'+
         logoHtml(isRicco) +
-        '<div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+subHtml(card.sub)+'</div></div>' +
+        '<div class="mid-left"><div class="card-name">'+nameHtml(card.name)+'</div><div class="card-sub">'+subHtml(card.sub)+'</div></div>' +
         '<div class="card-right"><div class="card-no">'+cardNoText(card)+'</div>' +
           specsHtml(card.months, true, card.design, card.rowId, card.rowId, isRicco) +
         '</div>' +
@@ -1140,7 +1150,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     return '<div class="card '+(isRicco?"ricco":"sixfour")+' archived"><div class="archived-stamp">ARCHIVE</div>'+
       '<div class="card-headgrid">'+
         logoHtml(isRicco) +
-        '<div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+subHtml(card.sub)+'</div></div>' +
+        '<div class="mid-left"><div class="card-name">'+nameHtml(card.name)+'</div><div class="card-sub">'+subHtml(card.sub)+'</div></div>' +
         '<div class="card-right"><div class="card-no">'+cardNoText(card)+'</div>' +
           /* ★2026/9/22：殿堂入りカードにもエイジングの言葉を出す（withLabelをtrueに変更）。
            *   ラベルはこのまま伸び続けるので、殿堂入りになった後も言葉が進んでいく。 */
