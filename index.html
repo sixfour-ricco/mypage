@@ -214,7 +214,7 @@
   /* ★2026/9/22：色だけで区別しない「ノートの見出しタブ」に変更。
    *   今見えている方＝下のシートと同じ色でつながる。見えていない方＝少し沈んで、文字も薄くする。
    *   （ナオユキさんは色覚特性があり、色の違いだけに頼るUIはNGという運用ルールのため） */
-  .sheet .w-tabs{ display:flex; gap:2px; position:relative; }
+  .sheet .w-tabs{ display:flex; gap:2px; position:relative; margin-bottom:12px; }
   .sheet .w-tab{ flex:1; padding:9px 8px 8px; border-radius:12px 12px 0 0;
       border:1px solid rgba(0,0,0,.12); border-bottom:none;
       background:var(--bg); font-family:inherit; font-size:12px; font-weight:400;
@@ -223,10 +223,12 @@
       transition:transform .15s, background .15s, color .15s, font-weight .15s; }
   .sheet .w-tab.active{ background:#fff; color:var(--ink); font-weight:700;
       transform:translateY(0); box-shadow:none; position:relative; z-index:2; }
-  /* ★2026/9/22 修正：箱（四方の線）ではなく、上下の区切り線だけに変更。
-   *   片方のブランドしか持たない人はタブ自体が出ないため、箱のままだと不自然に見える指摘のため。 */
-  .sheet .w-tab-content{ border-top:1px solid rgba(0,0,0,.1); border-bottom:1px solid rgba(0,0,0,.1);
-      padding:12px 0 14px; position:relative; z-index:1; }
+  /* ★2026/9/22 再修正：中身の枠の線は上下とも無しにした。
+   *   ・上の線 → 手前のタブの下まで横いっぱいに通ってしまい、奥のタブの下線と重なって二重線になっていた。
+   *     線は「奥側のタブの下」だけ（.w-tab の inset の影）に残し、手前のタブは中身とつながって見える形に。
+   *   ・下の線 → 次の項目の区切り線（.w-item の上線）と重なって二重線になっていたので削除。
+   *   タブと中身の間のすき間は .w-tabs の margin-bottom で取る（タブが出ない人には余白も出ない）。 */
+  .sheet .w-tab-content{ padding:0; position:relative; z-index:1; }
   .sheet .term{ display:inline-block; font-size:11px; font-weight:700; letter-spacing:.04em;
     background:#efece2; color:#6b6250; border-radius:5px; padding:3px 8px; margin-bottom:7px; }
   .sheet .forever{ font-weight:700; font-size:13px; color:#a8452c; }
