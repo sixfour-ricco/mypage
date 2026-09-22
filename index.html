@@ -184,11 +184,20 @@
   .sheet .w-item p{ font-size:12px; line-height:1.85; margin:0; color:#4a4436; }
   .sheet .w-icon{ font-size:14px; margin-right:4px; }
   /* ★2026/9/16夜：両ブランドをお持ちの方だけ出すタブ */
-  .sheet .w-tabs{ display:flex; gap:8px; margin-bottom:10px; }
-  .sheet .w-tab{ flex:1; padding:8px; border-radius:20px; border:1px solid rgba(0,0,0,.15);
-      background:#fff; font-family:inherit; font-size:12px; font-weight:700;
-      color:var(--ink); cursor:pointer; }
-  .sheet .w-tab.active{ background:var(--ink); color:#fff; border-color:var(--ink); }
+  /* ★2026/9/22：色だけで区別しない「ノートの見出しタブ」に変更。
+   *   今見えている方＝下のシートと同じ色でつながる。見えていない方＝少し沈んで、文字も薄くする。
+   *   （ナオユキさんは色覚特性があり、色の違いだけに頼るUIはNGという運用ルールのため） */
+  .sheet .w-tabs{ display:flex; gap:2px; position:relative; }
+  .sheet .w-tab{ flex:1; padding:9px 8px 8px; border-radius:12px 12px 0 0;
+      border:1px solid rgba(0,0,0,.12); border-bottom:none;
+      background:var(--bg); font-family:inherit; font-size:12px; font-weight:400;
+      color:var(--sub); cursor:pointer; transform:translateY(3px);
+      box-shadow:0 -1px 0 rgba(0,0,0,.12) inset;
+      transition:transform .15s, background .15s, color .15s, font-weight .15s; }
+  .sheet .w-tab.active{ background:#fff; color:var(--ink); font-weight:700;
+      transform:translateY(0); box-shadow:none; position:relative; z-index:2; }
+  .sheet .w-tab-content{ background:#fff; border:1px solid rgba(0,0,0,.12); border-top:none;
+      border-radius:0 0 12px 12px; padding:12px 12px 2px; position:relative; z-index:1; }
   .sheet .term{ display:inline-block; font-size:11px; font-weight:700; letter-spacing:.04em;
     background:#efece2; color:#6b6250; border-radius:5px; padding:3px 8px; margin-bottom:7px; }
   .sheet .forever{ font-weight:700; font-size:13px; color:#a8452c; }
@@ -480,10 +489,11 @@
         <button type="button" class="w-tab" id="tabBtnSix" onclick="showFrameTab('sixfour')">Sixfourの保証</button>
         <button type="button" class="w-tab" id="tabBtnRicco" onclick="showFrameTab('ricco')">RICCOの保証</button>
       </div>
+      <div class="w-tab-content">
     <div id="frameItemSix">
       <span class="w-icon">👓</span><span class="term">メガネ・サングラス保証 ／ 1年</span>
       <h3>フレームやレンズに不具合が生じたとき</h3>
-      <p>お渡し日より1年間はフレーム・レンズの品質保証いたします。<br>
+      <p>お渡し日より1年間、フレーム・レンズの品質保証いたします。<br>
       日常の使用でフレーム・レンズに不具合が生じた場合、無料で交換・修理いたしますのでご相談ください。<br>
       お客様の過失（落としたり、車内放置、サウナ・入浴時など）は保証対象外となりますのでご注意ください。<br>
       <span class="forever">※過失の場合でも1年間は破損保証（通常価格の50％で交換）もございますので、スタッフにご相談ください。</span></p>
@@ -494,9 +504,10 @@
       <h3>フレームやレンズに不具合が生じたとき</h3>
       <p>フレームは各ブランドの保証内容に準じます。<br>
       初期不良はメーカー在庫がある場合、交換対応いたします。<br>
-      レンズはお渡し日より1年間は品質保証いたします。<br>
+      レンズはお渡し日より1年間、品質保証いたします。<br>
       経年劣化・過失（落としたり、車内放置、サウナ・入浴等）による傷・破損は有償交換・修理のご対応となります。</p>
     </div>
+      </div>
     </div>
 
     <div class="w-item">
@@ -743,13 +754,18 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var i=Math.min(Math.floor(months/6), stops.length-1);
     var c=stops[i]; return "rgb("+c[0]+","+c[1]+","+c[2]+")";
   }
-  function agingLabel(months){
-    if(months<6) return "買ったばかり";
-    if(months<12) return "馴染み始め";
-    if(months<24) return "手に馴染む";
-    if(months<36) return "いい味に";
-    if(months<60) return "深い相棒感";
-    return "相棒";
+  /* ★2026/9/22：エイジングの言葉をブランド別に。
+   *   Sixfour＝メガネの気持ち版／RICCO＝情緒・やさしい言葉。最終段だけ両ブランド共通。 */
+  function agingLabel(months, isRicco){
+    var SIX = ["まだ緊張中","少し慣れてきた","くつろぎ中","大切にしてね","あ・うんの呼吸","相棒😌"];
+    var RIC = ["出会ったばかり","なじみ始め","しっくり","風合いが出てきた","愛着が深まる","相棒😌"];
+    var L = isRicco ? RIC : SIX;
+    if(months<6) return L[0];
+    if(months<12) return L[1];
+    if(months<24) return L[2];
+    if(months<36) return L[3];
+    if(months<60) return L[4];
+    return L[5];
   }
 
   /* ===== ランクの見た目 ===== */
@@ -1020,7 +1036,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   /* ★2026/9/12 改修：メモボタンを追加し、2つのボタンを横並びにした。
      pickRowId … 絵柄を選ぶボタンを出す行ID（現役カードのみ。不要なら null）
      memoRowId … メモボタンを出す行ID（殿堂入りカードにも出す。不要なら null） */
-  function specsHtml(months, withLabel, design, pickRowId, memoRowId){
+  function specsHtml(months, withLabel, design, pickRowId, memoRowId, isRicco){
     var no = parseInt(design,10); if(isNaN(no)||no<1||no>6) no = 1;
     var gsrc = tintWith(FRAME_CACHE[no], GLASS_W, months, no);
     if(!gsrc) return '<div class="specs"></div>';
@@ -1034,7 +1050,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     }
     var row = btns ? '<div class="pick-row">'+btns+'</div>' : '';
     return '<div class="specs"><img class="gimg" src="'+gsrc+'" alt="" style="width:'+GLASS_W+'px">'+
-      (withLabel ? '<div class="aging-tag">'+agingLabel(months)+'</div>' : '')+ row +'</div>';
+      (withLabel ? '<div class="aging-tag">'+agingLabel(months, isRicco)+'</div>' : '')+ row +'</div>';
   }
 
   /* ===== 現役カード ===== */
@@ -1054,7 +1070,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
         logoHtml(isRicco) +
         '<div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+subHtml(card.sub)+'</div></div>' +
         '<div class="card-right"><div class="card-no">'+esc(card.memberNo)+'</div>' +
-          specsHtml(card.months, true, card.design, card.rowId, card.rowId) +
+          specsHtml(card.months, true, card.design, card.rowId, card.rowId, isRicco) +
         '</div>' +
       '</div>'+
       '<div class="w-grid">'+ frameCell +
@@ -1088,7 +1104,9 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
         logoHtml(isRicco) +
         '<div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+subHtml(card.sub)+'</div></div>' +
         '<div class="card-right"><div class="card-no">'+esc(card.memberNo)+'</div>' +
-          specsHtml(card.months, false, card.design, null, card.rowId) +
+          /* ★2026/9/22：殿堂入りカードにもエイジングの言葉を出す（withLabelをtrueに変更）。
+           *   ラベルはこのまま伸び続けるので、殿堂入りになった後も言葉が進んでいく。 */
+          specsHtml(card.months, true, card.design, null, card.rowId, isRicco) +
         '</div>' +
       '</div>'+
       '<div class="w-grid"><div class="w-cell"><div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date">'+esc(card.frameEnd)+'</div></div></div>'+
@@ -1780,10 +1798,13 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       (rx.remarks ? '<div class="rx-remarks">'+rx.remarks+'</div>' : '')+
       '<div class="rx-caution">'+
         'My度数情報は最新の'+(isRicco ? "アイウェア" : "メガネ")+'分のみを表示しています。<br>'+
-        (isRicco
+        /* ★2026/9/22：ここだけ isRicco（直近購入ブランド）ではなく SHOP（今回の入口）で分岐。
+         *   「💬LINEで相談する」は開いた入口のトークに送られるため、案内文はそのトークの流れに合わせる必要がある。
+         *   isRiccoのままだと、直近購入と入口が違う人に、実際と違う案内をしてしまう。 */
+        (SHOP === "ricco"
           ? '以前の度数をご希望の場合は、「💬LINEで相談する」から、対象のメガネ(カード)の'+
             '末尾番号を確認して「カード◯◯の度数情報」とお問い合わせください🙇‍♂️'
-          : '以前の度数は「マイページ」→「💬LINEで相談する」→「6 その他」から'+
+          : '以前の度数は「💬LINEで相談する」→「6 その他」から'+
             'お問い合わせください🙇‍♂️')+
       '</div>';
 
