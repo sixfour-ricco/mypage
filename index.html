@@ -14,8 +14,8 @@
   .wrap{ max-width:410px; margin:0 auto; }
   .head{ text-align:center; margin-bottom:10px; display:none; }   /* ★2026/9/22 ⑤ 18→10px */
   .head .brandmark{ font-size:11px; letter-spacing:.34em; color:var(--sub); text-transform:uppercase; margin-bottom:8px; padding-left:.34em; }
-  .head .who{ font-size:28px; font-weight:600; letter-spacing:.02em; }
-  .head .memberno{ display:inline-block; margin-top:9px; font-size:22px; font-weight:600; color:#6b6250; font-family:"SFMono-Regular",Consolas,"Courier New",monospace; letter-spacing:.14em; }
+  .head .who{ font-size:28px; font-weight:600; letter-spacing:.02em; margin-top:2px; }   /* ★2026/9/22 No.の下に置く */
+  .head .memberno{ display:inline-block; margin-top:0; font-size:22px; font-weight:600; color:#6b6250; font-family:"SFMono-Regular",Consolas,"Courier New",monospace; letter-spacing:.14em; }
   .rank-badge{ margin-top:13px; display:inline-flex; gap:9px; align-items:center; font-size:11.5px; padding:7px 15px 7px 12px; border-radius:22px; letter-spacing:.03em; box-shadow:0 3px 10px -4px rgba(90,70,40,.4), 0 0 0 1px rgba(255,255,255,.4) inset; }
   .rank-badge .rk{ font-size:10px; font-weight:800; letter-spacing:.1em; }
   .rank-badge b{ font-weight:700; }
@@ -27,10 +27,13 @@
    *   ・左右の端は下の「保証・修理／LINEで相談する」ボタンとそろえてある（gap9px・左右2px）。 */
   .top-pair{ display:flex; gap:9px; margin:8px 2px 0; }   /* ⑤ 会員No.→この行＝8px */
   .cap{ flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
-        padding:6px 8px; border-radius:14px; font-family:inherit; line-height:1.3; white-space:nowrap;
+        padding:4px 8px; border-radius:14px; font-family:inherit; line-height:1.3; white-space:nowrap;
+        min-height:38px;   /* ★2026/9/22 下のボタンと同じ高さ（1行表示のときも薄くならない） */
         letter-spacing:.03em; box-sizing:border-box; }
-  .cap .c1{ display:flex; align-items:center; gap:5px; font-size:11px; font-weight:700; }
-  .cap .c2{ font-size:10.5px; margin-top:1px; }
+  /* ★2026/9/22：行の高さを数字で固定。絵文字（👓）はフォントの都合で行が高くなりやすいため、
+   *   絵文字はそのまま使い、行の箱の高さだけ決め打ちにしてそろえる。 */
+  .cap .c1{ display:flex; align-items:center; gap:5px; font-size:11px; font-weight:700; height:15px; line-height:15px; }
+  .cap .c2{ font-size:10.5px; margin-top:1px; height:14px; line-height:14px; }
   .cap .c1.fit1{ max-width:100%; min-width:0; }   /* 1行表示：はみ出すときだけ fitCardNos() が縮める */
   .sq{ font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif; }
   .cap .c2 b{ font-size:14px; font-weight:800; }   /* 通算本数の数字だけ大きく（ランク名より必ず大きく） */
@@ -70,9 +73,11 @@
   .card-no{ font-family:"SFMono-Regular",Consolas,"Courier New",monospace; font-size:22px; font-weight:800;
             letter-spacing:0; opacity:.92; white-space:nowrap; }   /* 色はブランド別のまま（Sixfour＝カードの文字色） */
   .mid-left{ min-width:0; }
-  .card-name{ font-size:30px; font-weight:600; letter-spacing:.03em; line-height:1.05; margin-bottom:4px; }
+  .card-name{ font-size:24px; font-weight:600; letter-spacing:.03em; line-height:1.1; margin-bottom:4px; }   /* ★2026/9/22 30→24px */
   /* ★2026/9/22 ②：姓・名それぞれは途中で折り返さない。改行できるのは姓と名の間だけ */
-  .card-name .nm{ white-space:nowrap; }
+  .card-name .nm, .head .who .nm{ white-space:nowrap; }
+  /* ★2026/9/22：下限まで縮めてもスペースの無い1語が入らないときだけ、単語の途中で折り返す */
+  .nm-break .nm{ white-space:normal; overflow-wrap:anywhere; word-break:break-all; }
   .card-sub{ font-size:13.8px; opacity:.82; }
   .specs{ text-align:center; flex:none; width:100%; }
   .specs .gimg{ display:block; width:84px; height:auto; margin:0 auto; }
@@ -150,14 +155,16 @@
   /* ===== 土台の共通ボタン（カードの外・常設） ===== */
   .actions{ display:none; gap:9px; margin:20px 2px 0; }
   .actions button{ flex:1; min-width:0; border:none; cursor:pointer; font-family:inherit;
-    padding:13px 8px; border-radius:12px; font-size:12px; font-weight:600; letter-spacing:.04em;
+    padding:11px 8px; line-height:16px; border-radius:12px; font-size:12px; font-weight:600; letter-spacing:.04em;   /* ★2026/9/22 高さ38px */
     background:rgba(255,255,255,.8); color:#4a4436;
     box-shadow:0 6px 16px -10px rgba(120,100,60,.6), 0 0 0 1px rgba(0,0,0,.06); }
   .actions button:active{ transform:scale(.98); }
   .actions .btn-consult{ background:#06c755; color:#fff; box-shadow:0 6px 16px -8px rgba(6,199,85,.6); }
   /* ★2026/9/22 ④⑤：会員証があるときは、ボタンを「今月のひとこと」の直後に置く */
-  .actions.in-flow{ margin:10px 2px 12px; }
-  .actions.in-flow + .sec-label{ margin-top:0; }
+  /* ★2026/9/22 並び替え：ランク/度数 →(10) ボタン →(10) 今月のひとこと →(12) ご利用中のメガネ */
+  .actions.in-flow{ margin:0 2px 10px; }
+  .actions.in-flow + .sec-label{ margin-top:2px; }   /* ひとことが無い月でも間隔が詰まりすぎないように */
+  .monthly + .sec-label{ margin-top:12px; }
 
   /* ===== 保証・修理の説明（マイページ内蔵） ===== */
   /* ===== ★2026/9/15 My度数情報 ===== */
@@ -432,9 +439,10 @@
 <body>
 <div class="wrap">
   <div class="head" id="head">
-    <div class="brandmark">Members Card</div>
-    <div class="who" id="whoName"></div>
+    <!-- ★2026/9/22：「Members Card」は外した（上のチャネル名「Sixfour & RICCO Card」と重なるため）。
+         並びは No. → 名前 の順に変更 -->
     <div class="memberno" id="whoNo"></div>
+    <div class="who" id="whoName"></div>
     <div id="tenureWrap"></div>
   </div>
   <div id="app">
@@ -1088,10 +1096,14 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
 
   /* ★2026/9/22 ②：名前を姓・名のかたまりに分ける（半角・全角スペースで区切る）。
    *   スペースが無い名前は、そのまま1つのかたまりとして出す。 */
-  function nameHtml(name){
+  function nameHtml(name, suffix){
     var parts = String(name || '').trim().split(/[ \u3000]+/).filter(function(p){ return p; });
-    if(parts.length < 2) return esc(String(name || ''));
-    return parts.map(function(p){ return '<span class="nm">'+esc(p)+'</span>'; }).join(' ');
+    if(!parts.length) return '';
+    /* ★2026/9/22：「様」などは最後の語にくっつけて、「様」だけが次の行に落ちないようにする */
+    return parts.map(function(p, i){
+      var tail = (suffix && i === parts.length - 1) ? '\u00a0' + esc(suffix) : '';
+      return '<span class="nm">'+esc(p)+tail+'</span>';
+    }).join(' ');
   }
 
   /* ★2026/9/22 ⑦：カードの番号＝会員No.＋枝番（そのメガネが何本目か）。例 01-02423-38
@@ -1165,6 +1177,25 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
 
   /* ★2026/9/22 ⑦ C案：枝番が180pxの箱からはみ出すときだけ、1pxずつ縮める（下限13px）。
    *   ふだん（1〜2桁）は22pxのまま。見えていない箱（畳まれた殿堂入り）は測れないので触らない。 */
+  /* ★2026/9/22：名前の自動縮小。
+   *   ①いったん1行に並べて測り、はみ出す間だけ1pxずつ縮める（max → 下限min）
+   *   ②下限でも1行に入らなければ、元に戻してスペースの位置で改行させる
+   *   ③それでも1語だけで幅を超える（スペースの無い長い名前）なら、その語の途中で折り返す */
+  function fitName(el, max, min){
+    if(!el || !el.clientWidth) return;
+    el.style.fontSize = ''; el.classList.remove('nm-break');
+    el.style.whiteSpace = 'nowrap';
+    var size = max;
+    while(el.scrollWidth > el.clientWidth + 0.5 && size > min){ size -= 1; el.style.fontSize = size + 'px'; }
+    var oneLine = (el.scrollWidth <= el.clientWidth + 0.5);
+    el.style.whiteSpace = '';
+    if(oneLine) return;
+    var spans = el.querySelectorAll('.nm');
+    for(var k=0; k<spans.length; k++){
+      if(spans[k].getBoundingClientRect().width > el.clientWidth + 0.5){ el.classList.add('nm-break'); break; }
+    }
+  }
+
   function fitCardNos(){
     var list = document.querySelectorAll('.card-no');
     for(var i=0; i<list.length; i++){
@@ -1174,6 +1205,10 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       var size = 22;
       while(el.scrollWidth > el.clientWidth + 0.5 && size > 13){ size -= 1; el.style.fontSize = size + 'px'; }
     }
+    /* ★2026/9/22：名前も、1行に入らないときだけ縮める。下限でも入らなければスペースの位置で改行 */
+    fitName(document.getElementById('whoName'), 28, 20);
+    var names = document.querySelectorAll('.card-name');
+    for(var n=0; n<names.length; n++) fitName(names[n], 24, 18);
     /* ★2026/9/22：度数カプセルの1行表示（「👓 度数をお調べしています…」等）も同じ考え方で縮める */
     var caps = document.querySelectorAll('.cap .fit1');
     for(var j=0; j<caps.length; j++){
@@ -1188,7 +1223,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   window.addEventListener('resize', fitCardNos);
 
   /* ★2026/9/22 ④：「保証・修理／LINEで相談する」の置き場所。
-   *   会員証があるとき＝「今月のひとこと」の直後（#app の中の actionsSlot）。
+   *   会員証があるとき＝ランク/度数の直後・「今月のひとこと」の前（#app の中の actionsSlot）。
    *   それ以外（準備中・登録フォーム・エラー）＝これまでどおりフッターの上。
    *   #app を描き直す前に必ず parkActions() で外に戻す（描き直しでボタンが消えないように）。 */
   function parkActions(){
@@ -1502,7 +1537,9 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     if(cards.length===0){ renderNoCard(); return; }
 
     document.getElementById("head").style.display="block";
-    document.getElementById("whoName").textContent=d.name||"";
+    /* ★2026/9/22：上の名前も語ごとのかたまりに（外国のお客様の長い名前もスペースの位置で改行） */
+    var headName = String(d.name || '').replace(/[ \u3000]*様[ \u3000]*$/, '');
+    document.getElementById("whoName").innerHTML = headName ? nameHtml(headName, '様') : '';
     document.getElementById("whoNo").textContent=d.no||"";
     /* ★2026/9/22 ⑥：ランクとMy度数情報を横並びの2つのカプセルで出す */
     var capRank = '';
@@ -1519,8 +1556,8 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var archived=cards.filter(function(c){return c.archived;});
 
     /* ★2026/9/22：My度数情報はランクの横（tenureWrap）へ移動したので、ここでは出さない */
-    var html = monthlyHtml(d.memberYears);   // ★月替わりのひとこと（カード群の上）
-    html += '<div id="actionsSlot"></div>'; // ★2026/9/22 ④ ボタンはひとことの直後
+    var html = '<div id="actionsSlot"></div>'; // ★2026/9/22 ボタンはランク/度数の直後（ひとことの前）
+    html += monthlyHtml(d.memberYears);      // ★月替わりのひとこと（ボタンの下）
 
     if(active.length){
       html+='<div class="sec-label">ご利用中のメガネ</div>';
