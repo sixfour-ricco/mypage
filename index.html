@@ -12,7 +12,7 @@
     background:radial-gradient(120% 80% at 50% -10%, #f4f2ec 0%, var(--bg) 55%, #e2e0d8 100%);
     min-height:100vh; color:var(--ink); padding:24px 14px 60px; }
   .wrap{ max-width:410px; margin:0 auto; }
-  .head{ text-align:center; margin-bottom:18px; display:none; }
+  .head{ text-align:center; margin-bottom:10px; display:none; }   /* ★2026/9/22 ⑤ 18→10px */
   .head .brandmark{ font-size:11px; letter-spacing:.34em; color:var(--sub); text-transform:uppercase; margin-bottom:8px; padding-left:.34em; }
   .head .who{ font-size:28px; font-weight:600; letter-spacing:.02em; }
   .head .memberno{ display:inline-block; margin-top:9px; font-size:22px; font-weight:600; color:#6b6250; font-family:"SFMono-Regular",Consolas,"Courier New",monospace; letter-spacing:.14em; }
@@ -21,6 +21,27 @@
   .rank-badge b{ font-weight:700; }
   .rank-badge .dot{ width:3px; height:3px; border-radius:50%; opacity:.5; background:currentColor; }
   .rank-badge svg{ display:block; }
+  /* ★2026/9/22 ⑥：ランクとMy度数情報を横並びの2つのカプセルに。
+   *   ・2つは必ず同じ幅（flex:1）。高さは背の高い方に自動でそろう。
+   *   ・中は2段組（上：ラベル／下：詳細）。文字は上下左右とも中央。
+   *   ・左右の端は下の「保証・修理／LINEで相談する」ボタンとそろえてある（gap9px・左右2px）。 */
+  .top-pair{ display:flex; gap:9px; margin:8px 2px 0; }   /* ⑤ 会員No.→この行＝8px */
+  .cap{ flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+        padding:6px 8px; border-radius:14px; font-family:inherit; line-height:1.3; white-space:nowrap;
+        letter-spacing:.03em; box-sizing:border-box; }
+  .cap .c1{ display:flex; align-items:center; gap:5px; font-size:11px; font-weight:700; }
+  .cap .c2{ font-size:10.5px; margin-top:1px; }
+  .cap .c1.fit1{ max-width:100%; min-width:0; }   /* 1行表示：はみ出すときだけ fitCardNos() が縮める */
+  .sq{ font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif; }
+  .cap .c2 b{ font-size:14px; font-weight:800; }   /* 通算本数の数字だけ大きく（ランク名より必ず大きく） */
+  .cap .rk{ font-size:10px; font-weight:800; letter-spacing:.1em; }
+  .cap svg{ display:block; }
+  .cap-rank{ box-shadow:0 3px 10px -4px rgba(90,70,40,.4), 0 0 0 1px rgba(255,255,255,.4) inset; }
+  .cap-rx{ cursor:pointer; border:1px solid rgba(0,0,0,.12); background:rgba(255,255,255,.78); color:var(--ink);
+           box-shadow:0 2px 8px -4px rgba(90,70,40,.35); }
+  button.cap-rx:active{ transform:translateY(1px); }
+  .cap-rx .c2{ color:var(--sub); font-weight:500; }
+  .cap-wait{ cursor:default; border-style:dashed; border-color:rgba(0,0,0,.14); background:rgba(255,255,255,.6); color:var(--sub); }
   .sec-label{ display:flex; align-items:center; gap:10px; font-size:11px; letter-spacing:.18em; color:var(--sub); margin:22px 4px 12px; }
   .sec-label::after{ content:""; flex:1; height:1px; background:rgba(0,0,0,.09); }
   .card{ position:relative; border-radius:16px; padding:18px 20px 26px; margin-bottom:14px; overflow:hidden; isolation:isolate; transition:transform .18s ease; }
@@ -44,7 +65,10 @@
   .ricco .brand-logo{ height:18px; }
   .sixfour .brand-logo{ height:25px; }
   .logo-text{ font-size:13px; font-weight:700; letter-spacing:.22em; opacity:.75; }
-  .card-no{ font-family:"SFMono-Regular",Consolas,"Courier New",monospace; font-size:22px; font-weight:600; letter-spacing:.12em; opacity:.92; }
+  /* ★2026/9/22 ⑦：枝番付き（01-02423-38）の確定仕様＝太さ800／22px／字間0em／色#6a5c3d（2026/9/4）。
+   *   3桁（-101等）で180pxの箱からはみ出すときだけ、fitCardNos() がその場で文字を少し縮める（C案）。 */
+  .card-no{ font-family:"SFMono-Regular",Consolas,"Courier New",monospace; font-size:22px; font-weight:800;
+            letter-spacing:0; opacity:.92; white-space:nowrap; }   /* 色はブランド別のまま（Sixfour＝カードの文字色） */
   .mid-left{ min-width:0; }
   .card-name{ font-size:30px; font-weight:600; letter-spacing:.03em; line-height:1.05; margin-bottom:4px; }
   .card-sub{ font-size:13.8px; opacity:.82; }
@@ -115,7 +139,7 @@
   .msg-sub{ font-size:11px; opacity:.6; margin-top:14px; padding-top:12px; border-top:1px solid rgba(0,0,0,.08); }
 
   /* ===== 月替わりのひとこと ===== */
-  .monthly{ margin:0 2px 20px; padding:15px 18px; border-radius:14px; font-size:12.5px; line-height:1.85;
+  .monthly{ margin:0 2px 0; padding:15px 18px; border-radius:14px; font-size:12.5px; line-height:1.85;
     background:linear-gradient(150deg,rgba(255,255,255,.72),rgba(255,255,255,.42));
     box-shadow:0 6px 18px -12px rgba(120,100,60,.5), 0 0 0 1px rgba(255,255,255,.55) inset;
     color:#4a4436; letter-spacing:.01em; }
@@ -129,6 +153,9 @@
     box-shadow:0 6px 16px -10px rgba(120,100,60,.6), 0 0 0 1px rgba(0,0,0,.06); }
   .actions button:active{ transform:scale(.98); }
   .actions .btn-consult{ background:#06c755; color:#fff; box-shadow:0 6px 16px -8px rgba(6,199,85,.6); }
+  /* ★2026/9/22 ④⑤：会員証があるときは、ボタンを「今月のひとこと」の直後に置く */
+  .actions.in-flow{ margin:10px 2px 12px; }
+  .actions.in-flow + .sec-label{ margin-top:0; }
 
   /* ===== 保証・修理の説明（マイページ内蔵） ===== */
   /* ===== ★2026/9/15 My度数情報 ===== */
@@ -196,8 +223,10 @@
       transition:transform .15s, background .15s, color .15s, font-weight .15s; }
   .sheet .w-tab.active{ background:#fff; color:var(--ink); font-weight:700;
       transform:translateY(0); box-shadow:none; position:relative; z-index:2; }
-  .sheet .w-tab-content{ background:#fff; border:1px solid rgba(0,0,0,.12); border-top:none;
-      border-radius:0 0 12px 12px; padding:12px 12px 2px; position:relative; z-index:1; }
+  /* ★2026/9/22 修正：箱（四方の線）ではなく、上下の区切り線だけに変更。
+   *   片方のブランドしか持たない人はタブ自体が出ないため、箱のままだと不自然に見える指摘のため。 */
+  .sheet .w-tab-content{ border-top:1px solid rgba(0,0,0,.1); border-bottom:1px solid rgba(0,0,0,.1);
+      padding:12px 0 14px; position:relative; z-index:1; }
   .sheet .term{ display:inline-block; font-size:11px; font-weight:700; letter-spacing:.04em;
     background:#efece2; color:#6b6250; border-radius:5px; padding:3px 8px; margin-bottom:7px; }
   .sheet .forever{ font-weight:700; font-size:13px; color:#a8452c; }
@@ -1053,6 +1082,13 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       (withLabel ? '<div class="aging-tag">'+agingLabel(months, isRicco)+'</div>' : '')+ row +'</div>';
   }
 
+  /* ★2026/9/22 ⑦：カードの番号＝会員No.＋枝番（そのメガネが何本目か）。例 01-02423-38
+   *   本数が未登録（空・0）のカードは枝番を付けない（01-02423- のような中途半端な表示にしない）。 */
+  function cardNoText(card){
+    var n = parseInt(card.count, 10);
+    return esc(card.memberNo) + ((!isNaN(n) && n > 0) ? '-' + n : '');
+  }
+
   /* ===== 現役カード ===== */
   function activeCard(card){
     var isRicco=(card.brand==="RICCO"), cls=isRicco?"ricco":"sixfour";
@@ -1069,7 +1105,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       '<div class="card-headgrid">'+
         logoHtml(isRicco) +
         '<div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+subHtml(card.sub)+'</div></div>' +
-        '<div class="card-right"><div class="card-no">'+esc(card.memberNo)+'</div>' +
+        '<div class="card-right"><div class="card-no">'+cardNoText(card)+'</div>' +
           specsHtml(card.months, true, card.design, card.rowId, card.rowId, isRicco) +
         '</div>' +
       '</div>'+
@@ -1103,7 +1139,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       '<div class="card-headgrid">'+
         logoHtml(isRicco) +
         '<div class="mid-left"><div class="card-name">'+esc(card.name)+'</div><div class="card-sub">'+subHtml(card.sub)+'</div></div>' +
-        '<div class="card-right"><div class="card-no">'+esc(card.memberNo)+'</div>' +
+        '<div class="card-right"><div class="card-no">'+cardNoText(card)+'</div>' +
           /* ★2026/9/22：殿堂入りカードにもエイジングの言葉を出す（withLabelをtrueに変更）。
            *   ラベルはこのまま伸び続けるので、殿堂入りになった後も言葉が進んでいく。 */
           specsHtml(card.months, true, card.design, null, card.rowId, isRicco) +
@@ -1115,9 +1151,51 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       memoPreviewHtml(card.rowId)+'</div>';   // ★メガネ手帳のメモ
   }
 
+  /* ★2026/9/22 ⑦ C案：枝番が180pxの箱からはみ出すときだけ、1pxずつ縮める（下限13px）。
+   *   ふだん（1〜2桁）は22pxのまま。見えていない箱（畳まれた殿堂入り）は測れないので触らない。 */
+  function fitCardNos(){
+    var list = document.querySelectorAll('.card-no');
+    for(var i=0; i<list.length; i++){
+      var el = list[i];
+      if(!el.clientWidth) continue;
+      el.style.fontSize = '';
+      var size = 22;
+      while(el.scrollWidth > el.clientWidth + 0.5 && size > 13){ size -= 1; el.style.fontSize = size + 'px'; }
+    }
+    /* ★2026/9/22：度数カプセルの1行表示（「👓 度数をお調べしています…」等）も同じ考え方で縮める */
+    var caps = document.querySelectorAll('.cap .fit1');
+    for(var j=0; j<caps.length; j++){
+      var c = caps[j];
+      if(!c.clientWidth) continue;
+      c.style.fontSize = '';
+      var s = 11;
+      while(c.scrollWidth > c.clientWidth + 0.5 && s > 8){ s -= 0.5; c.style.fontSize = s + 'px'; }
+    }
+  }
+  try{ if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitCardNos); }catch(e){}
+  window.addEventListener('resize', fitCardNos);
+
+  /* ★2026/9/22 ④：「保証・修理／LINEで相談する」の置き場所。
+   *   会員証があるとき＝「今月のひとこと」の直後（#app の中の actionsSlot）。
+   *   それ以外（準備中・登録フォーム・エラー）＝これまでどおりフッターの上。
+   *   #app を描き直す前に必ず parkActions() で外に戻す（描き直しでボタンが消えないように）。 */
+  function parkActions(){
+    var a = document.getElementById('actions'), foot = document.querySelector('.foot');
+    if(!a || !foot) return;
+    a.classList.remove('in-flow');
+    if(a.nextElementSibling !== foot) foot.parentNode.insertBefore(a, foot);
+  }
+  function slotActions(){
+    var a = document.getElementById('actions'), slot = document.getElementById('actionsSlot');
+    if(!a || !slot) return;
+    slot.parentNode.replaceChild(a, slot);
+    a.classList.add('in-flow');
+  }
+
   window.toggleArchive=function(btn){
     btn.classList.toggle("open");
     btn.nextElementSibling.classList.toggle("open");
+    fitCardNos();   // ★開いたカードの枝番も幅を確認する
   };
 
   /* ===== 画面を描く ===== */
@@ -1414,21 +1492,23 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     document.getElementById("head").style.display="block";
     document.getElementById("whoName").textContent=d.name||"";
     document.getElementById("whoNo").textContent=d.no||"";
+    /* ★2026/9/22 ⑥：ランクとMy度数情報を横並びの2つのカプセルで出す */
+    var capRank = '';
     if(d.rank){
       var rk=rankStyle(d.rank);
-      var totalTxt = d.total ? '<span class="dot"></span><span>通算 <b>'+d.total+'本</b></span>' : '';
-      document.getElementById("tenureWrap").innerHTML=
-        '<div class="rank-badge" style="background:'+rk.grad+'; color:'+rk.text+'">'+
-          badgeGlasses(rk.icon)+'<span class="rk">'+rk.name+'</span>'+totalTxt+'</div>';
-    } else {
-      document.getElementById("tenureWrap").innerHTML="";
+      capRank = '<div class="cap cap-rank" style="background:'+rk.grad+'; color:'+rk.text+'">'+
+        '<div class="c1">'+badgeGlasses(rk.icon)+'<span class="rk">'+rk.name+'</span></div>'+
+        (d.total ? '<div class="c2">通算<b>'+d.total+'</b>本</div>' : '')+'</div>';
     }
+    document.getElementById("tenureWrap").innerHTML =
+      '<div class="top-pair">'+capRank+rxCapHtml(d)+'</div>';
 
     var active=cards.filter(function(c){return !c.archived;});
     var archived=cards.filter(function(c){return c.archived;});
 
-    var html = rxBarHtml(d);                 // ★My度数情報（ランクと今月のひとことの間）
-    html += monthlyHtml(d.memberYears);      // ★月替わりのひとこと（カード群の上）
+    /* ★2026/9/22：My度数情報はランクの横（tenureWrap）へ移動したので、ここでは出さない */
+    var html = monthlyHtml(d.memberYears);   // ★月替わりのひとこと（カード群の上）
+    html += '<div id="actionsSlot"></div>'; // ★2026/9/22 ④ ボタンはひとことの直後
 
     if(active.length){
       html+='<div class="sec-label">ご利用中のメガネ</div>';
@@ -1450,8 +1530,11 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       archived.forEach(function(c){ html+=archivedCard(c); });
       html+='</div>';
     }
+    parkActions();                           // ★描き直す前にボタンを外へ退避
     document.getElementById("app").innerHTML=html;
+    slotActions();                           // ★ひとことの直後へはめ込む
     showActions();
+    fitCardNos();                            // ★⑦ 枝番がはみ出していないか確認
     playSeason();                        // ★季節アニメーション（その月の初回表示時のみ）
   }
 
@@ -1483,6 +1566,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
         : '👓️まだ会員証がありません<br><br>SixfourとRICCOで<br>メガネ・サングラスを<br>お作りいただくと、<br>あなただけの会員証が発行されます。<div class="msg-sub">保証の残り日数も、ひと目でわかります☺️</div>';
     }
 
+    parkActions();
     document.getElementById("app").innerHTML=
       '<div class="msg-card '+(ricco?'ricco':'sixfour')+'">'+msgBrandHtml(ricco)+body+'</div>';
     showActions();
@@ -1504,6 +1588,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var monOpts = '<option value="">月</option>';
     for(var m=1;m<=12;m++) monOpts += '<option value="'+m+'">'+m+'</option>';
 
+    parkActions();
     document.getElementById("app").innerHTML =
       '<div class="reg-lead"><b>会員証をお作りします👓️</b>'+
         'ご登録いただくと、<br>ご購入後にデジタル会員証が<br>発行されます。</div>'+
@@ -1643,6 +1728,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   /* ===== エラー画面 ===== */
   function renderError(msg){
     document.getElementById("head").style.display="none";
+    parkActions();
     document.getElementById("app").innerHTML=
       '<div class="msg-card sixfour">'+msgBrandHtml(false)+
         '申し訳ありません。会員証を読み込めませんでした。<br>通信環境の良い場所で、もう一度お試しください。'+
@@ -1741,6 +1827,20 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   }
 
   /* ランクと今月のひとことの間に出す1行。状態で3通りに変わる */
+  /* ★2026/9/22 ⑥：My度数情報のカプセル（2段組）。文言はこれまでと同じで、2段に分けただけ。
+   *   rxBarHtml（旧・1行版）は使わなくなったが、戻せるように残してある。 */
+  function rxCapHtml(d){
+    if(d && d.rx && d.rx.updatedAt){
+      return '<button type="button" class="cap cap-rx" onclick="openRx()">'+
+               '<div class="c1">👓 My度数情報</div><div class="c2">最終更新 '+esc(d.rx.updatedAt)+'</div></button>';
+    }
+    if(d && d.rxPending){
+      return '<div class="cap cap-rx cap-wait"><div class="c1 fit1">👓 度数をお調べしています…</div></div>';
+    }
+    return '<button type="button" class="cap cap-rx" onclick="openRxAsk()">'+
+             '<div class="c1 fit1">👓 度数を確認する</div></button>';
+  }
+
   function rxBarHtml(d){
     if(d && d.rx && d.rx.updatedAt){
       return '<div class="rx-bar"><button type="button" onclick="openRx()">'+
@@ -1803,7 +1903,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
          *   isRiccoのままだと、直近購入と入口が違う人に、実際と違う案内をしてしまう。 */
         (SHOP === "ricco"
           ? '以前の度数をご希望の場合は、「💬LINEで相談する」から、対象のメガネ(カード)の'+
-            '末尾番号を確認して「カード◯◯の度数情報」とお問い合わせください🙇‍♂️'
+            '末尾番号<span class="sq">▢</span>を確認して「カード<span class="sq">▢</span>の度数情報」とお問い合わせください🙇‍♂️'
           : '以前の度数は「💬LINEで相談する」→「6 その他」から'+
             'お問い合わせください🙇‍♂️')+
       '</div>';
