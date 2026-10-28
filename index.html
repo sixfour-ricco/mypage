@@ -1925,11 +1925,19 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
 
     /* ADDは遠用・近用だと空。空の欄は「ー」で埋めて、表がガタつかないようにする */
     var cell = function(v){ return (v && String(v).trim()) ? v : "ー"; };
+    /* ★2026/10/28：乱視なし（Cが0.00）のときは、軸度を必ず「0°」で表示する。
+       スタッフ画面の以前の初期値「180°」で保存済みの方も、ここで「0°」に揃う。
+       乱視ありの方の軸度（180°を含む）は、そのまま表示する。 */
+    var axCell = function(pre){
+      var c = String(rx[pre+"C"] == null ? "" : rx[pre+"C"]).trim();
+      var n = Number(c.replace("+", ""));
+      return (c !== "" && !isNaN(n) && n === 0) ? "0°" : cell(rx[pre+"AX"]);
+    };
     var row = function(label, pre){
       return '<tr><td class="rx-eye">'+label+'</td>'+
              '<td>'+cell(rx[pre+"S"])+'</td>'+
              '<td>'+cell(rx[pre+"C"])+'</td>'+
-             '<td>'+cell(rx[pre+"AX"])+'</td>'+
+             '<td>'+axCell(pre)+'</td>'+
              '<td>'+cell(rx[pre+"ADD"])+'</td>'+
              '<td>'+cell(rx[pre+"PD"])+'</td></tr>';
     };
