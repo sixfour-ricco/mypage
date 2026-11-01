@@ -1866,11 +1866,45 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
    *    その場合ボタンが永久に案内アラートしか出さなくなる。
    *    事前チェックはせず、必ず「まず送ってみて、失敗したら案内」の順にすること。
    */
+  /* ★2026/11/1 追加：お店のLINE公式のトークで「誰からの問い合わせか」が分かるように、
+   *   「💬LINEで相談する」を押すと、お客様の入力なしで次の2通を、この順で自動送信する。
+   *     ①カルテNO.とお名前（ラベルなし）  例：「01-02423」改行「橋本 直之様」
+   *     ②「👓🕶️」＝自動応答の定型文を呼び出すキーワード（公式アカウントの応答設定は完全一致）
+   *   ・①には「お問い合わせ」などのキーワードを入れない（①で自動応答が動かないように）
+   *   ・会員証が1枚も無い方（未登録・未紐付け）は、①を付けずに②だけ送る
+   *   ・家族のカードが同じLINEにあるときは、全員分を並べる（同じ人・同じNo.は1回だけ）
+   *   ・②の絵文字を変えるときは、必ず公式アカウント3つ（エルパ・武生楽市・RICCO）のキーワードも同じ文字に直すこと */
+  var CONSULT_KEYWORD = "\uD83D\uDC53\uD83D\uDD76\uFE0F";   // 👓🕶️
+
+  function memberInfoMessages(){
+    try{
+      var d = PAGE_DATA;
+      if(!d || !d.cards || !d.cards.length) return [];
+      var seen = {}, blocks = [];
+      d.cards.forEach(function(c){
+        var no = String(c.memberNo || "").trim();
+        var nm = String(c.name || "").replace(/[ \u3000]*様[ \u3000]*$/, "").trim();
+        if(!no && !nm) return;
+        var key = no + "|" + nm;
+        if(seen[key]) return;
+        seen[key] = 1;
+        var lines = [];
+        if(no) lines.push(no);
+        if(nm) lines.push(nm + "様");
+        blocks.push(lines.join("\n"));
+      });
+      if(!blocks.length) return [];
+      return [{ type:"text", text: blocks.join("\n\n") }];
+    }catch(e){
+      return [];
+    }
+  }
+
   window.consult = function(){
-    var word = "お問い合わせ";
+    var word = "お問い合わせ";   // 失敗したときの案内用（公式アカウントには、このキーワードも残してある）
     var guide = "トーク画面で「"+word+"」と送信してください。すぐにご案内が届きます。";
     try{
-      liff.sendMessages([{ type:"text", text: word }])
+      liff.sendMessages(memberInfoMessages().concat([{ type:"text", text: CONSULT_KEYWORD }]))
         .then(function(){ liff.closeWindow(); })
         .catch(function(){ alert(guide); });
     }catch(e){
@@ -1972,15 +2006,12 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       '</tr></thead><tbody>'+ row("R", "r") + row("L", "l") +'</tbody></table>'+
       (rx.remarks ? '<div class="rx-remarks">'+rx.remarks+'</div>' : '')+
       '<div class="rx-caution">'+
+        /* ★2026/11/1 SixfourとRICCOで文言を統一（ナオユキ指示）。
+         *   「カード▢の度数情報」と問い合わせてもらう方式に両店舗とも揃えた（旧Sixfourの「6 その他」案内は廃止）。 */
         'My度数情報は最新の'+(isRicco ? "アイウェア" : "メガネ")+'分のみを表示しています。<br>'+
-        /* ★2026/9/22：ここだけ isRicco（直近購入ブランド）ではなく SHOP（今回の入口）で分岐。
-         *   「💬LINEで相談する」は開いた入口のトークに送られるため、案内文はそのトークの流れに合わせる必要がある。
-         *   isRiccoのままだと、直近購入と入口が違う人に、実際と違う案内をしてしまう。 */
-        (SHOP === "ricco"
-          ? '以前の度数をご希望の場合は、「💬LINEで相談する」から、対象のメガネ(カード)の'+
-            '末尾番号<span class="sq">▢</span>を確認して「カード<span class="sq">▢</span>の度数情報」とお問い合わせください🙇‍♂️'
-          : '以前の度数は「💬LINEで相談する」→「6 その他」から'+
-            'お問い合わせください🙇‍♂️')+
+        '以前の度数をご希望の場合は、「💬LINEで相談する」から、対象のメガネ(カード)の'+
+          '末尾番号<span class="sq">▢</span>を確認して「カード<span class="sq">▢</span>の度数情報」とお問い合わせください🙇‍♂️<br>'+
+        '例：01-23456-7️⃣の「７」の数字'+
       '</div>';
 
     /* ★2026/9/16：作製日を独立チップから外して、リード文に合体させた
