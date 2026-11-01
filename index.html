@@ -604,6 +604,23 @@ var LIFF_IDS = [
     return (v === 'ricco') ? 'ricco' : 'sixfour';
   })();
 
+  /* ★2026/11/1 追加：どの店のリッチメニュー（NFCタグ）から友だち追加・登録されたかを記録する目印。
+     リッチメニューのURLに &store=lpa（Sixfourエルパ店）／&store=takefu（Sixfour武生楽市店）／&store=ricco を付ける。
+     SHOP と同じ方法で読む（liff.state の中も見る）。上の3つ以外・付いていない場合は空（＝店舗不明）で送る。
+     ※RICCOは付いていなくても、登録時にGAS側で ricco として記録される */
+  var STORE = (function(){
+    function pick(qs){
+      var m = /[?&]store=([^&]+)/.exec(qs || '');
+      return m ? decodeURIComponent(m[1]).toLowerCase() : '';
+    }
+    var v = pick(location.search);
+    if(!v){
+      var st = /[?&]liff\.state=([^&]+)/.exec(location.search);
+      if(st) v = pick(decodeURIComponent(st[1]));
+    }
+    return (v === 'lpa' || v === 'takefu' || v === 'ricco') ? v : '';
+  })();
+
 // ② GASのAPI用URL（/exec で終わる長いURL）
 //    ★今つかっている index.html の同じ行と見比べて、違っていたら今の方に直してください
 var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3IEiiTSjjzpUDKORMHD0iH3T9Ku43N6DGWvw8XgK0oV6/exec";
@@ -1757,6 +1774,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       + "&meiKana="  + encodeURIComponent(meiK)
       + "&birthday=" + encodeURIComponent(birthday)
       + "&brand="    + encodeURIComponent(SHOP)
+      + "&store="    + encodeURIComponent(STORE)
       + "&bought="   + encodeURIComponent(REG_BOUGHT)
       + "&callback=" + cbName;
 
