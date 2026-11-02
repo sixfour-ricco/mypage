@@ -1624,8 +1624,8 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       body += '<div class="msg-sub">お渡しの手続きが済むと、ここに会員証が表示されます。保証の残り日数も、ひと目でわかるようになります。</div>';
     } else if(bought){
       body = ricco
-        ? 'ありがとうございます😌<br><br>次回ご来店の際に<br>「LINEの会員証をお願いします」と<br>スタッフへお伝えください。<br><br>これまでお選びいただいたアイウェアも<br>数えて会員証を発行いたします👓️🕶️'
-        : 'ありがとうございます😌<br><br>次回ご来店の際に<br>「LINEの会員証をお願いします」と<br>スタッフへお伝えください。<br><br>これまでのメガネ・サングラスも<br>数えて会員証を発行いたします👓️🕶️';
+        ? 'ありがとうございます😌<br><br>ご来店の際に<br>「LINEの会員証をお願いします」と<br>スタッフへお伝えください。<br><br>これまでお選びいただいたアイウェアも<br>数えて会員証を発行いたします👓️🕶️'
+        : 'ありがとうございます😌<br><br>ご来店の際に<br>「LINEの会員証をお願いします」と<br>スタッフへお伝えください。<br><br>これまでのメガネ・サングラスも<br>数えて会員証を発行いたします👓️🕶️';
     } else {
       body = ricco
         ? '👓️まだ会員証がございません<br><br>SixfourとRICCOで<br>アイウェアを<br>お作りいただきますと、<br>あなただけの会員証が発行されます。<div class="msg-sub">保証の残り日数も、ひと目で。</div>'
@@ -1674,7 +1674,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       '<div class="reg-why">15歳以下のお客様は、<br><b>見え方保証が90日間→180日間</b>になります。<br><br>'+
         'それと──<br>あなたの目が何年がんばってきたか、<br>メガネ屋👓️としては、<br>ちょっと知っておきたいのです😌</div>'+
 
-      '<div class="reg-field"><label>SixfourまたはRICCOでメガネ👓️や<br>サングラス🕶️をご購入されたことはありますか？<span class="req">必須</span></label>'+
+      '<div class="reg-field"><label>SixfourまたはRICCOでメガネ👓️や<br>サングラス🕶️をご購入されたことはありますか？<span class="req">必須</span><br><span class="hint" style="display:block;margin:5px 0 0;font-size:11.5px;color:#9E1A3A;font-weight:700;">※今回ご購入の方も「はい」でお願いします</span></label>'+
         '<div class="reg-yesno"><button type="button" id="rYes" onclick="setBought(\'あり\')">はい</button>'+
         '<button type="button" id="rNo" onclick="setBought(\'なし\')">いいえ</button></div></div>'+
 
