@@ -434,6 +434,22 @@
     0%  { transform:translateX(0) scale(.8); }
     100%{ transform:translateX(var(--drift,180px)) scale(.8); }
   }
+
+  /* ===== ★2026/11/15 追加：家族の会員証の追加（ご申請） ===== */
+  .fam-box{ margin:6px 2px 6px; }
+  .fam-add{ display:block; width:100%; padding:13px 10px; border-radius:12px; border:1.5px dashed rgba(0,0,0,.28);
+    background:rgba(255,255,255,.7); color:var(--ink); font-family:inherit; font-size:13.5px; font-weight:700; letter-spacing:.04em; cursor:pointer; }
+  .fam-add:active{ transform:scale(.99); }
+  .fam-banner{ border:1.5px dashed rgba(0,0,0,.28); background:rgba(255,255,255,.7); border-radius:12px; padding:12px 14px; margin-bottom:10px; text-align:center; line-height:1.7; }
+  .fam-banner .fb1{ font-size:13px; font-weight:700; }
+  .fam-banner .fb2{ font-size:12.5px; margin-top:2px; }
+  .fam-banner .fb3{ font-size:11.5px; color:var(--sub); margin-top:4px; }
+  .fam-note{ background:rgba(0,0,0,.035); border-radius:10px; padding:11px 13px 11px 13px; margin-bottom:16px; font-size:11.5px; line-height:1.85; color:#4a4436; }
+  .fam-note p{ margin:0 0 6px; padding-left:1em; text-indent:-1em; }
+  .fam-note .ph{ display:inline-block; text-indent:0; }
+  .fam-note p:last-child{ margin-bottom:0; }
+  .fam-err{ font-size:12px; color:#9E1A3A; text-align:center; margin-top:10px; min-height:1.2em; }
+  #famSheet .reg-field input, #famSheet .reg-field select{ background:#fff; }
 </style>
 </head>
 <body>
@@ -567,6 +583,30 @@
 
     <a class="more" id="warrantyMore" href="https://www.6666mega.net/guarantee-repair/" target="_blank" rel="noopener">Sixfour公式サイトでさらに詳しく</a>
     <button type="button" class="close" onclick="closeWarranty()">閉じる</button>
+  </div>
+</div>
+
+<!-- ★2026/11/15 追加：家族の会員証の追加（ご申請）。お店でスタッフが確認してから会員証になる -->
+<div class="sheet" id="famSheet">
+  <div class="veil" onclick="closeFam()"></div>
+  <div class="panel">
+    <h2>家族の会員証💳️を追加する</h2>
+    <div class="fam-note" id="famNote"></div>
+
+    <div class="reg-field"><label>お名前<span class="req">必須</span></label>
+      <div class="reg-two"><input id="fSei" type="text" placeholder="姓" maxlength="20">
+      <input id="fMei" type="text" placeholder="名" maxlength="20"></div></div>
+
+    <div class="reg-field"><label>フリガナ<span class="req">必須</span></label>
+      <div class="reg-two"><input id="fSeiK" type="text" placeholder="セイ" maxlength="20">
+      <input id="fMeiK" type="text" placeholder="メイ" maxlength="20"></div></div>
+
+    <div class="reg-field"><label>生年月日<span class="req">必須</span></label>
+      <div class="reg-three"><select id="fY"></select><select id="fM"></select><select id="fD"></select></div></div>
+
+    <button class="reg-btn" id="fBtn" onclick="submitFam()">申請する</button>
+    <div class="fam-err" id="fErr"></div>
+    <button class="close" onclick="closeFam()">閉じる</button>
   </div>
 </div>
 
@@ -1092,7 +1132,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   };
 
   /* ★2026/9/12 改修：メモボタンを追加し、2つのボタンを横並びにした。
-     pickRowId … 絵柄を選ぶボタンを出す行ID（現役カードのみ。不要なら null）
+     pickRowId … 絵柄を選ぶボタンを出す行ID（★2026/11/15〜殿堂入りカードにも出す。不要なら null）
      memoRowId … メモボタンを出す行ID（殿堂入りカードにも出す。不要なら null） */
   function specsHtml(months, withLabel, design, pickRowId, memoRowId, isRicco){
     var no = parseInt(design,10); if(isNaN(no)||no<1||no>6) no = 1;
@@ -1183,7 +1223,9 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
         '<div class="card-right"><div class="card-no">'+cardNoText(card)+'</div>' +
           /* ★2026/9/22：殿堂入りカードにもエイジングの言葉を出す（withLabelをtrueに変更）。
            *   ラベルはこのまま伸び続けるので、殿堂入りになった後も言葉が進んでいく。 */
-          specsHtml(card.months, true, card.design, null, card.rowId, isRicco) +
+          /* ★2026/11/15：殿堂入りカードにも「メガネを選ぶ」を出す（絵柄を変えて楽しめるように）。
+           *   絵は経過月数（card.months）で色づけるので、選び直した絵柄にも、このカードの経年変化がそのまま乗る。 */
+          specsHtml(card.months, true, card.design, card.rowId, card.rowId, isRicco) +
         '</div>' +
       '</div>'+
       '<div class="w-grid"><div class="w-cell"><div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date">'+esc(card.frameEnd)+'</div></div></div>'+
@@ -1591,6 +1633,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
         : '<div class="msg-card sixfour">'+msgBrandHtml(false)+
           '今お使いのメガネ・サングラスの保証は、すべて終了しています。<br>でも、調整・クリーニングは<span class="forever-in">いつまでも</span>無料です☺️<br>新しい一本も、いつでもお待ちしてます👓🕶️</div>';
     }
+    html += famBoxHtml();                    // ★2026/11/15 家族の会員証の追加（申請中なら「確認中」）
     if(archived.length){
       html+='<button class="archive-toggle" onclick="toggleArchive(this)"><span class="chev">▶</span> 保証が終了したメガネ（'+archived.length+'本）</button><div class="archive-wrap">';
       archived.forEach(function(c){ html+=archivedCard(c); });
@@ -2307,6 +2350,114 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   function cleanupDp(cbName){
     try{ delete window[cbName]; }catch(e){ window[cbName]=undefined; }
     var el=document.getElementById(cbName); if(el) el.parentNode.removeChild(el);
+  }
+
+
+  /* ============================================================
+   *  ★2026/11/15 追加：家族の会員証の追加（ご申請）
+   *  ・［＋ 家族の会員証💳️を追加する］→ お名前・フリガナ・生年月日（すべて必須）→［申請する］
+   *  ・申請はスタッフ画面④「家族追加ご希望のお客様」に並ぶ。店頭でスタッフが確認してから会員証になる
+   *  ・申請中は「確認中」を表示（PAGE_DATA.famPending）。スタッフが追加・キャンセルすると消える
+   * ============================================================ */
+  function famIsRicco(){ return SHOP === "ricco"; }
+
+  function famBoxHtml(){
+    var ricco = famIsRicco(), h = '';
+    var list = (PAGE_DATA && PAGE_DATA.famPending) || [];
+    if(list.length){
+      var names = list.map(function(f){ return esc(f.name) + ' さん'; }).join('<br>');
+      h += '<div class="fam-banner"><div class="fb1">👪 '+(ricco ? 'ご家族の追加を確認中でございます' : '家族の追加を確認中です')+'</div>'+
+           '<div class="fb2">'+names+'</div>'+
+           '<div class="fb3">'+(ricco ? 'ご来店の際、スタッフにお声がけくださいませ' : 'ご来店の際、スタッフにお声がけください')+'</div></div>';
+    }
+    h += '<button type="button" class="fam-add" onclick="openFam()">＋ 家族の会員証💳️を追加する</button>';
+    return '<div class="fam-box" id="famBox">' + h + '</div>';
+  }
+
+  function famNoteHtml(){
+    var ricco = famIsRicco();
+    /* ¶＝改行の位置（ナオユキ指定）　|＝画面が狭いときに折り返してよい位置（句の切れ目） */
+    var lines = ricco ? [
+      '追加されたご家族の度数情報・|ご購入履歴が、|こちらのマイページに表示されます。¶（RICCOまたはSixfourで|ご購入のない方は、|追加いたしかねます）',
+      '店頭でスタッフが|ご家族の情報を確認のうえ、|追加いたします。¶お手数をおかけいたしますが、|ご来店くださいませ。',
+      '追加後に外されたい場合は、|店頭またはLINEにて|お知らせください。'
+    ] : [
+      '追加したご家族の度数情報・|ご購入履歴が、|このマイページに表示されます。¶（SixfourまたはRICCOで|ご購入のない方は、|追加できませんのでご了承ください）',
+      '店頭でスタッフが|家族情報を確認してからの|追加となります。¶お手数ですが、|ご来店をお願いいたします。',
+      '追加後に外したい時は、|店頭またはLINEで|お知らせください。'
+    ];
+    function ph(line){ return line.split('|').map(function(t){ return '<span class="ph">'+t+'</span>'; }).join(''); }
+    return lines.map(function(t){ return '<p>・'+t.split('¶').map(ph).join('<br>')+'</p>'; }).join('');
+  }
+
+  function famBuildDays(){
+    var yv=parseInt(document.getElementById("fY").value,10), mv=parseInt(document.getElementById("fM").value,10);
+    var last=(yv&&mv)?new Date(yv,mv,0).getDate():31, dsel=document.getElementById("fD"), keep=dsel.value;
+    var h='<option value="">日</option>'; for(var d=1; d<=last; d++) h+='<option value="'+d+'">'+d+'</option>';
+    dsel.innerHTML=h; if(keep && parseInt(keep,10)<=last) dsel.value=keep;
+  }
+  function openFam(){
+    document.getElementById("famNote").innerHTML = famNoteHtml();
+    ["fSei","fMei","fSeiK","fMeiK"].forEach(function(id){ document.getElementById(id).value=""; });
+    var thisYear = new Date().getFullYear();
+    var yo='<option value="">年</option>'; for(var y=thisYear; y>=1920; y--) yo+='<option value="'+y+'">'+y+'（'+wareki(y)+'）</option>';
+    var mo='<option value="">月</option>'; for(var m=1; m<=12; m++) mo+='<option value="'+m+'">'+m+'</option>';
+    document.getElementById("fY").innerHTML=yo; document.getElementById("fM").innerHTML=mo;
+    famBuildDays();
+    document.getElementById("fY").onchange = famBuildDays; document.getElementById("fM").onchange = famBuildDays;
+    document.getElementById("fErr").textContent = "";
+    var btn=document.getElementById("fBtn"); btn.disabled=false; btn.textContent="申請する";
+    document.getElementById("famSheet").classList.add("open");
+  }
+  function closeFam(){ document.getElementById("famSheet").classList.remove("open"); }
+
+  function submitFam(){
+    var g=function(id){ return (document.getElementById(id).value||"").trim(); };
+    var err=document.getElementById("fErr"), btn=document.getElementById("fBtn");
+    if(!g("fSei")||!g("fMei")){ err.textContent="お名前をご入力ください"; return; }
+    if(!g("fSeiK")||!g("fMeiK")){ err.textContent="フリガナをご入力ください"; return; }
+    if(!g("fY")||!g("fM")||!g("fD")){ err.textContent="生年月日は、年・月・日をすべてお選びください"; return; }
+    err.textContent="";
+    var p2=function(n){ return ("0"+n).slice(-2); };
+    var birthday = g("fY")+"-"+p2(g("fM"))+"-"+p2(g("fD"));
+
+    var idToken = liff.getIDToken();
+    if(!idToken){ err.textContent="ログイン情報を取得できませんでした。画面を開き直してください"; return; }
+    btn.disabled=true; btn.textContent="申請しています…";
+
+    var cbName = 'famcb_' + Date.now();
+    var timer = setTimeout(function(){
+      cleanupDp(cbName);
+      btn.disabled=false; btn.textContent="申請する";
+      err.textContent="通信に時間がかかっています。もう一度お試しください";
+    }, 15000);
+    window[cbName] = function(json){
+      clearTimeout(timer); cleanupDp(cbName);
+      btn.disabled=false; btn.textContent="申請する";
+      if(json && json.ok){
+        if(PAGE_DATA) PAGE_DATA.famPending = json.famPending || PAGE_DATA.famPending || [];
+        closeFam(); render();
+        var b=document.querySelector(".fam-banner"); if(b && b.scrollIntoView) b.scrollIntoView({block:"center", behavior:"smooth"});
+      }else{
+        err.textContent = (json && json.error) ? json.error : "申請できませんでした。もう一度お試しください";
+      }
+    };
+    var url = API_URL + "?action=requestFamily"
+      + "&idToken="  + encodeURIComponent(idToken)
+      + "&sei="      + encodeURIComponent(g("fSei"))
+      + "&mei="      + encodeURIComponent(g("fMei"))
+      + "&seiKana="  + encodeURIComponent(g("fSeiK"))
+      + "&meiKana="  + encodeURIComponent(g("fMeiK"))
+      + "&birthday=" + encodeURIComponent(birthday)
+      + "&callback=" + cbName;
+    var sc = document.createElement('script');
+    sc.id = cbName; sc.src = url;
+    sc.onerror = function(){
+      clearTimeout(timer); cleanupDp(cbName);
+      btn.disabled=false; btn.textContent="申請する";
+      err.textContent = "サーバーに接続できませんでした";
+    };
+    document.body.appendChild(sc);
   }
 
   /* ===== 起動 ===== */
