@@ -205,6 +205,32 @@
       background:rgba(0,0,0,.035); border-radius:10px; padding:11px 13px; }
   .rx-sending{ font-size:12px; color:var(--sub); text-align:center; padding:8px 0; }
 
+  /* ===== ★2026/11/15 Myファミリー度数情報（家族ごとのタブ） =====
+   *  ・タブは［保証・修理について］と同じ「ノートの見出しタブ」をそのまま使う（色だけで区別しない）
+   *  ・同じ苗字の家族は「名」だけ、苗字がちがう方がいるときは「姓」と「名」の2段にする
+   *  ・6人以上のときだけ横にスワイプできる（5人までは見た目は変わらない）
+   *  ・タブを切り替えてもタブの位置が動かないよう、家族のときだけシートの高さをそろえる */
+  #rxSheet.fam .panel{ min-height:min(86vh, 700px); }
+  #rxTabs .w-tab{ min-width:0; padding:9px 4px 8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #rxTabs .w-tab.two{ padding:6px 2px 6px; }
+  #rxTabs .w-tab .t-s{ display:block; font-size:10px; font-weight:500; opacity:.75; line-height:1.2; overflow:hidden; text-overflow:ellipsis; }
+  #rxTabs .w-tab .t-m{ display:block; font-size:12.5px; line-height:1.3; overflow:hidden; text-overflow:ellipsis; }
+  #rxTabs .w-tab.active .t-s{ opacity:.85; }
+  #rxTabs.many{ overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+  #rxTabs.many::-webkit-scrollbar{ display:none; }
+  #rxTabs.many .w-tab{ flex:0 0 64px; }
+  .rx-empty{ text-align:center; padding:18px 6px 6px; }
+  .rx-empty .em-t{ font-size:12.5px; line-height:1.9; color:#4a4436; margin-bottom:14px; }
+  .rx-ask-btn{ display:inline-flex; align-items:center; gap:7px; cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:700;
+      padding:11px 20px; border-radius:22px; border:1px solid rgba(0,0,0,.12); background:rgba(255,255,255,.9); color:var(--ink);
+      box-shadow:0 2px 8px -4px rgba(90,70,40,.35); }
+  .rx-ask-btn:active{ transform:translateY(1px); }
+  .rx-empty .rx-wait{ display:inline-block; font-size:12px; color:var(--sub); background:rgba(255,255,255,.6);
+      border:1px dashed rgba(0,0,0,.14); border-radius:20px; padding:10px 18px; }
+  .rx-check{ margin-top:14px; font-size:12px; line-height:1.85; color:#4a4436; background:#f3efe2;
+      border-radius:10px; padding:10px 12px; display:flex; gap:8px; }
+  .rx-check .ic{ flex:none; }
+
   .sheet{ display:none; position:fixed; inset:0; z-index:50; }
   .sheet.open{ display:block; }
   .sheet .veil{ position:absolute; inset:0; background:rgba(30,26,18,.5); }
@@ -502,9 +528,11 @@
 <div class="sheet" id="rxSheet">
   <div class="veil" onclick="closeRx()"></div>
   <div class="panel">
-    <h2>My度数情報</h2>
+    <h2 id="rxTitle">My度数情報</h2>
+    <!-- ★2026/11/15 家族が2人以上のときだけ出す名前のタブ（中身は rxRenderFam() で組み立てる） -->
+    <div class="w-tabs" id="rxTabs" style="display:none;"></div>
     <div class="lead" id="rxLead"></div>
-    <div id="rxBody"></div>
+    <div class="w-tab-content" id="rxBody"></div>
     <button class="close" onclick="closeRx()">閉じる</button>
   </div>
 </div>
@@ -1974,6 +2002,16 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   /* ★2026/9/22 ⑥：My度数情報のカプセル（2段組）。文言はこれまでと同じで、2段に分けただけ。
    *   rxBarHtml（旧・1行版）は使わなくなったが、戻せるように残してある。 */
   function rxCapHtml(d){
+    /* ★2026/11/15 家族が2人以上：「Myファミリー度数情報」。日付は家族の中で一番新しい更新日。
+     *   押すと、更新日が一番新しい方のタブで開く。度数がまだ誰も無いときは「度数を確認する」 */
+    var fam = rxFam();
+    if(fam && fam.length >= 2){
+      var ni = rxNewestIdx(fam);
+      var upd = (ni >= 0) ? fam[ni].rx.updatedAt : '';
+      return '<button type="button" class="cap cap-rx" onclick="openRx()">'+
+               '<div class="c1 fit1">👓 Myファミリー度数情報</div>'+
+               '<div class="c2">'+(upd ? '最終更新 '+esc(upd) : '度数を確認する')+'</div></button>';
+    }
     if(d && d.rx && d.rx.updatedAt){
       return '<button type="button" class="cap cap-rx" onclick="openRx()">'+
                '<div class="c1">👓 My度数情報</div><div class="c2">最終更新 '+esc(d.rx.updatedAt)+'</div></button>';
@@ -2008,12 +2046,59 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     return m[1] + '.' + parseInt(m[2], 10) + '.' + parseInt(m[3], 10);
   }
 
-  window.openRx = function(){
-    var rx = PAGE_DATA && PAGE_DATA.rx;
-    if(!rx) return;
-    var isRicco = rxIsRicco();
-    var madeNice = rx.made ? rxDateNice(rx.made) : '';
+  /* ===== ★2026/11/15 家族ごとのMy度数情報 =====
+   *  GASの family（[{rowId, sei, mei, birth, rx, rxAt, rxPending}]。先頭＝マイページTOPの方）を使う。
+   *  family が無い（古いGAS）・1人だけのときは、これまで通りの表示になる。 */
+  var RX_CUR = 0;          // いま開いている家族のタブ
+  var RX_ASK_TARGET = null; // 度数を依頼する方 { i, rowId, name }
 
+  function rxFam(){
+    var f = PAGE_DATA && PAGE_DATA.family;
+    return (f && f.length) ? f : null;
+  }
+  /* 更新日が一番新しい方（度数が誰も無ければ -1） */
+  function rxNewestIdx(fam){
+    var best = -1, bt = 0;
+    for(var i=0;i<fam.length;i++){
+      var p = fam[i];
+      if(p.rx && p.rx.updatedAt && (best < 0 || (p.rxAt || 0) > bt)){ best = i; bt = p.rxAt || 0; }
+    }
+    return best;
+  }
+  /* 苗字がちがう方がいるか（いれば、タブは「姓」「名」の2段・文面はフルネーム） */
+  function rxMixedSei(fam){
+    for(var i=1;i<fam.length;i++){ if(String(fam[i].sei) !== String(fam[0].sei)) return true; }
+    return false;
+  }
+  function rxPersonName(fam, p){
+    return rxMixedSei(fam) ? (p.sei + " " + p.mei) : p.mei;
+  }
+  /* 15歳以下で、作製から6か月たった方へのお知らせ（子どもの度数は変わりやすいため） */
+  function rxAgeOf(iso){
+    var m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(iso || ''); if(!m) return 99;
+    var t = new Date(), y = +m[1], mo = +m[2], d = +m[3];
+    var a = t.getFullYear() - y;
+    if(t.getMonth()+1 < mo || (t.getMonth()+1 === mo && t.getDate() < d)) a--;
+    return a;
+  }
+  function rxMonthsSince(iso){
+    var m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(iso || ''); if(!m) return -1;
+    var t = new Date(), y = +m[1], mo = +m[2], d = +m[3];
+    return (t.getFullYear()-y)*12 + (t.getMonth()+1-mo) - (t.getDate() < d ? 1 : 0);
+  }
+  function rxCheckHtml(birth, rx){
+    if(!rx || !rx.made || !birth) return '';
+    if(rxAgeOf(birth) > 15 || rxMonthsSince(rx.made) < 6) return '';
+    return '<div class="rx-check"><span class="ic">👀</span><div>' +
+      (rxIsRicco()
+        ? 'ご成長にあわせて、そろそろ見え方のご確認はいかがでしょうか。お気軽にお立ち寄りくださいませ。'
+        : 'そろそろ見え方チェックの時期です👀<br>お子様の度数は変わりやすいので、お気軽にお立ち寄りください。') +
+      '</div></div>';
+  }
+
+  /* 度数の表・メモ・注意書き（1人用・家族用で共通。中身はこれまでの openRx と同じ） */
+  function rxDetailHtml(rx, extra){
+    var isRicco = rxIsRicco();
     var chips = '';
     if(rx.lens)  chips += '<span class="rx-chip">'+rx.lens+'</span>';
     if(rx.index) chips += '<span class="rx-chip">'+rx.index+'</span>';
@@ -2037,8 +2122,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
              '<td>'+cell(rx[pre+"PD"])+'</td></tr>';
     };
 
-    var html =
-      (chips ? '<div class="rx-meta">'+chips+'</div>' : '') +
+    return (chips ? '<div class="rx-meta">'+chips+'</div>' : '') +
       '<table class="rx-table"><thead><tr>'+
         '<th></th>'+
         '<th>S<small>(球面)</small></th>'+
@@ -2048,6 +2132,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
         '<th>PD<small>(目の距離)</small></th>'+
       '</tr></thead><tbody>'+ row("R", "r") + row("L", "l") +'</tbody></table>'+
       (rx.remarks ? '<div class="rx-remarks">'+rx.remarks+'</div>' : '')+
+      (extra || '')+
       '<div class="rx-caution">'+
         /* ★2026/11/1 SixfourとRICCOで文言を統一（ナオユキ指示）。
          *   「カード▢の度数情報」と問い合わせてもらう方式に両店舗とも揃えた（旧Sixfourの「6 その他」案内は廃止）。 */
@@ -2056,18 +2141,85 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
           '末尾番号<span class="sq">▢</span>を確認して「カード<span class="sq">▢</span>の度数情報」とお問い合わせください🙇‍♂️<br>'+
         '例：01-23456-7️⃣の「７」の数字'+
       '</div>';
+  }
 
-    /* ★2026/9/16：作製日を独立チップから外して、リード文に合体させた
-       （「作製2026.08.31」単独だと何のことか分かりにくいとのご指摘のため） */
-    /* ★2026/9/16夜：作製日を、レンズ種類・屈折率のチップと全く同じ見た目（.rx-chip）で
-       文中に埋め込む。地の文と同じ太さ・色にならないよう、あえてタグごと差し込んでいる */
+  /* ★2026/9/16：作製日を独立チップから外して、リード文に合体させた
+     （「作製2026.08.31」単独だと何のことか分かりにくいとのご指摘のため） */
+  /* ★2026/9/16夜：作製日を、レンズ種類・屈折率のチップと全く同じ見た目（.rx-chip）で
+     文中に埋め込む。地の文と同じ太さ・色にならないよう、あえてタグごと差し込んでいる */
+  function rxLeadHtml(rx){
+    var isRicco = rxIsRicco();
+    var madeNice = rx.made ? rxDateNice(rx.made) : '';
     var madeChip = madeNice ? '<span class="rx-chip">'+madeNice+'</span>' : '';
-    document.getElementById("rxLead").innerHTML = madeNice
+    return madeNice
       ? (isRicco ? "店頭で"+madeChip+"に作製を承ったお度数でございます。"
                  : "お店で"+madeChip+"に作製したメガネの度数です👓")
       : (isRicco ? "店頭で承ったお度数でございます。" : "お店でお作りしたメガネの度数です👓");
-    document.getElementById("rxBody").innerHTML = html;
-    document.getElementById("rxSheet").classList.add("open");
+  }
+
+  /* 家族のタブと、選んだ方の中身を組み立てる */
+  function rxRenderFam(){
+    var fam = rxFam(); if(!fam) return;
+    if(RX_CUR < 0 || RX_CUR >= fam.length) RX_CUR = 0;
+    var two = rxMixedSei(fam), isRicco = rxIsRicco();
+    var tabs = document.getElementById("rxTabs");
+    var th = '';
+    for(var i=0;i<fam.length;i++){
+      var f = fam[i];
+      th += '<button type="button" class="w-tab'+(i===RX_CUR?' active':'')+(two?' two':'')+'" onclick="rxShowTab('+i+')">'+
+            (two ? '<span class="t-s">'+esc(f.sei)+'</span><span class="t-m">'+esc(f.mei)+'</span>' : esc(f.mei))+'</button>';
+    }
+    tabs.innerHTML = th;
+    tabs.className = 'w-tabs' + (fam.length > 5 ? ' many' : '');
+    tabs.style.display = 'flex';
+
+    var p = fam[RX_CUR], lead = document.getElementById("rxLead"), body = '';
+    if(p.rx){
+      lead.innerHTML = rxLeadHtml(p.rx); lead.style.display = '';
+      body = rxDetailHtml(p.rx, rxCheckHtml(p.birth, p.rx));
+    }else{
+      lead.innerHTML = ''; lead.style.display = 'none';
+      if(p.rxPending){
+        body = '<div class="rx-empty"><span class="rx-wait">👓 度数をお調べしています…</span></div>';
+      }else{
+        body = '<div class="rx-empty"><div class="em-t">'+esc(rxPersonName(fam, p))+
+               (isRicco ? 'さまの度数情報は、まだ登録がございません。' : 'さんの度数情報は、まだ登録がありません。')+'</div>'+
+               '<button type="button" class="rx-ask-btn" onclick="openRxAsk('+RX_CUR+')">👓 この方の度数を確認する</button></div>';
+      }
+    }
+    document.getElementById("rxBody").innerHTML = body;
+    /* 選んだタブが見える位置に（6人以上で横にスワイプするときだけ効く） */
+    try{ var at = tabs.children[RX_CUR]; if(at && at.scrollIntoView && fam.length > 5) at.scrollIntoView({ block:'nearest', inline:'nearest' }); }catch(e){}
+  }
+  window.rxShowTab = function(i){ RX_CUR = i; rxRenderFam(); };
+
+  window.openRx = function(i){
+    var sheet = document.getElementById("rxSheet");
+    var fam = rxFam();
+    if(fam && fam.length >= 2){
+      /* ★2026/11/15 家族：最初は更新日が一番新しい方のタブ（誰も無ければ先頭＝TOPの方） */
+      if(typeof i === 'number') RX_CUR = i;
+      else { var ni = rxNewestIdx(fam); RX_CUR = ni >= 0 ? ni : 0; }
+      document.getElementById("rxTitle").textContent = "Myファミリー度数情報";
+      sheet.classList.add("fam");
+      rxRenderFam();
+      sheet.classList.add("open");
+      document.body.style.overflow = "hidden";
+      return;
+    }
+
+    /* 1人だけ：これまで通り */
+    var rx = PAGE_DATA && PAGE_DATA.rx;
+    if(!rx) return;
+    document.getElementById("rxTitle").textContent = "My度数情報";
+    document.getElementById("rxTabs").style.display = "none";
+    sheet.classList.remove("fam");
+    var lead = document.getElementById("rxLead");
+    lead.style.display = '';
+    lead.innerHTML = rxLeadHtml(rx);
+    var me = fam ? fam[0] : null;   // 15歳以下の方へのお知らせ（1人だけのときも同じ条件で出す）
+    document.getElementById("rxBody").innerHTML = rxDetailHtml(rx, me ? rxCheckHtml(me.birth, rx) : '');
+    sheet.classList.add("open");
     document.body.style.overflow = "hidden";
   };
 
@@ -2082,9 +2234,18 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   var RX_PURPOSES_SIX = ["最近の見え方が気になる", "自分の度数、記録しておきたい", "他店・ネットでメガネを作りたい"];
   var RX_PURPOSES_RIC = ["見え方のご確認に", "記録として、お手元に", "他店・ネットでのご購入に"];
 
-  window.openRxAsk = function(){
+  window.openRxAsk = function(i){
     var isRicco = rxIsRicco();
     var list = isRicco ? RX_PURPOSES_RIC : RX_PURPOSES_SIX;
+    /* ★2026/11/15 家族のタブから開いたときは「その方の分」。1人だけのときは、その方の行を伝えるだけ（見た目はこれまで通り） */
+    var fam = rxFam();
+    RX_ASK_TARGET = null;
+    if(fam && fam.length >= 2 && typeof i === 'number' && fam[i]){
+      RX_ASK_TARGET = { i: i, rowId: fam[i].rowId || '', name: rxPersonName(fam, fam[i]) };
+    }else if(fam && fam.length === 1){
+      RX_ASK_TARGET = { i: 0, rowId: fam[0].rowId || '', name: '' };
+    }
+    var who = (RX_ASK_TARGET && RX_ASK_TARGET.name) ? RX_ASK_TARGET.name : '';
 
     var body = "";
     list.forEach(function(t){
@@ -2103,8 +2264,9 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       '</div>';
     body += '<div class="rx-sending" id="rxAskMsg"></div>';
 
-    document.getElementById("rxAskTitle").textContent =
-      isRicco ? "👓度数のお問い合わせ" : "👓度数、お調べします!";
+    document.getElementById("rxAskTitle").textContent = who
+      ? (isRicco ? "👓"+who+"さまの度数のお問い合わせ" : "👓"+who+"さんの度数、お調べします!")
+      : (isRicco ? "👓度数のお問い合わせ" : "👓度数、お調べします!");
     document.getElementById("rxAskLead").textContent =
       isRicco ? "ご用途をお聞かせください。" : "ご用途を教えてください。";
     document.getElementById("rxAskBody").innerHTML = body;
@@ -2139,6 +2301,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     };
 
     var idToken = liff.getIDToken() || "";
+    var target = RX_ASK_TARGET;   // ★2026/11/15 誰の分か（送っている途中で変わらないよう、ここで控える）
 
     /* ★2026/9/15 追加：こちらも同じ理由（4G回線の不安定さ）で、1回失敗しても
        お客様には見せずに自動でもう1回だけ静かにやり直す。 */
@@ -2172,14 +2335,28 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
         /* ②お店のトークにも流す。ここが失敗しても受付自体は済んでいるので、
              お客様には成功として伝える（スタッフ画面には確実に出ている）。 */
         try{
-          liff.sendMessages([{ type:"text", text:"度数のお問い合わせ（"+purpose+"）" }])
+          /* ★2026/11/15 家族の方の分は、お名前も入れる（例：度数のお問い合わせ（蓮さん・最近の見え方が気になる）） */
+          var who = (target && target.name) ? target.name + "さん・" : "";
+          liff.sendMessages([{ type:"text", text:"度数のお問い合わせ（"+who+purpose+"）" }])
             .then(function(){}).catch(function(){});
         }catch(e){}
 
         done(true, "承りました。お調べしてご連絡いたします🙇‍♂️");
         setTimeout(function(){
           closeRxAsk();
-          if(PAGE_DATA){ PAGE_DATA.rxPending = true; render(); }
+          if(PAGE_DATA){
+            var fam = rxFam();
+            if(target && target.name && fam && fam[target.i]){
+              /* ★2026/11/15 家族：その方のタブだけ「お調べしています」にする */
+              fam[target.i].rxPending = true;
+              render();
+              if(document.getElementById("rxSheet").classList.contains("open")) rxRenderFam();
+            }else{
+              PAGE_DATA.rxPending = true;
+              if(fam && fam[0]) fam[0].rxPending = true;
+              render();
+            }
+          }
         }, 1600);
       };
 
@@ -2187,6 +2364,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
         + "?action=requestRx"
         + "&idToken=" + encodeURIComponent(idToken)
         + "&purpose=" + encodeURIComponent(purpose)
+        + (target && target.rowId ? "&rowId=" + encodeURIComponent(target.rowId) : "")   // ★2026/11/15 誰の分か
         + "&callback=" + cbName;
 
       var sc = document.createElement("script");
