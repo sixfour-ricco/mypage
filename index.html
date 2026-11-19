@@ -1941,6 +1941,7 @@ I18NX.en = {
   regSlow:'The connection is taking a while. Please try again where the signal is better.',
   regFail:'Registration failed.',
   consultGuide:function(w){ return 'Please send "'+w+'" in the chat. We will reply with guidance right away.'; },
+  consultGuideFor:'Could not send automatically. Please type your message in this chat — our staff will reply.',   // ★2026/11/19 外国語のお客様用（相談ボタンは自動応答を呼ばないため）
   rxAskPlain:'Check prescription',
   rxLeadNoDateSix:'This is the prescription of glasses made at our store 👓', rxLeadNoDateRic:'This is the prescription we prepared for you at our store.',
   rxEmptySix:function(n){ return 'No prescription has been registered for '+n+' yet.'; },
@@ -1997,6 +1998,7 @@ I18NX.pt = {
   regSlow:'A conexão está demorando. Tente novamente em um local com sinal melhor.',
   regFail:'Não foi possível cadastrar.',
   consultGuide:function(w){ return 'Envie "'+w+'" na conversa. Você receberá as orientações em seguida.'; },
+  consultGuideFor:'Não foi possível enviar automaticamente. Escreva sua mensagem nesta conversa — nossa equipe responderá.',   // ★2026/11/19 外国語のお客様用（相談ボタンは自動応答を呼ばないため）
   rxAskPlain:'Consultar grau',
   rxLeadNoDateSix:'Este é o grau dos óculos feitos na nossa loja 👓', rxLeadNoDateRic:'Este é o grau que preparamos para você na loja.',
   rxEmptySix:function(n){ return 'Ainda não há grau registrado para '+n+'.'; },
@@ -2053,6 +2055,7 @@ I18NX.zh = {
   regSlow:'网络响应较慢，请在信号好的地方重试。',
   regFail:'注册失败。',
   consultGuide:function(w){ return '请在聊天界面发送「'+w+'」，我们会马上回复。'; },
+  consultGuideFor:'未能自动发送。请直接在聊天中输入您的留言，店员会回复您。',   // ★2026/11/19 外国語のお客様用（相談ボタンは自動応答を呼ばないため）
   rxAskPlain:'查询度数',
   rxLeadNoDateSix:'这是在本店配制的眼镜度数👓', rxLeadNoDateRic:'这是在本店为您配制的度数。',
   rxEmptySix:function(n){ return n+'的度数信息尚未登记。'; },
@@ -2109,6 +2112,7 @@ I18NX.vi = {
   regSlow:'Kết nối đang chậm. Vui lòng thử lại ở nơi có sóng tốt hơn.',
   regFail:'Không đăng ký được.',
   consultGuide:function(w){ return 'Vui lòng gửi "'+w+'" trong khung trò chuyện. Chúng tôi sẽ hướng dẫn ngay.'; },
+  consultGuideFor:'Không gửi tự động được. Vui lòng nhập tin nhắn vào khung trò chuyện này, nhân viên sẽ phản hồi.',   // ★2026/11/19 外国語のお客様用（相談ボタンは自動応答を呼ばないため）
   rxAskPlain:'Xem độ kính',
   rxLeadNoDateSix:'Đây là độ của kính làm tại cửa hàng 👓', rxLeadNoDateRic:'Đây là độ kính cửa hàng đã làm cho quý khách.',
   rxEmptySix:function(n){ return 'Chưa có thông tin độ kính của '+n+'.'; },
@@ -2458,6 +2462,7 @@ window.sendRxPrev = function(rowId){
   var msgs = [];
   if(info) msgs.push({ type:'text', text: info });
   msgs.push({ type:'text', text: 'カード' + n + 'の度数情報' });
+  msgs = tagLastMsg_(msgs);   // ★2026/11/19 外国語のときだけ、最後に 🌐EN などの印
   try{
     liff.sendMessages(msgs)
       .then(function(){ liff.closeWindow(); })
@@ -3757,11 +3762,27 @@ window.sendRxPrev = function(rowId){
     }
   }
 
+  /* ★2026/11/19 外国語のお客様（C案）：
+   *   お店の自動応答（キーワード「👓🕶️」）は日本語でしか返せず、読めないため、外国語のときは「👓🕶️」を送らない。
+   *   かわりに、送る文の最後に「🌐EN」などの言語の印を付ける。スタッフは印を見て、翻訳ヘルパー（スタッフ画面⑥）で返信する。
+   *   日本語のお客様は、今までどおり。 */
+  function chatLangTag_(){ return isJa() ? '' : '\uD83C\uDF10' + String(LANG).toUpperCase(); }   // 🌐EN
+  function tagLastMsg_(msgs){
+    var tag = chatLangTag_();
+    if(!tag) return msgs;
+    if(!msgs || !msgs.length) return [{ type:"text", text: tag }];
+    var out = msgs.slice(0, msgs.length - 1), last = msgs[msgs.length - 1];
+    out.push({ type:"text", text: String(last.text || '') + ' ' + tag });
+    return out;
+  }
+
   window.consult = function(){
     var word = "お問い合わせ";   // 失敗したときの案内用（公式アカウントには、このキーワードも残してある）
-    var guide = X().consultGuide(word);   // ★2026/11/19 案内は言語ごと（送る言葉は日本語のまま）
+    var guide = (!isJa() && X().consultGuideFor) ? X().consultGuideFor : X().consultGuide(word);   // ★2026/11/19 案内は言語ごと
     try{
-      liff.sendMessages(memberInfoMessages().concat([{ type:"text", text: CONSULT_KEYWORD }]))
+      var cmsgs = memberInfoMessages();
+      cmsgs = isJa() ? cmsgs.concat([{ type:"text", text: CONSULT_KEYWORD }]) : tagLastMsg_(cmsgs);
+      liff.sendMessages(cmsgs)
         .then(function(){ liff.closeWindow(); })
         .catch(function(){ alert(guide); });
     }catch(e){
@@ -4107,7 +4128,7 @@ window.sendRxPrev = function(rowId){
         try{
           /* ★2026/11/15 家族の方の分は、お名前も入れる（例：度数のお問い合わせ（蓮さん・最近の見え方が気になる）） */
           var who = (target && target.name) ? target.name + "さん・" : "";
-          liff.sendMessages([{ type:"text", text:"度数のお問い合わせ（"+who+purpose+"）" }])
+          liff.sendMessages(tagLastMsg_([{ type:"text", text:"度数のお問い合わせ（"+who+purpose+"）" }]))   // ★2026/11/19 外国語のときだけ 🌐EN の印
             .then(function(){}).catch(function(){});
         }catch(e){}
 
