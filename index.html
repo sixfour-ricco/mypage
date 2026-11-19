@@ -476,6 +476,138 @@
   .fam-note p:last-child{ margin-bottom:0; }
   .fam-err{ font-size:12px; color:#9E1A3A; text-align:center; margin-top:10px; min-height:1.2em; }
   #famSheet .reg-field input, #famSheet .reg-field select{ background:#fff; }
+
+  /* =====================================================================
+   *  ★2026/11/19 多言語・🎫お引換券・🌐言語ボタン
+   * ===================================================================== */
+  /* ===== 🎫 お引換券 =====
+   *  色だけで区別しない：
+   *   準備中／入荷待ち ＝点線の枠のラベル
+   *   日程調整中       ＝二重線の枠のラベル「日程調整中」
+   *   仕上がり／入荷   ＝塗りつぶしのラベル「✓」＋カード全体の枠が太くなる */
+  .ticket{ position:relative; border-radius:16px; padding:16px 20px 16px; margin-bottom:14px; overflow:hidden; isolation:isolate; }
+  .ticket::after{ content:""; position:absolute; inset:6px; border:1.5px dashed rgba(0,0,0,.14); border-radius:11px; pointer-events:none; z-index:-1; }
+  .ticket.ricco::after{ border-color:rgba(70,60,40,.22); }
+  .ticket.ready{ outline:2.5px solid #b5182b; outline-offset:-2.5px; }
+  .ticket.ricco.ready{ outline-color:#7d4a2e; }
+  .tk-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .tk-label{ font-size:11px; font-weight:800; letter-spacing:.32em; padding-left:.32em; opacity:.7; }
+  .tk-main{ display:flex; align-items:flex-end; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  .tk-name{ font-size:24px; font-weight:600; letter-spacing:.03em; line-height:1.1; min-width:0; }
+  .tk-no{ font-family:"SFMono-Regular",Consolas,"Courier New",monospace; font-size:20px; font-weight:800; letter-spacing:0; white-space:nowrap; opacity:.92; }
+  .ricco .tk-no{ color:#7a6b47; }
+  .tk-sub{ font-size:12.5px; opacity:.78; margin-top:7px; line-height:1.6; }
+  .tk-sub span{ white-space:nowrap; }
+  .tk-cut{ position:relative; height:0; border-top:1.5px dashed rgba(0,0,0,.24); margin:14px -20px 14px; }
+  .ricco .tk-cut{ border-top-color:rgba(70,60,40,.34); }
+  .tk-cut::before,.tk-cut::after{ content:""; position:absolute; top:-10.5px; width:19px; height:19px; border-radius:50%; background:var(--bg); }
+  .tk-cut::before{ left:-10px; }
+  .tk-cut::after{ right:-10px; }
+  .tk-state{ text-align:center; }
+  .tk-pill{ display:inline-block; font-size:12.5px; font-weight:800; letter-spacing:.1em; padding:6px 18px; border-radius:20px; margin-bottom:9px; }
+  .tk-pill.wait{ border:1.5px dashed currentColor; background:transparent; opacity:.75; }
+  .tk-pill.delay{ border:4px double currentColor; padding:3px 16px; background:transparent; opacity:.85; }
+  .tk-pill.ready{ background:#b5182b; color:#fff; box-shadow:0 4px 12px -5px rgba(181,24,43,.6); animation:tkGlow 3s ease-in-out infinite; }
+  .ricco .tk-pill.ready{ background:#6b5c3a; box-shadow:0 4px 12px -5px rgba(90,78,50,.6); }
+  @keyframes tkGlow{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.04); } }
+  @media (prefers-reduced-motion: reduce){ .tk-pill.ready{ animation:none; } }
+  .tk-msg{ font-size:14.5px; font-weight:700; line-height:1.6; text-wrap:balance; word-break:auto-phrase; }
+  .tk-msg2{ font-size:12px; opacity:.82; line-height:1.85; margin-top:8px; text-wrap:balance; word-break:auto-phrase; }
+  .tk-fine{ font-size:11px; opacity:.6; line-height:1.7; margin-top:8px; }
+  .tk-sched{ margin:11px 0 0; padding:10px 12px 11px; border:1.5px solid rgba(0,0,0,.2); border-radius:12px; background:rgba(255,255,255,.55); }
+  .ricco .tk-sched{ border-color:rgba(70,60,40,.3); background:rgba(255,255,255,.34); }
+  .tk-sl{ font-size:10.5px; font-weight:800; letter-spacing:.2em; padding-left:.2em; opacity:.65; }
+  .tk-sd{ font-size:22px; font-weight:700; letter-spacing:.02em; margin-top:2px; font-variant-numeric:tabular-nums; flex-wrap:wrap; }
+  .tk-sd .sl{ font-size:17px; margin-left:8px; }
+  .tk-sx{ font-size:12.5px; font-weight:700; margin-top:7px; padding-top:7px; border-top:1px dotted rgba(0,0,0,.3); line-height:1.6; }
+  .tk-chg{ display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.06em; padding:2px 10px; border-radius:6px; background:#2c2a22; color:#fff; margin-bottom:6px; }
+  .ricco .tk-chg{ background:#5a4c34; }
+  .tk-from{ font-size:11.5px; opacity:.72; margin-top:3px; }
+  .tk-from s{ text-decoration:line-through; }
+  /* 大切なお知らせ（定休日・フレーム持参・備考）：太い枠・太字・「!」マーク・ラベルで目立たせる */
+  .tk-note{ margin-top:13px; text-align:left; padding:10px 13px 12px; border:3px solid #2c2a22; border-radius:12px; background:#fff; }
+  .ricco .tk-note{ border-color:#6b5c3a; background:rgba(255,255,255,.62); }
+  .tk-note-h{ display:flex; align-items:center; gap:7px; font-size:11.5px; font-weight:800; letter-spacing:.14em; margin-bottom:5px; }
+  .tk-note-h::before{ content:"!"; flex:none; width:19px; height:19px; border-radius:50%; background:#2c2a22; color:#fff; font-size:13px; line-height:19px; text-align:center; letter-spacing:0; }
+  .ricco .tk-note-h::before{ background:#6b5c3a; }
+  .tk-note p{ margin:0; font-size:14.5px; font-weight:800; line-height:1.7; text-wrap:pretty; word-break:auto-phrase; }
+  .tk-note p + p{ margin-top:7px; padding-top:7px; border-top:1.5px dotted rgba(0,0,0,.3); }
+  .tk-strike{ font-size:19px; font-weight:700; opacity:.62; margin:0 0 7px; font-variant-numeric:tabular-nums; }
+  .tk-strike s{ text-decoration-thickness:2px; }
+  .tk-strike .sl{ font-size:15px; margin-left:8px; }
+
+  /* ===== 以前のメガネの度数を問い合わせる（カードを選ぶ） ===== */
+  .rx-prev{ margin-top:14px; padding-top:13px; border-top:1px solid rgba(0,0,0,.08); }
+  .rx-prev-h{ font-size:12.5px; font-weight:700; color:var(--ink); margin-bottom:4px; }
+  .rx-prev-lead{ font-size:11px; color:var(--sub); line-height:1.7; margin-bottom:9px; }
+  .rx-prev-btn{ display:flex; align-items:center; gap:10px; width:100%; min-height:48px; text-align:left; cursor:pointer; font-family:inherit; color:var(--ink);
+    background:#fff; border:1px solid rgba(0,0,0,.16); border-radius:11px; padding:9px 12px; margin-bottom:8px; }
+  .rx-prev-btn .pc{ flex:none; font-size:12.5px; font-weight:800; padding:3px 9px; border-radius:7px; border:1.5px solid currentColor; white-space:nowrap; }
+  .rx-prev-btn .ps{ flex:1; min-width:0; font-size:11.5px; line-height:1.5; color:#4a4436; overflow-wrap:anywhere; }
+  .rx-prev-btn .pa{ flex:none; font-size:18px; opacity:.5; }
+
+  /* ===== 🌐 言語ボタン（小さく）と、言語を選ぶシート ===== */
+  .head{ position:relative; }
+  .gbtn{ position:relative; display:inline-flex; align-items:center; gap:3px; height:28px; padding:0 8px; border:1.5px solid rgba(0,0,0,.3); background:rgba(255,255,255,.85); color:var(--ink);
+    border-radius:999px; font-size:11.5px; font-weight:700; cursor:pointer; font-family:inherit; line-height:1; letter-spacing:.03em; white-space:nowrap; }
+  .gbtn::after{ content:""; position:absolute; inset:-7px -4px; }   /* 見た目は小さく、押せる範囲は縦42px */
+  .gbtn .gi{ font-size:13px; line-height:1; }
+  .gbtn .gc{ font-size:8.5px; opacity:.65; }
+  .gbtn:focus-visible, .lopt:focus-visible, .lclose:focus-visible{ outline:3px solid #1b6fe0; outline-offset:2px; }
+  .head .gbtn{ position:absolute; right:0; top:0; }
+  .gbar{ display:flex; justify-content:flex-end; margin:0 0 8px; }
+  .lback{ position:fixed; inset:0; background:rgba(20,18,12,.45); z-index:70; opacity:0; pointer-events:none; transition:opacity .22s; }
+  .lback.on{ opacity:1; pointer-events:auto; }
+  .lsheet{ position:fixed; left:50%; bottom:0; width:100%; max-width:430px; transform:translate(-50%,102%); background:#fff; border-radius:18px 18px 0 0; z-index:71;
+    padding:10px 16px calc(18px + env(safe-area-inset-bottom)); box-shadow:0 -8px 30px rgba(0,0,0,.2); transition:transform .26s cubic-bezier(.2,.8,.2,1); visibility:hidden; color:var(--ink); }
+  .lsheet.on{ transform:translate(-50%,0); visibility:visible; }
+  .lgrab{ width:38px; height:4px; border-radius:2px; background:#d4d0c8; margin:0 auto 10px; }
+  .lhead{ display:flex; align-items:center; justify-content:space-between; margin:0 2px 8px; }
+  .lhead h2{ margin:0; font-size:15px; font-weight:800; letter-spacing:.02em; }
+  .lhead h2 small{ display:block; font-weight:400; font-size:11px; opacity:.65; margin-top:3px; }
+  .lclose{ width:40px; height:40px; border:none; background:transparent; font-size:22px; line-height:1; cursor:pointer; color:var(--ink); border-radius:50%; }
+  .lopt{ display:flex; align-items:center; justify-content:space-between; width:100%; min-height:52px; padding:10px 14px; margin:0 0 7px; border:1.5px solid #ddd8ce; background:#fff;
+    border-radius:12px; font-size:16px; font-family:inherit; color:var(--ink); cursor:pointer; text-align:left; }
+  .lopt .ck{ font-size:18px; font-weight:800; min-width:22px; text-align:right; }
+  .lopt.on{ border-color:var(--ink); border-width:2.5px; font-weight:800; background:#faf8f3; }
+  .lnote{ font-size:11px; line-height:1.8; opacity:.7; margin:6px 2px 0; }
+  @media (prefers-reduced-motion: reduce){ .lback,.lsheet{ transition:none; } }
+
+  /* ===== 言語ごとの文字まわり ===== */
+  body[data-lang="zh"]{ font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Noto Sans SC",sans-serif; }
+  body[data-lang="vi"], body[data-lang="pt"], body[data-lang="en"]{ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Roboto,"Noto Sans",Arial,sans-serif; }
+  /* 日本語以外は単語の途中で切らない／長い語だけ折り返す */
+  body:not([data-lang="ja"]) .tk-msg, body:not([data-lang="ja"]) .tk-msg2, body:not([data-lang="ja"]) .tk-note p,
+  body:not([data-lang="ja"]) .monthly, body:not([data-lang="ja"]) .rx-caution, body:not([data-lang="ja"]) .rx-tip,
+  body:not([data-lang="ja"]) .fam-note, body:not([data-lang="ja"]) .sheet p, body:not([data-lang="ja"]) .msg-card,
+  body:not([data-lang="ja"]) .reg-why, body:not([data-lang="ja"]) .reg-lead{ word-break:normal; overflow-wrap:break-word; }
+  body[data-lang="zh"] .tk-msg, body[data-lang="zh"] .tk-msg2, body[data-lang="zh"] .tk-note p, body[data-lang="zh"] .monthly{ word-break:auto-phrase; }
+  body:not([data-lang="ja"]) .w-label{ white-space:normal; line-height:1.25; }
+  body:not([data-lang="ja"]) .w-date{ font-size:15px; }
+  body:not([data-lang="ja"]) .ring .rtxt .rsm{ font-size:9.5px; }
+  body[data-lang="vi"] .ring .rtxt .rsm{ font-size:8.5px; }
+  body:not([data-lang="ja"]) .tk-pill{ letter-spacing:.04em; padding:6px 14px; }
+  body:not([data-lang="ja"]) .tk-pill.delay{ padding:3px 12px; }
+  body:not([data-lang="ja"]) .tk-label{ letter-spacing:.14em; padding-left:.14em; font-size:10.5px; }
+  body:not([data-lang="ja"]) .tk-sl{ letter-spacing:.06em; padding-left:.06em; }
+  body:not([data-lang="ja"]) .tk-note-h{ letter-spacing:.06em; }
+  body:not([data-lang="ja"]) .tk-sd{ overflow-wrap:anywhere; }
+  body:not([data-lang="ja"]) .tk-sub{ font-size:12px; }
+  body:not([data-lang="ja"]) .tk-sub span{ white-space:normal; }
+  body:not([data-lang="ja"]) .sec-label{ letter-spacing:.08em; }
+  body:not([data-lang="ja"]) .actions button{ font-size:11.5px; letter-spacing:0; }
+  body:not([data-lang="ja"]) .monthly .mo-mark{ letter-spacing:.08em; }
+  body:not([data-lang="ja"]) .fam-add{ font-size:12.5px; letter-spacing:0; }
+  .card-sub .sub-line{ display:block; white-space:normal; }
+
+  /* ===== 実機確認で直した所 ===== */
+  .archived-stamp{ top:4px; right:10px; }
+  @media (max-width:380px){
+    .w-date{ font-size:14.5px; }
+    body:not([data-lang="ja"]) .w-date{ font-size:14px; }
+    .w-cell{ gap:7px; }
+    .w-label{ font-size:9.5px; }
+  }
 </style>
 </head>
 <body>
@@ -483,16 +615,17 @@
   <div class="head" id="head">
     <!-- ★2026/9/22：「Members Card」は外した（上のチャネル名「Sixfour & RICCO Card」と重なるため）。
          並びは No. → 名前 の順に変更 -->
+    <button type="button" class="gbtn" id="gbtnHead" onclick="openLang()" aria-haspopup="dialog"></button>
     <div class="memberno" id="whoNo"></div>
     <div class="who" id="whoName"></div>
     <div id="tenureWrap"></div>
   </div>
   <div id="app">
-    <div class="loading"><img class="spin" src="LINE_spinner_light.svg" width="30" height="30" alt="">会員証を読み込んでいます…</div>
+    <div class="loading"><img class="spin" src="LINE_spinner_light.svg" width="30" height="30" alt=""><span id="loadingTxt">会員証を読み込んでいます…</span></div>
   </div>
   <div class="actions" id="actions">
-    <button type="button" onclick="openWarranty()">保証・修理について</button>
-    <button type="button" class="btn-consult" onclick="consult()">💬 LINEで相談する</button>
+    <button type="button" id="actWarranty" onclick="openWarranty()">保証・修理について</button>
+    <button type="button" class="btn-consult" id="actConsult" onclick="consult()">💬 LINEで相談する</button>
   </div>
   <div class="foot"></div>
 
@@ -500,7 +633,7 @@
   <div class="dp" id="dp" style="display:none;">
     <div class="dp-head">
       <span class="dp-title" id="dpTitle">メガネ👓️🕶️を選ぶ</span>
-      <button class="dp-close" onclick="closePicker()">閉じる</button>
+      <button class="dp-close" id="dpClose" onclick="closePicker()">閉じる</button>
     </div>
     <div class="dp-lead" id="dpLead"></div>
     <div class="dp-grid" id="dpGrid"></div>
@@ -513,10 +646,10 @@
   <div class="mm" id="mm" style="display:none;">
     <div class="mm-head">
       <span class="mm-title" id="mmTitle">📝 このメガネのメモ</span>
-      <button class="mm-close" onclick="closeMemo()">閉じる</button>
+      <button class="mm-close" id="mmClose" onclick="closeMemo()">閉じる</button>
     </div>
     <div class="mm-note" id="mmNote"></div>
-    <div class="mm-ex">例）なくした💦と思って買った2本目<br>　　寝落ち用(意外と丈夫)</div>
+    <div class="mm-ex" id="mmEx">例）なくした💦と思って買った2本目<br>　　寝落ち用(意外と丈夫)</div>
     <textarea class="mm-input" id="mmInput" maxlength="30" placeholder="メモを入力"></textarea>
     <div class="mm-count" id="mmCount">0/30</div>
     <button class="mm-save" id="mmSave" onclick="saveMemo()">保存する</button>
@@ -533,7 +666,7 @@
     <div class="w-tabs" id="rxTabs" style="display:none;"></div>
     <div class="lead" id="rxLead"></div>
     <div class="w-tab-content" id="rxBody"></div>
-    <button class="close" onclick="closeRx()">閉じる</button>
+    <button class="close" id="rxClose" onclick="closeRx()">閉じる</button>
   </div>
 </div>
 
@@ -544,14 +677,14 @@
     <h2 id="rxAskTitle"></h2>
     <div class="lead" id="rxAskLead"></div>
     <div id="rxAskBody"></div>
-    <button class="close" onclick="closeRxAsk()">閉じる</button>
+    <button class="close" id="rxAskClose" onclick="closeRxAsk()">閉じる</button>
   </div>
 </div>
 
 <!-- 保証・修理の説明（外部サイトに飛ばさず、この中で完結させる） -->
 <div class="sheet" id="warrantySheet">
   <div class="veil" onclick="closeWarranty()"></div>
-  <div class="panel">
+  <div class="panel" id="warrantyPanel">
     <h2>保証・修理について</h2>
     <div class="lead">お渡し日から下記の期間、無料で対応いたします。</div>
 
@@ -618,24 +751,33 @@
 <div class="sheet" id="famSheet">
   <div class="veil" onclick="closeFam()"></div>
   <div class="panel">
-    <h2>家族の会員証💳️を追加する</h2>
+    <h2 id="famTitle">家族の会員証💳️を追加する</h2>
     <div class="fam-note" id="famNote"></div>
 
-    <div class="reg-field"><label>お名前<span class="req">必須</span></label>
+    <div class="reg-field"><label><span id="fNameL">お名前</span><span class="req" id="fNameReq">必須</span></label>
       <div class="reg-two"><input id="fSei" type="text" placeholder="姓" maxlength="20">
       <input id="fMei" type="text" placeholder="名" maxlength="20"></div></div>
 
-    <div class="reg-field"><label>フリガナ<span class="req">必須</span></label>
+    <div class="reg-field"><label><span id="fKanaL">フリガナ</span><span class="req" id="fKanaReq">必須</span></label>
       <div class="reg-two"><input id="fSeiK" type="text" placeholder="セイ" maxlength="20">
       <input id="fMeiK" type="text" placeholder="メイ" maxlength="20"></div></div>
 
-    <div class="reg-field"><label>生年月日<span class="req">必須</span></label>
+    <div class="reg-field"><label><span id="fBirthL">生年月日</span><span class="req" id="fBirthReq">必須</span></label>
       <div class="reg-three"><select id="fY"></select><select id="fM"></select><select id="fD"></select></div></div>
 
     <button class="reg-btn" id="fBtn" onclick="submitFam()">申請する</button>
     <div class="fam-err" id="fErr"></div>
-    <button class="close" onclick="closeFam()">閉じる</button>
+    <button class="close" id="famClose" onclick="closeFam()">閉じる</button>
   </div>
+</div>
+
+<!-- ★2026/11/19 🌐 言語を選ぶシート（画面の下から出る） -->
+<div class="lback" id="lback" onclick="closeLang()"></div>
+<div class="lsheet" id="lsheet" role="dialog" aria-modal="true" aria-labelledby="ltitle">
+  <div class="lgrab"></div>
+  <div class="lhead"><h2><span id="ltitle">🌐 言語 / Language</span><small id="lsub">Idioma・语言・Ngôn ngữ</small></h2><button class="lclose" type="button" aria-label="Close" onclick="closeLang()">×</button></div>
+  <div id="lopts"></div>
+  <div class="lnote" id="lnote"></div>
 </div>
 
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -692,6 +834,1638 @@ var LIFF_IDS = [
 // ② GASのAPI用URL（/exec で終わる長いURL）
 //    ★今つかっている index.html の同じ行と見比べて、違っていたら今の方に直してください
 var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3IEiiTSjjzpUDKORMHD0iH3T9Ku43N6DGWvw8XgK0oV6/exec";
+
+/* ★2026/11/19 5言語の辞書（引換券デモ5で確認済み） */
+var I18N = {};
+I18N.ja = {
+  code:'ja', htmlLang:'ja', label:'日本語', demoName:'山田 花子', numLoc:'ja-JP',
+  wd:['日','月','火','水','木','金','土'],
+  fmtDay:function(d){ return (d.getMonth()+1)+'/'+d.getDate()+'('+this.wd[d.getDay()]+')'; },
+  fmtYMD:function(y,m,d){ return y+'.'+m+'.'+d; },
+  ui:{
+    btnWarranty:`保証・修理について`, btnConsult:`💬 LINEで相談する`,
+    secUsing:`ご利用中のメガネ`, secWaiting:`お渡し待ち`,
+    famAdd:`＋ 家族の会員証💳️を追加する`,
+    archToggle:function(n){ return `保証が終了したメガネ（${n}本）`; },
+    total:function(n){ return `通算<b>${n}</b>本`; },
+    rxBtn:`👓 My度数情報`, rxBtnFam:`👓 Myファミリー度数情報`,
+    rxUpd:function(d){ return `最終更新 ${d}`; }, rxAsk:`👓 度数を確認する`, rxWait:`👓 度数をお調べしています…`,
+    ringLeft:`残り`, ringDays:`日`, ringEnd:`終了`,
+    wFrame:`メガネ・サングラス保証`, wVision:`見え方保証`,
+    pickSix:`👓️🕶️ メガネを選ぶ`, pickRic:`👓️🕶️ アイウェアを選ぶ`, memoBtn:`📝 メモ`,
+    moMark:function(m){ return `${m}月のひとこと`; },
+    tkLabel:`お引換券`, tkDelay:`日程調整中`, tkFrom:`変更前`, tkNoteH:`大切なお知らせ`, slotAm:`午前中`,
+    noteClosed:function(d){ return `${d}は定休日となりますので、お気をつけください😌`; },
+    noteFrame:`レンズ交換するフレームをお忘れずにご持参ください😌`,
+    who:function(n){ return n+' 様'; },
+    sub:function(product, date){ return `${product} ／ ${date} お渡し`; },
+    hof:{ six:`殿堂入りメガネ`, ric:`殿堂入りアイウェア` },
+    archStamp:`ARCHIVE`
+  },
+  tk:{
+    six:{
+      make:{
+        schedLabel:`仕上がり予定`, pillWait:`準備中`, pillReady:`✓ 仕上がりました`,
+        waitMsg:`ただいま、スタッフが仕上げ中です👓🕶️`,
+        come:`上記日時以降の、ご都合のよい時にご来店ください😊`,
+        comeDate:`ご都合のよい時にご来店ください😊`,
+        next:function(n){ return `${n}の開店から、お渡しできます。`; },
+        fine:`仕上がると、この表示が変わります。`,
+        readyMsg:`あなたの新しい👓🕶️、<br>店頭でお待ちしています😊`,
+        readyMsg2:`ご来店の際、この画面をスタッフにお見せください。`,
+        delayMsg:`仕上がり日程を調整中です。`,
+        delaySorry:`お待たせして申し訳ありません🙇<br>日程が決まり次第、スタッフからご連絡します。`,
+        chg:`予定が変更になりました`, chgSorry:`ご迷惑をおかけして申し訳ありません🙇`
+      },
+      lens:{
+        schedLabel:`レンズ入荷予定`, pillWait:`入荷待ち`, pillReady:`✓ 入荷しました`,
+        waitMsg:`レンズの入荷をお待ちください👓🕶️`,
+        come:`レンズ加工に1時間ほどかかります。<br>お時間に余裕のある時にご来店ください😊`,
+        comeDate:`レンズ加工に1時間ほどかかります。<br>お時間に余裕のある時にご来店ください😊`,
+        next:function(n){ return `${n}の開店から、ご来店いただけます。`; },
+        fine:`入荷すると、この表示が変わります。`,
+        readyMsg:`レンズが届きました！お待ちしています😊`,
+        readyMsg2:`レンズ加工に1時間ほどかかります。<br>お時間に余裕のある時にご来店ください😊`,
+        delayMsg:`レンズの入荷日程を調整中です。`,
+        delaySorry:`お待たせして申し訳ありません🙇<br>日程が決まり次第、スタッフからご連絡します。`,
+        chg:`予定が変更になりました`, chgSorry:`ご迷惑をおかけして申し訳ありません🙇`
+      }
+    },
+    ric:{
+      make:{
+        schedLabel:`仕上がり予定`, pillWait:`準備中`, pillReady:`✓ 仕上がりました`,
+        waitMsg:`ただいま、心を込めて仕上げております。`,
+        come:`上記日時以降で、ご都合のよいときに<br>お越しくださいませ。`,
+        comeDate:`ご都合のよいときに、お越しくださいませ。`,
+        next:function(n){ return `${n}の開店より、お渡しいたします。`; },
+        fine:`仕上がりましたら、こちらの表示が変わります。`,
+        readyMsg:`店頭にて、お待ちしております🤍`,
+        readyMsg2:`ご来店の際、こちらの画面をスタッフに<br>お見せくださいませ。`,
+        delayMsg:`仕上がり日程を調整しております。`,
+        delaySorry:`お待たせしており、誠に申し訳ございません。<br>日程が決まり次第、スタッフよりご連絡申し上げます。`,
+        chg:`予定を変更いたしました`, chgSorry:`ご迷惑をおかけし、申し訳ございません。`
+      },
+      lens:{
+        schedLabel:`レンズ入荷予定`, pillWait:`入荷待ち`, pillReady:`✓ 入荷しました`,
+        waitMsg:`レンズの入荷まで、<br>いましばらくお待ちくださいませ。`,
+        come:`レンズの加工に1時間ほどいただきます。<br>お時間にゆとりのあるときに、お越しくださいませ。`,
+        comeDate:`レンズの加工に1時間ほどいただきます。<br>お時間にゆとりのあるときに、お越しくださいませ。`,
+        next:function(n){ return `${n}の開店より、ご来店いただけます。`; },
+        fine:`入荷いたしましたら、こちらの表示が変わります。`,
+        readyMsg:`レンズが入荷いたしました🤍`,
+        readyMsg2:`レンズの加工に1時間ほどいただきます。<br>お時間にゆとりのあるときに、お越しくださいませ。`,
+        delayMsg:`レンズの入荷日程を調整しております。`,
+        delaySorry:`お待たせしており、誠に申し訳ございません。<br>日程が決まり次第、スタッフよりご連絡申し上げます。`,
+        chg:`予定を変更いたしました`, chgSorry:`ご迷惑をおかけし、申し訳ございません。`
+      }
+    }
+  },
+  aging:{
+    six:[`まだ緊張中`,`少し慣れてきた`,`くつろぎ中`,`大切にしてね`,`あ・うんの呼吸`,`相棒😌`],
+    ric:[`出会ったばかり`,`なじみ始め`,`しっくり`,`風合いが出てきた`,`愛着が深まる`,`相棒😌`]
+  },
+  together:{
+    six:function(n,arch){ return arch ? `${n}日間、たくさんの景色を一緒に見てきました` : `${n}日間、いつも一緒に同じ景色を見ています👓`; },
+    ric:function(n,arch){ return arch ? `${n}日間、共に時を過ごしてまいりました` : `${n}日間、共に時を過ごしております`; }
+  },
+  archived:{
+    six:function(days){ return `🏆 <b>殿堂入りメガネ</b><br>${days}お疲れさま。そして、ありがとう👓🕶️<br>——調整・クリーニングは、<span class="forever-in">いつまでも</span>無料です☺️`; },
+    ric:function(days){ return `🏆 <b>殿堂入りアイウェア</b><br>${days}この相棒👓🕶️との時間は、まだまだ続きます。<br>調整・クリーニングは、<span class="forever-in">いつまでも</span>無料で承ります。`; }
+  },
+  warranty:{
+    title:`保証・修理について`, lead:`お渡し日から下記の期間、無料で対応いたします。`,
+    vision:{ term:`見え方保証 ／ 90日間`, h:`度数が合わないとき`,
+      p:`お渡し日から90日間は見え方保証いたします。<br>また15歳以下のお客様は、成長で度数も変わりやすいため180日間となりますのでご安心ください。<br>期間中、見え方の不具合（度数が強い・弱い等）や慣れない場合、無料交換いたします。<br>レンズカラーの変更も期間中は1回限り、カラー代金の3,300円or4,400円のみで交換いたします。（調光レンズ・偏光レンズのカラー変更は対象外となります）<br><span class="forever">※目の疾患（白内障・緑内障等）、レーシック手術等による視力変化は保証対象外となります。</span><br><span class="forever">※眼科さんの処方箋でメガネ作製の場合は、再度眼科さんの処方箋が必要となります。</span>` },
+    frameSix:{ term:`メガネ・サングラス保証 ／ 1年間`, h:`フレームやレンズに不具合が生じたとき`,
+      p:`お渡し日より1年間、フレーム・レンズの品質保証いたします。<br>日常の使用でフレーム・レンズに不具合が生じた場合、無料で交換・修理いたしますのでご相談ください。<br>お客様の過失（落としたり、車内放置、サウナ・入浴時など）は保証対象外となりますのでご注意ください。<br><span class="forever">※過失の場合でも1年間は破損保証（通常価格の50％で交換）もございますので、スタッフにご相談ください。</span>` },
+    frameRic:{ term:`アイウェア保証 ／ 各ブランドに準ずる`, h:`フレームやレンズに不具合が生じたとき`,
+      p:`フレームは各ブランドの保証内容に準じます。<br>初期不良はメーカー在庫がある場合、交換対応いたします。<br>レンズはお渡し日より1年間、品質保証いたします。<br>経年劣化・過失（落としたり、車内放置、サウナ・入浴等）による傷・破損は有償交換・修理のご対応となります。` },
+    clean:{ term:`クリーニング・視力検査・調整 ／ 無期限`, h:`ゆるみ・ズレ・汚れが気になったとき`,
+      p:`ネジの締め直し、掛け具合の調整、超音波洗浄、視力検査は<span class="forever">いつでも、いつまでも無料です</span>。<br>保証期間が過ぎた後でも、無期限で承っておりますのでお気軽にお立ち寄りください。` },
+    visit:{ term:`お手続き`, h:`ご来店のとき`,
+      p:`この会員証のマイページをスタッフにお見せいただき、ご用件をお伝えいただくだけで大丈夫です。<br><span class="forever">※保証書やレシートのご持参は不要です。</span>` },
+    tabSix:`Sixfourの保証`, tabRic:`RICCOの保証`, more:`Sixfour公式サイトでさらに詳しく`, close:`閉じる`
+  },
+  rx:{
+    title:`My度数情報`, titleFam:`Myファミリー度数情報`,
+    leadSix:function(chip){ return `お店で${chip}に作製したメガネの度数です👓`; },
+    leadRic:function(chip){ return `店頭で${chip}に作製を承ったお度数でございます。`; },
+    th:{ S:[`S`,`(球面)`], C:[`C`,`(乱視)`], AX:[`AX`,`(軸度)`], ADD:[`ADD`,`(加入度)`], PD:[`PD`,`(目の距離)`] },
+    lensType:`遠近両用`,
+    remarks:`備考：右目 プリズム 1.0△ 基底下`,
+    cautionSix:`My度数情報は最新のメガネ分のみを表示しています。<br>以前の度数をご希望の場合は、「💬LINEで相談する」から、対象のメガネ(カード)の末尾番号<span class="sq">▢</span>を確認して「カード<span class="sq">▢</span>の度数情報」とお問い合わせください🙇‍♂️<br>例：01-23456-7️⃣の「７」の数字`,
+    cautionRic:`My度数情報は最新のアイウェア分のみを表示しています。<br>以前の度数をご希望の場合は、「💬LINEで相談する」から、対象のメガネ(カード)の末尾番号<span class="sq">▢</span>を確認して「カード<span class="sq">▢</span>の度数情報」とお問い合わせください🙇‍♂️<br>例：01-23456-7️⃣の「７」の数字`,
+    askTitleSix:`👓度数、お調べします!`, askTitleRic:`👓度数のお問い合わせ`,
+    askLeadSix:`ご用途を教えてください。`, askLeadRic:`ご用途をお聞かせください。`,
+    purposesSix:[`最近の見え方が気になる`,`自分の度数、記録しておきたい`,`他店・ネットでメガネを作りたい`],
+    purposesRic:[`見え方のご確認に`,`記録として、お手元に`,`他店・ネットでのご購入に`],
+    tipSix:`※手作業でカルテをお探ししますので、お返事まで少しだけお待ちを☺️<br><br>💡コンタクト購入で度数を知りたい方へ<br>メガネとは度数が異なります。(目とレンズの距離が違うため)<br>眼科さんやご購入先での測定が安心です👀`,
+    tipRic:`※スタッフがカルテを確認し、のちほどご連絡いたします。<br><br>💡コンタクト購入で度数を知りたい方へ<br>メガネとは度数が異なります。(目とレンズの距離が違うため)<br>眼科さんやご購入先での測定をおすすめいたします。`,
+    checkSix:`そろそろ見え方チェックの時期です👀<br>お子様の度数は変わりやすいので、お気軽にお立ち寄りください。`,
+    checkRic:`ご成長にあわせて、そろそろ見え方のご確認はいかがでしょうか。お気軽にお立ち寄りくださいませ。`,
+    close:`閉じる`
+  },
+  nocard:{
+    six:{ pending:`🎉ようこそ、メガネの沼へ！<br><br>ただいま、スタッフが会員証を<br>せっせと準備中です<br>完成まで気長にお待ちください👓️🕶️`,
+          pendingSub:`お渡しの手続きが済むと、ここに会員証が表示されます。保証の残り日数も、ひと目でわかるようになります。`,
+          bought:`ありがとうございます😌<br><br>ご来店・お渡しの際に、<br>スタッフがお名前などを確認して、<br>ご購入いただいた<br>メガネ・サングラスを数えて<br>会員証を発行いたします👓️🕶️`,
+          none:`👓️まだ会員証がありません<br><br>SixfourとRICCOで<br>メガネ・サングラスを<br>お作りいただくと、<br>あなただけの会員証が発行されます。`,
+          noneSub:`保証の残り日数も、ひと目でわかります☺️` },
+    ric:{ pending:`ようこそ、RICCOへ！<br><br>あなたのアイウェアライフに、<br>そっと寄り添うページを👓️🕶️<br><br>只今、心を込めて準備中です😌`,
+          pendingSub:`お渡しの手続きが済むと、ここに会員証が表示されます。保証の残り日数も、ひと目でわかるようになります。`,
+          bought:`ありがとうございます😌<br><br>ご来店・お渡しの際に、<br>スタッフがお名前などを確認の上、<br>ご購入いただいた<br>アイウェアを数えて<br>会員証を発行いたします👓️🕶️`,
+          none:`👓️まだ会員証がございません<br><br>SixfourとRICCOで<br>アイウェアを<br>お作りいただきますと、<br>あなただけの会員証が発行されます。`,
+          noneSub:`保証の残り日数も、ひと目で。` }
+  },
+  reg:{
+    lead1:`会員証をお作りします👓️`, lead2:`ご登録いただくと、<br>ご購入後にデジタル会員証が<br>発行されます。`,
+    name:`お名前`, sei:`姓`, mei:`名`, kana:`フリガナ`, seiK:`セイ`, meiK:`メイ`, birth:`生年月日`,
+    req:`必須`, opt:`任意`, y:`年`, m:`月`, d:`日`,
+    why:`15歳以下のお客様は、<br><b>見え方保証が90日間→180日間</b>になります。<br><br>それと──<br>あなたの目が何年がんばってきたか、<br>メガネ屋👓️としては、<br>ちょっと知っておきたいのです😌`,
+    q:`SixfourまたはRICCOでメガネ👓️や<br>サングラス🕶️をご購入されたことはありますか？`,
+    qNote:`※今回ご購入の方も「はい」でお願いします`, yes:`はい`, no:`いいえ`, btn:`登録する`,
+    privacy:`お預かりした情報は、<br>会員証と保証のためだけに使います`, link:`プライバシーポリシー`
+  },
+  fam:{
+    title:`家族の会員証💳️を追加する`, btn:`申請する`,
+    notesSix:[`追加したご家族の度数情報・ご購入履歴が、このマイページに表示されます。<br>（SixfourまたはRICCOでご購入のない方は、追加できませんのでご了承ください）`,
+              `店頭でスタッフが家族情報を確認してからの追加となります。<br>お手数ですが、ご来店をお願いいたします。`,
+              `追加後に外したい時は、店頭またはLINEでお知らせください。`],
+    notesRic:[`追加されたご家族の度数情報・ご購入履歴が、こちらのマイページに表示されます。<br>（RICCOまたはSixfourでご購入のない方は、追加いたしかねます）`,
+              `店頭でスタッフがご家族の情報を確認のうえ、追加いたします。<br>お手数をおかけいたしますが、ご来店くださいませ。`,
+              `追加後に外されたい場合は、店頭またはLINEにてお知らせください。`],
+    bannerSix:`👪 家族の追加を確認中です`, bannerRic:`👪 ご家族の追加を確認中でございます`,
+    fb3Six:`ご来店の際、スタッフにお声がけください`, fb3Ric:`ご来店の際、スタッフにお声がけくださいませ`,
+    person:function(n){ return `${n} さん`; }
+  },
+  monthly:{
+    1:[`あけましておめでとうございます。\n今年もよく見える一年になりますように👓`,
+       `あけましておめでとうございます。\n今年もあなたのメガネ選び、こっそり応援してます☺️`,
+       `「あけましておめでとうございます」も何度目でしょうね。\n毎年こうして挨拶できるのが、しみじみ嬉しいんです☺️`],
+    2:[`一年で一番寒い時期。\nメガネが曇ったら、それは温かい場所にいる証拠です☺️`,
+       `空気が乾く季節。レンズのホコリを、から拭きは傷のもと。\n洗面所でサッと水洗いが正解ですよ👓`,
+       `寒いと、ついメガネをかけたままうたた寝しちゃう季節。\n起きたらメガネ負傷😭→全力でお直しします🛠️`],
+    3:[`花粉、飛んでますね。\nメガネ、花粉対策にも地味に役立つんですよ👓`,
+       `また花粉の季節です。去年も言いましたが、メガネ、地味に効くんです。\n（今年こそ症状、軽めでありますように）😌`,
+       `今年も花粉、つらい時期ですよね。\n「メガネ、地味に効くんです」ってもう耳タコでしょ？でも本当なんです😌`],
+    4:[`桜の季節ですね。お花見、行きました？\nピントの合った桜は、格別です🌸`,
+       `また桜の季節。同じ景色でも去年とちょっと違って見えるのは、\nあなたが変わったからかも🌸`,
+       `今年も桜の季節。何度見ても、いいものはいい。\nあなたと見た桜が、また一つ増えました🌸`],
+    5:[`5月は紫外線がもっとも強くなる季節。\n今のレンズのUVカット率、店頭で測れますよ。無料で簡単に確認できます☺️`,
+       `新緑がきれいな季節。緑を見ると目が休まるって、本当なんです。\nたまには画面から離れて、遠くの緑を🌿`,
+       `「紫外線は5月がピーク」——毎年言ってますね😌\nUVカット率測定、今年も無料なのでチェックを！レンズは経年でカット率下がるんです`],
+    6:[`梅雨入り。雨粒でメガネが見えづらい日は、\nちょっとだけ世界がにじんで見えますね☔`,
+       `梅雨、今年も来ました☔\n雨の日のレンズ拭き、もう達人の域でしょ？`,
+       `梅雨入り。雨の日のレンズ、もう気にならなくなってきたでしょ？\n慣れって、すごい☔`],
+    7:[`夏本番。汗でメガネがずり落ちる季節です。\n鼻パッド調整、無料でやってますよ😌`,
+       `夏本番。冷房の効いた部屋は、目が乾きがちです。\n意識してまばたきを。メガネは乾燥も少し防いでくれます👓`,
+       `夏本番。ずり落ちるメガネ、そろそろ調整の頃合いです。\nいつでも無料、遠慮はいりませんからね😌`],
+    8:[`暑い日が続きますね。水分補給はこまめに。\nメガネも汗をかいてます。洗ってあげてください👓`,
+       `猛暑日。メガネもあなたも、ぐったり。\n汗でベタついたメガネ、超音波洗浄でスッキリ。もちろん無料ですよ👓`,
+       `毎年恒例の猛暑です。メガネもあなたも、無理は禁物。\n洗って、休んで、また一緒に夏を越えましょう👓`],
+    9:[`少しずつ、秋の気配。\n夜が長くなると、読書やスマホの時間も増えますね。目、大事にしてあげてください📖`,
+       `秋の夜長。スマホの見過ぎで、目、疲れてませんか？\nたまにはお月様🌙を見て、休ませてあげてください`,
+       `秋の夜長。あなたと過ごす秋も、もう何度目でしょう。\n数えないでおきます。野暮ですからね☺️`],
+    10:[`空気が澄んで、遠くまでよく見える季節。\n度数、合ってますか？👀`,
+        `食欲の秋、そして目にもごちそうの季節。\n紅葉のグラデーション、ピントが合うと本当にきれいです🍁`,
+        `空気が澄んで、遠くの山までくっきり。\n毎年この景色を、あなたと一緒に見られる幸せ👓`],
+    11:[`温かい飲み物が恋しい季節。\n……メガネが曇るのは、もう諦めましょう☕`,
+        `また来ました、曇るシーズン☕\n「もう諦めた」って、去年も言った気がします`,
+        `また来ました、曇る季節。\n諦めるのも、もう年中行事。笑って拭きましょう☕`],
+    12:[`師走に入りましたね。今年も一年、あっという間でした。\n大掃除のついでに、メガネも店頭で無料クリーニング、いかがですか👓`,
+        `気づけば、もう師走。一年って、本当に早いですね。\n気ぜわしい毎日こそ、視界はスッキリと。汚れが気になったら、無料の超音波洗浄にどうぞ👓`,
+        `今年も師走がやってきましたね。\n何かと慌ただしい季節ですが、どうかご無理なさらず。目とメガネも、たまには休ませてあげてください☺️`],
+    '12b':[`今年もお世話になりました。\n来年も、思わず笑顔になる景色をたくさん見ましょう👓`,
+           `今年もありがとうございました。\n一緒に見た景色、また一年ぶん増えましたね👓`,
+           `今年も一年、ありがとうございました。\n何年経っても、あなたと見る景色が一番の宝物です👓`]
+  }
+};
+
+I18N.en = {
+  code:'en', htmlLang:'en', label:'English', demoName:'Emily Carter', numLoc:'en-US',
+  wd:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+  mon:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+  monLong:['January','February','March','April','May','June','July','August','September','October','November','December'],
+  fmtDay:function(d){ return this.wd[d.getDay()]+', '+this.mon[d.getMonth()]+' '+d.getDate(); },
+  fmtYMD:function(y,m,d){ return this.mon[m-1]+' '+d+', '+y; },
+  ui:{
+    btnWarranty:`Warranty & Repairs`, btnConsult:`💬 Chat with us on LINE`,
+    secUsing:`Your glasses in use`, secWaiting:`Awaiting pickup`,
+    famAdd:`＋ Add a family member's card 💳️`,
+    archToggle:function(n){ return `Glasses with ended warranty (${n})`; },
+    total:function(n){ return `Total <b>${n}</b> ${n===1?'pair':'pairs'}`; },
+    rxBtn:`👓 My Prescription`, rxBtnFam:`👓 My Family Prescriptions`,
+    rxUpd:function(d){ return `Updated ${d}`; }, rxAsk:`👓 Check my prescription`, rxWait:`👓 Looking up your prescription…`,
+    ringLeft:`Left`, ringDays:`days`, ringEnd:`Ended`,
+    wFrame:`Frame & lens warranty`, wVision:`Vision warranty`,
+    pickSix:`👓️🕶️ Choose your glasses`, pickRic:`👓️🕶️ Choose your eyewear`, memoBtn:`📝 Memo`,
+    moMark:function(m){ return `Note for ${I18N.en.monLong[m-1]}`; },
+    tkLabel:`Pickup Voucher`, tkDelay:`Rescheduling`, tkFrom:`Previously`, tkNoteH:`Important notice`, slotAm:`Morning`,
+    noteClosed:function(d){ return `We are closed on ${d}. Please keep this in mind 😌`; },
+    noteFrame:`Please remember to bring the frame whose lenses are being replaced 😌`,
+    who:function(n){ return n; },
+    sub:function(product, date){ return `${product} ／ Picked up ${date}`; },
+    hof:{ six:`Hall of Fame glasses`, ric:`Hall of Fame eyewear` },
+    archStamp:`ARCHIVE`
+  },
+  tk:{
+    six:{
+      make:{
+        schedLabel:`Estimated ready time`, pillWait:`In preparation`, pillReady:`✓ Ready for pickup`,
+        waitMsg:`Our staff are getting your glasses ready 👓🕶️`,
+        come:`Feel free to drop by any time after the time above 😊`,
+        comeDate:`Feel free to drop by whenever is convenient 😊`,
+        next:function(n){ return `Ready for pickup from opening time on ${n}.`; },
+        fine:`This display will change when your glasses are ready.`,
+        readyMsg:`Your new 👓🕶️ are waiting<br>for you at the shop 😊`,
+        readyMsg2:`Please show this screen to our staff when you visit.`,
+        delayMsg:`We are rescheduling your ready date.`,
+        delaySorry:`We apologize for the wait 🙇<br>Our staff will contact you as soon as the new date is set.`,
+        chg:`Your schedule has changed`, chgSorry:`We apologize for the inconvenience 🙇`
+      },
+      lens:{
+        schedLabel:`Estimated lens arrival`, pillWait:`Awaiting lenses`, pillReady:`✓ Lenses arrived`,
+        waitMsg:`Waiting for your lenses to arrive 👓🕶️`,
+        come:`Fitting the lenses takes about 1 hour.<br>Please visit when you have some time to spare 😊`,
+        comeDate:`Fitting the lenses takes about 1 hour.<br>Please visit when you have some time to spare 😊`,
+        next:function(n){ return `You can visit from opening time on ${n}.`; },
+        fine:`This display will change when the lenses arrive.`,
+        readyMsg:`Your lenses have arrived! See you soon 😊`,
+        readyMsg2:`Fitting the lenses takes about 1 hour.<br>Please visit when you have some time to spare 😊`,
+        delayMsg:`We are rescheduling the lens arrival date.`,
+        delaySorry:`We apologize for the wait 🙇<br>Our staff will contact you as soon as the new date is set.`,
+        chg:`Your schedule has changed`, chgSorry:`We apologize for the inconvenience 🙇`
+      }
+    },
+    ric:{
+      make:{
+        schedLabel:`Estimated ready time`, pillWait:`In preparation`, pillReady:`✓ Ready for pickup`,
+        waitMsg:`Your eyewear is being finished with great care.`,
+        come:`Please visit at your convenience<br>after the time above.`,
+        comeDate:`Please visit at your convenience.`,
+        next:function(n){ return `Available for pickup from opening on ${n}.`; },
+        fine:`This display will update once your eyewear is ready.`,
+        readyMsg:`We look forward to welcoming you in store 🤍`,
+        readyMsg2:`Please present this screen to our staff upon your visit.`,
+        delayMsg:`We are adjusting the completion date.`,
+        delaySorry:`We sincerely apologize for the delay.<br>Our staff will contact you as soon as the date is confirmed.`,
+        chg:`Your schedule has been updated`, chgSorry:`We apologize for any inconvenience.`
+      },
+      lens:{
+        schedLabel:`Estimated lens arrival`, pillWait:`Awaiting lenses`, pillReady:`✓ Lenses arrived`,
+        waitMsg:`Please wait a little longer<br>until your lenses arrive.`,
+        come:`Fitting the lenses takes approximately one hour.<br>Please visit when your schedule allows.`,
+        comeDate:`Fitting the lenses takes approximately one hour.<br>Please visit when your schedule allows.`,
+        next:function(n){ return `Available from opening on ${n}.`; },
+        fine:`This display will update once the lenses arrive.`,
+        readyMsg:`Your lenses have arrived 🤍`,
+        readyMsg2:`Fitting the lenses takes approximately one hour.<br>Please visit when your schedule allows.`,
+        delayMsg:`We are adjusting the lens arrival date.`,
+        delaySorry:`We sincerely apologize for the delay.<br>Our staff will contact you as soon as the date is confirmed.`,
+        chg:`Your schedule has been updated`, chgSorry:`We apologize for any inconvenience.`
+      }
+    }
+  },
+  aging:{
+    six:[`Still a bit nervous`,`Getting used to you`,`Feeling at home`,`Take good care of me`,`In perfect sync`,`Your partner 😌`],
+    ric:[`Newly met`,`Settling in`,`A perfect fit`,`Developing character`,`Growing attachment`,`Your partner 😌`]
+  },
+  together:{
+    six:function(n,arch){ var u=(n==='1'||n===1)?'day':'days'; return arch ? `${n} ${u} of seeing so many views together` : `${n} ${u} of seeing the same views together 👓`; },
+    ric:function(n,arch){ var u=(n==='1'||n===1)?'day':'days'; return arch ? `${n} ${u} we have spent together` : `${n} ${u} spent together`; }
+  },
+  archived:{
+    six:function(days){ return `🏆 <b>Hall of Fame glasses</b><br>${days}Well done, and thank you 👓🕶️<br>— Adjustments and cleaning are <span class="forever-in">always</span> free ☺️`; },
+    ric:function(days){ return `🏆 <b>Hall of Fame eyewear</b><br>${days}Our time with this companion 👓🕶️ is far from over.<br>Adjustments and cleaning are <span class="forever-in">always</span> complimentary.`; }
+  },
+  warranty:{
+    title:`Warranty & Repairs`, lead:`We'll take care of it free of charge for the periods below, counted from the pickup date.`,
+    vision:{ term:`Vision warranty / 90 days`, h:`When the prescription doesn't suit you`,
+      p:`Your vision is guaranteed for 90 days from the pickup date.<br>For customers aged 15 and under, whose prescriptions change easily as they grow, this is extended to 180 days.<br>During this period, if you have any vision problems (prescription too strong or too weak, etc.) or can't get used to your lenses, we'll replace them free of charge.<br>A lens color change is also available once during this period, for only the color fee of ¥3,300 or ¥4,400. (Color changes for photochromic and polarized lenses are not covered.)<br><span class="forever">*Changes in vision caused by eye diseases (cataracts, glaucoma, etc.) or surgery such as LASIK are not covered.</span><br><span class="forever">*If your glasses were made from an ophthalmologist's prescription, a new prescription from your ophthalmologist is required.</span>` },
+    frameSix:{ term:`Glasses & sunglasses warranty / 1 year`, h:`When there is a problem with the frame or lenses`,
+      p:`We guarantee the quality of frames and lenses for 1 year from the pickup date.<br>If a problem occurs with the frame or lenses during normal use, we'll replace or repair them free of charge, so please talk to us.<br>Please note that damage caused by the customer's negligence (dropping, leaving in a car, wearing in a sauna or bath, etc.) is not covered.<br><span class="forever">*Even in cases of negligence, a breakage warranty (replacement at 50% of the regular price) is available for 1 year, so please ask our staff.</span>` },
+    frameRic:{ term:`Eyewear warranty / Per each brand`, h:`When there is a problem with the frame or lenses`,
+      p:`Frames follow each brand's warranty terms.<br>Initial defects will be replaced if the manufacturer has stock.<br>Lenses are quality-guaranteed for 1 year from the pickup date.<br>Scratches or damage caused by aging or negligence (dropping, leaving in a car, wearing in a sauna or bath, etc.) are handled as paid replacement or repair.` },
+    clean:{ term:`Cleaning, eye tests & adjustments / Unlimited`, h:`When it feels loose, crooked or dirty`,
+      p:`Screw tightening, fit adjustments, ultrasonic cleaning and eye tests are <span class="forever">always free, forever</span>.<br>Even after the warranty period has ended, we offer them with no time limit, so please feel free to stop by.` },
+    visit:{ term:`How to use`, h:`When you visit`,
+      p:`Just show this My Page to our staff and tell them what you need.<br><span class="forever">*You don't need to bring a warranty card or receipt.</span>` },
+    tabSix:`Sixfour warranty`, tabRic:`RICCO warranty`, more:`More details on the Sixfour website`, close:`Close`
+  },
+  rx:{
+    title:`My Prescription`, titleFam:`My Family Prescriptions`,
+    leadSix:function(chip){ return `This is the prescription of the glasses we made for you on ${chip} 👓`; },
+    leadRic:function(chip){ return `This is the prescription for the eyewear ordered with us on ${chip}.`; },
+    th:{ S:[`S`,`(Sphere)`], C:[`C`,`(Cylinder)`], AX:[`AX`,`(Axis)`], ADD:[`ADD`,`(Addition)`], PD:[`PD`,`(Pupil dist.)`] },
+    lensType:`Progressive`,
+    remarks:`Note: Right eye prism 1.0△ base down`,
+    cautionSix:`My Prescription shows only your latest glasses.<br>To see an earlier prescription, tap "💬 Chat with us on LINE", check the last number <span class="sq">▢</span> of the card for that pair, and send us "Card <span class="sq">▢</span> prescription" (カード<span class="sq">▢</span>の度数情報) 🙇‍♂️<br>Example: the "7" in 01-23456-7️⃣`,
+    cautionRic:`My Prescription shows only your latest eyewear.<br>To see an earlier prescription, tap "💬 Chat with us on LINE", check the last number <span class="sq">▢</span> of the card for that pair, and send us "Card <span class="sq">▢</span> prescription" (カード<span class="sq">▢</span>の度数情報) 🙇‍♂️<br>Example: the "7" in 01-23456-7️⃣`,
+    askTitleSix:`👓 Let us look up your prescription!`, askTitleRic:`👓 Prescription inquiry`,
+    askLeadSix:`What will you use it for?`, askLeadRic:`May we ask what you will use it for?`,
+    purposesSix:[`I'm concerned about my vision lately`,`I want to keep a record of my prescription`,`I want to get glasses at another shop or online`],
+    purposesRic:[`For a vision check`,`For my own records`,`For a purchase elsewhere or online`],
+    tipSix:`*Our staff will search for your chart by hand, so please allow a little time for our reply ☺️<br><br>💡If you're buying contact lenses and want your prescription<br>It differs from glasses (the distance between eye and lens is different).<br>Getting measured at an eye clinic or where you buy is safer 👀`,
+    tipRic:`*Our staff will check your chart and contact you later.<br><br>💡For those purchasing contact lenses<br>The prescription differs from that of glasses (the distance between the eye and the lens differs).<br>We recommend a measurement at an eye clinic or the place of purchase.`,
+    checkSix:`Time for a vision check 👀<br>Children's prescriptions change easily, so feel free to drop by.`,
+    checkRic:`As your child grows, may we suggest a vision check? You are most welcome to visit us.`,
+    close:`Close`
+  },
+  nocard:{
+    six:{ pending:`🎉 Welcome to the world of glasses!<br><br>Our staff are busy preparing<br>your membership card.<br>Please wait patiently until it's ready 👓️🕶️`,
+          pendingSub:`Once the pickup is complete, your membership card will appear here, along with the remaining days of your warranty.`,
+          bought:`Thank you 😌<br><br>When you visit and pick up your purchase,<br>our staff will confirm your name and details,<br>count the glasses and sunglasses you've bought,<br>and issue your membership card 👓️🕶️`,
+          none:`👓️ You don't have a membership card yet<br><br>When you get glasses or sunglasses<br>at Sixfour or RICCO,<br>your very own membership card will be issued.`,
+          noneSub:`You'll see your remaining warranty days at a glance ☺️` },
+    ric:{ pending:`Welcome to RICCO.<br><br>A page that quietly accompanies<br>your eyewear life 👓️🕶️<br><br>We are preparing it with great care 😌`,
+          pendingSub:`Once the pickup is complete, your membership card will appear here, along with the remaining days of your warranty.`,
+          bought:`Thank you 😌<br><br>When you visit and collect your purchase,<br>our staff will confirm your details,<br>count your eyewear purchases<br>and issue your membership card 👓️🕶️`,
+          none:`👓️ You do not yet have a membership card<br><br>Once you have eyewear made<br>at Sixfour or RICCO,<br>your own membership card will be issued.`,
+          noneSub:`Your remaining warranty days, at a glance.` }
+  },
+  reg:{
+    lead1:`Let's make your membership card 👓️`, lead2:`Once you register,<br>a digital membership card will be<br>issued after your purchase.`,
+    name:`Name`, sei:`Last name`, mei:`First name`, kana:`Katakana reading`, seiK:`Last (カナ)`, meiK:`First (カナ)`, birth:`Date of birth`,
+    req:`Required`, opt:`Optional`, y:`Year`, m:`Month`, d:`Day`,
+    why:`Customers aged 15 and under<br>get <b>vision warranty extended from 90 to 180 days</b>.<br><br>And one more thing —<br>as an eyewear shop 👓️,<br>we'd love to know how many years your eyes have been working hard 😌`,
+    q:`Have you ever purchased glasses 👓️ or sunglasses 🕶️<br>at Sixfour or RICCO?`,
+    qNote:`*If you are purchasing today, please answer "Yes" too`, yes:`Yes`, no:`No`, btn:`Register`,
+    privacy:`The information you provide is used<br>only for your membership card and warranty`, link:`Privacy policy`
+  },
+  fam:{
+    title:`Add a family member's card 💳️`, btn:`Submit request`,
+    notesSix:[`The prescription and purchase history of the family member you add will appear on this My Page.<br>(People who haven't purchased at Sixfour or RICCO cannot be added.)`,
+              `Our staff will confirm the family member's details in store before adding them.<br>Sorry for the trouble, but please visit us.`,
+              `If you want to remove someone after adding them, please let us know in store or via LINE.`],
+    notesRic:[`The prescription and purchase history of the family member you add will appear on this My Page.<br>(We are unable to add those who have not purchased at RICCO or Sixfour.)`,
+              `Our staff will confirm your family member's details in store before adding them.<br>We apologize for the inconvenience, and kindly ask you to visit us.`,
+              `Should you wish to remove someone after adding them, please let us know in store or via LINE.`],
+    bannerSix:`👪 Checking your family request`, bannerRic:`👪 Your family request is being confirmed`,
+    fb3Six:`Please let our staff know when you visit`, fb3Ric:`Please let our staff know when you visit.`,
+    person:function(n){ return n; }
+  },
+  monthly:{
+    1:[`Happy New Year!\nMay this be another year of seeing clearly 👓`,
+       `Happy New Year!\nWe'll be quietly cheering you on in your glasses picks again this year ☺️`,
+       `How many New Years have we greeted each other now?\nIt truly makes us happy to say hello like this every year ☺️`],
+    2:[`The coldest time of the year.\nIf your glasses fog up, it means you're somewhere warm ☺️`,
+       `The air is dry this season. Wiping dust off lenses dry can scratch them.\nA quick rinse with water at the sink is the right way 👓`,
+       `It's the season of dozing off with your glasses still on.\nWake up to bent glasses 😭 → we'll fix them with all we've got 🛠️`],
+    3:[`Pollen is in the air.\nGlasses quietly help with pollen protection, too 👓`,
+       `Pollen season again. As we said last year, glasses really do quietly help.\n(May your symptoms be milder this year!) 😌`,
+       `Pollen season is rough again this year.\nYou're probably sick of hearing "glasses really help," right? But it's true 😌`],
+    4:[`It's cherry blossom season. Have you been to a hanami yet?\nBlossoms in sharp focus are something special 🌸`,
+       `Cherry blossom season again. The same view may look a little different from last year —\nperhaps because you've changed 🌸`,
+       `Cherry blossom season once more. No matter how many times you see it, good things stay good.\nOne more spring of blossoms we've seen together 🌸`],
+    5:[`May is when UV rays are at their strongest.\nWe can measure the UV-cut rate of your current lenses in store — free and easy ☺️`,
+       `Fresh greenery is at its best. It's true that looking at green rests your eyes.\nTake a break from the screen and look at some distant green 🌿`,
+       `"UV peaks in May" — we say it every year, don't we? 😌\nThe UV-cut check is free again this year, so do drop by! A lens's UV-cut rate declines with age`],
+    6:[`Rainy season has begun. On days when raindrops cloud your glasses,\nthe world looks just a little blurred ☔`,
+       `The rainy season is back again ☔\nYou're a master at wiping lenses on rainy days by now, aren't you?`,
+       `Rainy season again. Raindrops on your lenses don't bother you much anymore, do they?\nIt's amazing how you get used to things ☔`],
+    7:[`Summer is in full swing, and sweat makes glasses slide down.\nNose pad adjustments are free at our shop 😌`,
+       `Summer is here. Air-conditioned rooms tend to dry out your eyes.\nBlink consciously — glasses help a little against dryness too 👓`,
+       `Peak summer. If your glasses keep slipping, it's about time for an adjustment.\nIt's always free — no need to hold back 😌`],
+    8:[`The hot days just keep coming. Stay hydrated.\nYour glasses sweat too — give them a wash 👓`,
+       `Scorching days. Both you and your glasses are worn out.\nSweaty, sticky glasses feel fresh again with ultrasonic cleaning. Free, of course 👓`,
+       `The annual scorching heat is here. Don't overdo it, you or your glasses.\nWash up, rest up, and let's get through summer together again 👓`],
+    9:[`Autumn is slowly arriving.\nAs nights grow longer, reading and phone time go up too. Please take care of your eyes 📖`,
+       `Long autumn nights. Are your eyes tired from too much phone time?\nGive them a rest by looking at the moon 🌙 once in a while`,
+       `Long autumn nights. How many autumns have we spent together now?\nWe'll leave them uncounted — counting would be a bit unrefined ☺️`],
+    10:[`The air is clear and you can see far.\nIs your prescription still right for you? 👀`,
+        `Autumn of appetite — and a feast for the eyes too.\nThe gradient of autumn leaves is truly beautiful when it's in focus 🍁`,
+        `The air is clear, and even distant mountains stand out sharply.\nWe're happy to see this view with you every year 👓`],
+    11:[`The season we crave warm drinks.\n...and fogged-up glasses? Let's just accept it ☕`,
+        `The fogging season is back ☕\nI think we said "we've given up" last year too`,
+        `The fogging season again.\nGiving up has become an annual tradition. Let's wipe it off with a smile ☕`],
+    12:[`December is here — the year has flown by again.\nWhile you're doing the big year-end clean, how about a free cleaning for your glasses in store? 👓`,
+        `Before we knew it, it's December. A year really goes by fast.\nIn busy days, a clear view matters most. If smudges bother you, drop by for a free ultrasonic cleaning 👓`,
+        `December has arrived again.\nIt's a hectic season, but please don't overdo it. Give your eyes and your glasses a rest now and then ☺️`],
+    '12b':[`Thank you for everything this year.\nLet's see many more sights that make us smile next year 👓`,
+           `Thank you again this year.\nAnother year's worth of views we've seen together 👓`,
+           `Thank you for another year.\nNo matter how many years pass, the views we share with you are our greatest treasure 👓`]
+  }
+};
+
+I18N.pt = {
+  code:'pt', htmlLang:'pt-BR', label:'Português (BR)', demoName:'Maria Silva', numLoc:'pt-BR',
+  wd:['dom','seg','ter','qua','qui','sex','sáb'],
+  monLong:['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'],
+  fmtDay:function(d){ return this.wd[d.getDay()]+', '+('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2); },
+  fmtYMD:function(y,m,d){ return ('0'+d).slice(-2)+'/'+('0'+m).slice(-2)+'/'+y; },
+  ui:{
+    btnWarranty:`Garantia e reparos`, btnConsult:`💬 Falar pelo LINE`,
+    secUsing:`Seus óculos em uso`, secWaiting:`Aguardando retirada`,
+    famAdd:`＋ Adicionar carteirinha de familiar 💳️`,
+    archToggle:function(n){ return `Óculos com garantia encerrada (${n})`; },
+    total:function(n){ return `<b>${n}</b> óculos no total`; },
+    rxBtn:`👓 Meu grau`, rxBtnFam:`👓 Grau da família`,
+    rxUpd:function(d){ return `Atualizado em ${d}`; }, rxAsk:`👓 Ver o meu grau`, rxWait:`👓 Consultando o seu grau…`,
+    ringLeft:`Faltam`, ringDays:`dias`, ringEnd:`Fim`,
+    wFrame:`Garantia da armação e lentes`, wVision:`Garantia de visão`,
+    pickSix:`👓️🕶️ Escolher os óculos`, pickRic:`👓️🕶️ Escolher a peça`, memoBtn:`📝 Nota`,
+    moMark:function(m){ return `Recado de ${I18N.pt.monLong[m-1]}`; },
+    tkLabel:`Vale de retirada`, tkDelay:`Reagendando`, tkFrom:`Antes`, tkNoteH:`Aviso importante`, slotAm:`Pela manhã`,
+    noteClosed:function(d){ return `Estaremos fechados em ${d}. Fique atento 😌`; },
+    noteFrame:`Não se esqueça de trazer a armação que terá as lentes trocadas 😌`,
+    who:function(n){ return n; },
+    sub:function(product, date){ return `${product} ／ Retirado em ${date}`; },
+    hof:{ six:`Óculos no Hall da Fama`, ric:`Peça no Hall da Fama` },
+    archStamp:`ARQUIVO`
+  },
+  tk:{
+    six:{
+      make:{
+        schedLabel:`Previsão de ficar pronto`, pillWait:`Em preparo`, pillReady:`✓ Ficou pronto`,
+        waitMsg:`Nossa equipe está preparando os seus óculos 👓🕶️`,
+        come:`Venha nos visitar quando for mais conveniente, a partir do horário acima 😊`,
+        comeDate:`Venha nos visitar quando for mais conveniente 😊`,
+        next:function(n){ return `Disponível para retirada a partir da abertura da loja em ${n}.`; },
+        fine:`Esta tela muda quando os seus óculos ficarem prontos.`,
+        readyMsg:`Seus óculos novos 👓🕶️<br>estão esperando por você na loja 😊`,
+        readyMsg2:`Ao vir à loja, mostre esta tela para a nossa equipe.`,
+        delayMsg:`Estamos ajustando a data de conclusão.`,
+        delaySorry:`Desculpe pela espera 🙇<br>Assim que a nova data for definida, nossa equipe entrará em contato.`,
+        chg:`Previsão alterada`, chgSorry:`Pedimos desculpas pelo transtorno 🙇`
+      },
+      lens:{
+        schedLabel:`Previsão de chegada das lentes`, pillWait:`Aguardando lentes`, pillReady:`✓ Lentes chegaram`,
+        waitMsg:`Aguardando a chegada das suas lentes 👓🕶️`,
+        come:`A montagem das lentes leva cerca de 1 hora.<br>Venha quando tiver um tempinho 😊`,
+        comeDate:`A montagem das lentes leva cerca de 1 hora.<br>Venha quando tiver um tempinho 😊`,
+        next:function(n){ return `Você pode vir a partir da abertura da loja em ${n}.`; },
+        fine:`Esta tela muda quando as lentes chegarem.`,
+        readyMsg:`As lentes chegaram! Esperamos por você 😊`,
+        readyMsg2:`A montagem das lentes leva cerca de 1 hora.<br>Venha quando tiver um tempinho 😊`,
+        delayMsg:`Estamos ajustando a data de chegada das lentes.`,
+        delaySorry:`Desculpe pela espera 🙇<br>Assim que a nova data for definida, nossa equipe entrará em contato.`,
+        chg:`Previsão alterada`, chgSorry:`Pedimos desculpas pelo transtorno 🙇`
+      }
+    },
+    ric:{
+      make:{
+        schedLabel:`Previsão de ficar pronto`, pillWait:`Em preparo`, pillReady:`✓ Ficou pronto`,
+        waitMsg:`Seus óculos estão sendo finalizados com todo o cuidado.`,
+        come:`Venha nos visitar quando lhe for conveniente,<br>a partir do horário acima.`,
+        comeDate:`Venha nos visitar quando lhe for conveniente.`,
+        next:function(n){ return `Disponível para retirada a partir da abertura em ${n}.`; },
+        fine:`Esta tela será atualizada assim que ficarem prontos.`,
+        readyMsg:`Aguardamos a sua visita na loja 🤍`,
+        readyMsg2:`Ao visitar a loja, apresente esta tela à nossa equipe.`,
+        delayMsg:`Estamos ajustando a data de conclusão.`,
+        delaySorry:`Pedimos sinceras desculpas pela espera.<br>Entraremos em contato assim que a data for definida.`,
+        chg:`Previsão atualizada`, chgSorry:`Pedimos desculpas pelo transtorno.`
+      },
+      lens:{
+        schedLabel:`Previsão de chegada das lentes`, pillWait:`Aguardando lentes`, pillReady:`✓ Lentes chegaram`,
+        waitMsg:`Aguarde um pouco mais, por favor,<br>até a chegada das lentes.`,
+        come:`A montagem das lentes leva aproximadamente uma hora.<br>Visite-nos quando for conveniente.`,
+        comeDate:`A montagem das lentes leva aproximadamente uma hora.<br>Visite-nos quando for conveniente.`,
+        next:function(n){ return `Disponível a partir da abertura em ${n}.`; },
+        fine:`Esta tela será atualizada quando as lentes chegarem.`,
+        readyMsg:`Suas lentes chegaram 🤍`,
+        readyMsg2:`A montagem das lentes leva aproximadamente uma hora.<br>Visite-nos quando for conveniente.`,
+        delayMsg:`Estamos ajustando a data de chegada das lentes.`,
+        delaySorry:`Pedimos sinceras desculpas pela espera.<br>Entraremos em contato assim que a data for definida.`,
+        chg:`Previsão atualizada`, chgSorry:`Pedimos desculpas pelo transtorno.`
+      }
+    }
+  },
+  aging:{
+    six:[`Ainda um pouco tímido`,`Se acostumando`,`Bem à vontade`,`Cuide bem de mim`,`Em total sintonia`,`Seu parceiro 😌`],
+    ric:[`Recém-conhecidos`,`Criando afinidade`,`Sob medida`,`Ganhando personalidade`,`Afeto crescente`,`Seu parceiro 😌`]
+  },
+  together:{
+    six:function(n,arch){ var u=(n==='1'||n===1)?'dia':'dias'; return arch ? `${n} ${u} vendo tantas paisagens juntos` : `${n} ${u} vendo as mesmas paisagens juntos 👓`; },
+    ric:function(n,arch){ var u=(n==='1'||n===1)?'dia':'dias'; return arch ? `${n} ${u} que passamos juntos` : `${n} ${u} de companhia`; }
+  },
+  archived:{
+    six:function(days){ return `🏆 <b>Óculos no Hall da Fama</b><br>${days}Bom trabalho, e obrigado 👓🕶️<br>— Ajustes e limpeza são <span class="forever-in">sempre</span> gratuitos ☺️`; },
+    ric:function(days){ return `🏆 <b>Peça no Hall da Fama</b><br>${days}O tempo com este parceiro 👓🕶️ ainda está longe de acabar.<br>Ajustes e limpeza são <span class="forever-in">sempre</span> gratuitos.`; }
+  },
+  warranty:{
+    title:`Garantia e reparos`, lead:`Atendemos gratuitamente pelos períodos abaixo, contados a partir da data de retirada.`,
+    vision:{ term:`Garantia de visão / 90 dias`, h:`Quando o grau não está adequado`,
+      p:`Garantimos a sua visão por 90 dias a partir da data de retirada.<br>Para clientes de até 15 anos, cujo grau muda com facilidade durante o crescimento, o prazo é de 180 dias.<br>Durante o período, se houver qualquer problema de visão (grau forte ou fraco demais etc.) ou se você não se adaptar, trocamos gratuitamente.<br>A troca da cor da lente também é possível uma única vez no período, pagando apenas o valor da cor: 3.300 ou 4.400 ienes. (Troca de cor em lentes fotossensíveis e polarizadas não é coberta.)<br><span class="forever">*Alterações de visão causadas por doenças oculares (catarata, glaucoma etc.) ou cirurgias como LASIK não são cobertas.</span><br><span class="forever">*Se os óculos foram feitos com receita de oftalmologista, será necessária uma nova receita.</span>` },
+    frameSix:{ term:`Garantia de óculos e óculos de sol / 1 ano`, h:`Quando há problema na armação ou nas lentes`,
+      p:`Garantimos a qualidade da armação e das lentes por 1 ano a partir da data de retirada.<br>Se houver problema na armação ou nas lentes durante o uso normal, trocamos ou consertamos gratuitamente; fale conosco.<br>Atenção: danos por descuido do cliente (queda, esquecer no carro, uso em sauna ou banho etc.) não são cobertos.<br><span class="forever">*Mesmo em caso de descuido, há garantia contra quebra por 1 ano (troca por 50% do preço normal); consulte a nossa equipe.</span>` },
+    frameRic:{ term:`Garantia da peça / Conforme cada marca`, h:`Quando há problema na armação ou nas lentes`,
+      p:`A armação segue a garantia de cada marca.<br>Defeitos iniciais são trocados caso o fabricante tenha estoque.<br>As lentes têm garantia de qualidade de 1 ano a partir da data de retirada.<br>Riscos ou danos por desgaste natural ou descuido (queda, esquecer no carro, uso em sauna ou banho etc.) são tratados como troca ou conserto pagos.` },
+    clean:{ term:`Limpeza, exame de vista e ajustes / Sem prazo`, h:`Quando incomoda folga, desalinhamento ou sujeira`,
+      p:`Reaperto de parafusos, ajuste de caimento, limpeza ultrassônica e exame de vista são <span class="forever">sempre gratuitos, para sempre</span>.<br>Mesmo depois do fim da garantia, atendemos sem prazo limite; fique à vontade para passar na loja.` },
+    visit:{ term:`Como usar`, h:`Ao visitar a loja`,
+      p:`Basta mostrar esta Minha Página à nossa equipe e dizer o que precisa.<br><span class="forever">*Não é preciso trazer certificado de garantia nem recibo.</span>` },
+    tabSix:`Garantia Sixfour`, tabRic:`Garantia RICCO`, more:`Mais detalhes no site da Sixfour`, close:`Fechar`
+  },
+  rx:{
+    title:`Meu grau`, titleFam:`Grau da família`,
+    leadSix:function(chip){ return `Este é o grau dos óculos que fizemos para você em ${chip} 👓`; },
+    leadRic:function(chip){ return `Este é o grau do pedido realizado conosco em ${chip}.`; },
+    th:{ S:[`S`,`(Esférico)`], C:[`C`,`(Cilíndrico)`], AX:[`AX`,`(Eixo)`], ADD:[`ADD`,`(Adição)`], PD:[`DP`,`(Dist. pupilar)`] },
+    lensType:`Multifocal`,
+    remarks:`Obs.: olho direito prisma 1,0△ base inferior`,
+    cautionSix:`O Meu grau mostra apenas o grau dos óculos mais recentes.<br>Para ver um grau anterior, toque em "💬 Falar pelo LINE", confira o último número <span class="sq">▢</span> do cartão do par desejado e envie "Cartão <span class="sq">▢</span> grau" (カード<span class="sq">▢</span>の度数情報) 🙇‍♂️<br>Exemplo: o "7" de 01-23456-7️⃣`,
+    cautionRic:`O Meu grau mostra apenas o grau da peça mais recente.<br>Para ver um grau anterior, toque em "💬 Falar pelo LINE", confira o último número <span class="sq">▢</span> do cartão da peça desejada e envie "Cartão <span class="sq">▢</span> grau" (カード<span class="sq">▢</span>の度数情報) 🙇‍♂️<br>Exemplo: o "7" de 01-23456-7️⃣`,
+    askTitleSix:`👓 Vamos consultar o seu grau!`, askTitleRic:`👓 Consulta de grau`,
+    askLeadSix:`Para que você vai usar?`, askLeadRic:`Poderia nos informar a finalidade?`,
+    purposesSix:[`Estou preocupado com a minha visão ultimamente`,`Quero guardar o meu grau registrado`,`Quero fazer óculos em outra loja ou na internet`],
+    purposesRic:[`Para verificar a visão`,`Para registro pessoal`,`Para compra em outro local ou online`],
+    tipSix:`*Procuramos a ficha manualmente, então aguarde um pouquinho pela resposta ☺️<br><br>💡Quer saber o grau para comprar lentes de contato?<br>É diferente do grau dos óculos (a distância entre o olho e a lente é outra).<br>O mais seguro é medir em uma clínica oftalmológica ou no local da compra 👀`,
+    tipRic:`*Nossa equipe verificará a ficha e entrará em contato em seguida.<br><br>💡Para quem vai comprar lentes de contato<br>O grau difere do dos óculos (a distância entre o olho e a lente é diferente).<br>Recomendamos medir em uma clínica oftalmológica ou no local da compra.`,
+    checkSix:`Está na hora de checar a visão 👀<br>O grau das crianças muda com facilidade, venha nos visitar.`,
+    checkRic:`Com o crescimento, que tal uma verificação da visão? Será um prazer recebê-lo.`,
+    close:`Fechar`
+  },
+  nocard:{
+    six:{ pending:`🎉 Bem-vindo ao mundo dos óculos!<br><br>Nossa equipe está preparando<br>a sua carteirinha com carinho.<br>Aguarde com paciência até ficar pronta 👓️🕶️`,
+          pendingSub:`Quando a retirada for concluída, a sua carteirinha aparecerá aqui, com os dias restantes da garantia.`,
+          bought:`Obrigado 😌<br><br>Quando você vier à loja retirar a compra,<br>nossa equipe vai confirmar o seu nome e dados,<br>contar os óculos e óculos de sol que você comprou<br>e emitir a sua carteirinha 👓️🕶️`,
+          none:`👓️ Você ainda não tem carteirinha<br><br>Ao fazer óculos ou óculos de sol<br>na Sixfour ou na RICCO,<br>a sua carteirinha exclusiva será emitida.`,
+          noneSub:`Os dias restantes da garantia ficam à vista ☺️` },
+    ric:{ pending:`Bem-vindo à RICCO.<br><br>Uma página para acompanhar,<br>com delicadeza, a sua vida com óculos 👓️🕶️<br><br>Estamos preparando tudo com muito cuidado 😌`,
+          pendingSub:`Quando a retirada for concluída, a sua carteirinha aparecerá aqui, com os dias restantes da garantia.`,
+          bought:`Obrigado 😌<br><br>Quando visitar a loja para retirar a sua compra,<br>nossa equipe confirmará os seus dados,<br>contabilizará as suas peças<br>e emitirá a sua carteirinha 👓️🕶️`,
+          none:`👓️ Você ainda não possui carteirinha<br><br>Ao fazer um óculos<br>na Sixfour ou na RICCO,<br>será emitida a sua carteirinha exclusiva.`,
+          noneSub:`Os dias restantes da garantia, em um só olhar.` }
+  },
+  reg:{
+    lead1:`Vamos criar a sua carteirinha 👓️`, lead2:`Ao se cadastrar,<br>você receberá a carteirinha digital<br>após a sua compra.`,
+    name:`Nome`, sei:`Sobrenome`, mei:`Primeiro nome`, kana:`Leitura em katakana`, seiK:`Sobren. (カナ)`, meiK:`Nome (カナ)`, birth:`Data de nascimento`,
+    req:`Obrigatório`, opt:`Opcional`, y:`Ano`, m:`Mês`, d:`Dia`,
+    why:`Clientes de até 15 anos têm<br><b>a garantia de visão ampliada de 90 para 180 dias</b>.<br><br>E mais uma coisa —<br>como ótica 👓️,<br>gostaríamos de saber há quantos anos os seus olhos vêm se esforçando 😌`,
+    q:`Você já comprou óculos 👓️ ou óculos de sol 🕶️<br>na Sixfour ou na RICCO?`,
+    qNote:`*Se você está comprando agora, responda também "Sim"`, yes:`Sim`, no:`Não`, btn:`Cadastrar`,
+    privacy:`As informações fornecidas são usadas<br>somente para a carteirinha e a garantia`, link:`Política de privacidade`
+  },
+  fam:{
+    title:`Adicionar carteirinha de familiar 💳️`, btn:`Enviar solicitação`,
+    notesSix:[`O grau e o histórico de compras do familiar adicionado aparecerão nesta Minha Página.<br>(Quem não comprou na Sixfour ou na RICCO não pode ser adicionado.)`,
+              `Nossa equipe confirma os dados do familiar na loja antes de adicionar.<br>Desculpe o trabalho, mas pedimos que venha até a loja.`,
+              `Para remover alguém depois de adicionar, avise na loja ou pelo LINE.`],
+    notesRic:[`O grau e o histórico de compras do familiar adicionado aparecerão nesta Minha Página.<br>(Não é possível adicionar quem não tenha comprado na RICCO ou na Sixfour.)`,
+              `Nossa equipe confirmará os dados do familiar na loja antes de adicioná-lo.<br>Pedimos desculpas pelo incômodo e solicitamos a sua visita.`,
+              `Caso deseje remover alguém depois de adicioná-lo, informe-nos na loja ou pelo LINE.`],
+    bannerSix:`👪 Confirmando a adição do familiar`, bannerRic:`👪 A adição do familiar está sendo confirmada`,
+    fb3Six:`Ao vir à loja, avise a nossa equipe`, fb3Ric:`Ao visitar a loja, por gentileza, informe a nossa equipe.`,
+    person:function(n){ return n; }
+  },
+  monthly:{
+    1:[`Feliz Ano Novo!\nQue este seja mais um ano de enxergar bem 👓`,
+       `Feliz Ano Novo!\nEste ano também vamos torcer, de mansinho, pelas suas escolhas de óculos ☺️`,
+       `Quantos Anos Novos já nos cumprimentamos?\nÉ uma alegria enorme poder dizer olá assim todo ano ☺️`],
+    2:[`A época mais fria do ano.\nSe seus óculos embaçarem, é sinal de que você está num lugar aconchegante ☺️`,
+       `O ar fica seco nesta época. Limpar a poeira da lente a seco pode riscar.\nO certo é enxaguar rapidinho com água na pia 👓`,
+       `É a época de cochilar com os óculos no rosto.\nAcordou com eles tortos 😭 → consertamos com todo o carinho 🛠️`],
+    3:[`O pólen está no ar.\nÓculos também ajudam, discretamente, contra o pólen 👓`,
+       `Mais uma temporada de pólen. Como dissemos ano passado, óculos ajudam discretamente.\n(Que os sintomas sejam mais leves este ano!) 😌`,
+       `A época do pólen está difícil de novo.\nJá deve estar cansado de ouvir "óculos ajudam", né? Mas é verdade 😌`],
+    4:[`É a época das cerejeiras. Já foi ao hanami?\nCerejeiras bem focadas são algo especial 🌸`,
+       `Chegou a época das cerejeiras de novo. A mesma paisagem parece um pouco diferente do ano passado —\ntalvez porque você mudou 🌸`,
+       `Mais uma temporada de cerejeiras. Por mais que se veja, o que é bom continua sendo bom.\nMais uma primavera de flores que vimos juntos 🌸`],
+    5:[`Maio é quando os raios UV estão mais fortes.\nMedimos a proteção UV das suas lentes na loja — grátis e rápido ☺️`,
+       `O verde novo está lindo. É verdade que olhar para o verde descansa a vista.\nSaia um pouco das telas e olhe para o verde ao longe 🌿`,
+       `"O UV atinge o pico em maio" — dizemos isso todo ano, né? 😌\nA medição de proteção UV é grátis também este ano, venha conferir! Com o tempo, a proteção da lente diminui`],
+    6:[`Começou a estação das chuvas. Nos dias em que gotas embaçam os óculos,\no mundo fica um pouquinho borrado ☔`,
+       `A estação das chuvas voltou ☔\nA essa altura você já é mestre em limpar lentes em dia de chuva, né?`,
+       `Chuva de novo. As gotas nas lentes já não incomodam tanto, né?\nAcostumar é uma coisa incrível ☔`],
+    7:[`O verão chegou de vez, e o suor faz os óculos escorregarem.\nAjustamos as plaquetas do nariz de graça 😌`,
+       `Verão em plena força. Ambientes com ar-condicionado ressecam os olhos.\nPisque de propósito — os óculos ajudam um pouco contra o ressecamento 👓`,
+       `Verão pleno. Se os óculos estão escorregando, é hora de ajustar.\nÉ sempre grátis — sem cerimônia 😌`],
+    8:[`Os dias quentes continuam. Beba água com frequência.\nOs óculos também suam — lave-os 👓`,
+       `Dias escaldantes. Você e seus óculos estão exaustos.\nÓculos grudentos de suor ficam novos com a limpeza ultrassônica. Grátis, claro 👓`,
+       `O calorão de todo ano chegou. Nem você nem os óculos devem se forçar.\nLave, descanse e vamos atravessar mais um verão juntos 👓`],
+    9:[`O outono se aproxima aos poucos.\nCom as noites mais longas, aumentam a leitura e o tempo no celular. Cuide bem dos seus olhos 📖`,
+       `Noites longas de outono. Seus olhos estão cansados de tanto celular?\nDê uma pausa a eles olhando para a lua 🌙 de vez em quando`,
+       `Noites longas de outono. Quantos outonos já passamos juntos?\nVamos deixar sem contar — contar seria deselegante ☺️`],
+    10:[`O ar está limpo e dá para enxergar longe.\nSeu grau ainda está certo? 👀`,
+        `Outono de apetite — e também de um banquete para os olhos.\nO degradê das folhas de outono fica lindo quando está bem focado 🍁`,
+        `O ar está limpo e até as montanhas distantes aparecem nítidas.\nÉ uma alegria ver esta paisagem com você todo ano 👓`],
+    11:[`A época em que dá vontade de bebidas quentes.\n...e óculos embaçados? Vamos aceitar ☕`,
+        `Chegou a temporada do embaçado ☕\nAcho que no ano passado também dissemos "já desisti"`,
+        `Chegou a temporada do embaçado.\nDesistir já virou tradição anual. Vamos limpar sorrindo ☕`],
+    12:[`Chegou dezembro — o ano passou voando mais uma vez.\nAproveitando a faxina de fim de ano, que tal uma limpeza grátis dos óculos na loja? 👓`,
+        `Quando vemos, já é dezembro. Um ano passa mesmo rápido.\nÉ nos dias corridos que a visão limpa faz diferença. Incomodado com sujeira? Venha para a limpeza ultrassônica grátis 👓`,
+        `Dezembro chegou de novo.\nÉ uma época agitada, mas não se force. De vez em quando, deixe os olhos e os óculos descansarem ☺️`],
+    '12b':[`Obrigado por tudo neste ano.\nQue no próximo ano vejamos muitas paisagens que nos façam sorrir 👓`,
+           `Obrigado mais uma vez neste ano.\nMais um ano de paisagens que vimos juntos 👓`,
+           `Obrigado por mais um ano.\nPor mais anos que passem, as paisagens que vemos com você são o nosso maior tesouro 👓`]
+  }
+};
+
+I18N.zh = {
+  code:'zh', htmlLang:'zh-Hans', label:'简体中文', demoName:'王 小明', numLoc:'zh-CN',
+  wd:['周日','周一','周二','周三','周四','周五','周六'],
+  monLong:['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
+  fmtDay:function(d){ return (d.getMonth()+1)+'月'+d.getDate()+'日（'+this.wd[d.getDay()]+'）'; },
+  fmtYMD:function(y,m,d){ return y+'年'+m+'月'+d+'日'; },
+  ui:{
+    btnWarranty:`保修与维修`, btnConsult:`💬 通过LINE咨询`,
+    secUsing:`使用中的眼镜`, secWaiting:`等待取件`,
+    famAdd:`＋ 添加家人的会员卡 💳️`,
+    archToggle:function(n){ return `保修已结束的眼镜（${n}）`; },
+    total:function(n){ return `共 <b>${n}</b> 副`; },
+    rxBtn:`👓 我的度数`, rxBtnFam:`👓 家人的度数`,
+    rxUpd:function(d){ return `更新于 ${d}`; }, rxAsk:`👓 查询我的度数`, rxWait:`👓 正在查询您的度数…`,
+    ringLeft:`剩余`, ringDays:`天`, ringEnd:`已结束`,
+    wFrame:`镜架·镜片保修`, wVision:`视力保修`,
+    pickSix:`👓️🕶️ 挑选眼镜`, pickRic:`👓️🕶️ 挑选眼镜`, memoBtn:`📝 留言`,
+    moMark:function(m){ return `${I18N.zh.monLong[m-1]}的留言`; },
+    tkLabel:`取件凭证`, tkDelay:`调整日期中`, tkFrom:`原定`, tkNoteH:`重要通知`, slotAm:`上午`,
+    noteClosed:function(d){ return `${d}为本店休息日，请您留意 😌`; },
+    noteFrame:`更换镜片时，请记得携带要更换镜片的镜架 😌`,
+    who:function(n){ return n; },
+    sub:function(product, date){ return `${product} ／ ${date}取件`; },
+    hof:{ six:`名人堂眼镜`, ric:`名人堂眼镜` },
+    archStamp:`已归档`
+  },
+  tk:{
+    six:{
+      make:{
+        schedLabel:`预计完成时间`, pillWait:`制作中`, pillReady:`✓ 已完成`,
+        waitMsg:`店员正在为您准备眼镜 👓🕶️`,
+        come:`上述时间之后，您方便时随时欢迎光临 😊`,
+        comeDate:`您方便时随时欢迎光临 😊`,
+        next:function(n){ return `${n}营业开始后即可取件。`; },
+        fine:`眼镜完成后，此页面会更新。`,
+        readyMsg:`您的新眼镜 👓🕶️<br>已在店内等您 😊`,
+        readyMsg2:`到店时，请向店员出示此页面。`,
+        delayMsg:`我们正在调整完成日期。`,
+        delaySorry:`让您久等了，非常抱歉 🙇<br>日期确定后，店员会立即与您联系。`,
+        chg:`日期有变更`, chgSorry:`给您添麻烦了，非常抱歉 🙇`
+      },
+      lens:{
+        schedLabel:`镜片预计到货`, pillWait:`等待镜片`, pillReady:`✓ 镜片已到`,
+        waitMsg:`正在等待您的镜片到货 👓🕶️`,
+        come:`镜片安装约需1小时。<br>请您在时间充裕时光临 😊`,
+        comeDate:`镜片安装约需1小时。<br>请您在时间充裕时光临 😊`,
+        next:function(n){ return `${n}营业开始后即可光临。`; },
+        fine:`镜片到货后，此页面会更新。`,
+        readyMsg:`镜片已到货！期待您的光临 😊`,
+        readyMsg2:`镜片安装约需1小时。<br>请您在时间充裕时光临 😊`,
+        delayMsg:`我们正在调整镜片到货日期。`,
+        delaySorry:`让您久等了，非常抱歉 🙇<br>日期确定后，店员会立即与您联系。`,
+        chg:`日期有变更`, chgSorry:`给您添麻烦了，非常抱歉 🙇`
+      }
+    },
+    ric:{
+      make:{
+        schedLabel:`预计完成时间`, pillWait:`制作中`, pillReady:`✓ 已完成`,
+        waitMsg:`您的眼镜正在精心制作中。`,
+        come:`上述时间之后，<br>请您方便时光临。`,
+        comeDate:`请您方便时光临。`,
+        next:function(n){ return `${n}营业开始后即可取件。`; },
+        fine:`眼镜完成后，此页面将会更新。`,
+        readyMsg:`恭候您的光临 🤍`,
+        readyMsg2:`到店时，请向店员出示此页面。`,
+        delayMsg:`我们正在调整完成日期。`,
+        delaySorry:`让您久等了，深表歉意。<br>日期确定后，店员将立即与您联系。`,
+        chg:`日期已更新`, chgSorry:`给您带来不便，深表歉意。`
+      },
+      lens:{
+        schedLabel:`镜片预计到货`, pillWait:`等待镜片`, pillReady:`✓ 镜片已到`,
+        waitMsg:`请您稍候，<br>镜片到货后即可安装。`,
+        come:`镜片安装约需1小时。<br>请您在时间方便时光临。`,
+        comeDate:`镜片安装约需1小时。<br>请您在时间方便时光临。`,
+        next:function(n){ return `${n}营业开始后即可光临。`; },
+        fine:`镜片到货后，此页面将会更新。`,
+        readyMsg:`镜片已到货 🤍`,
+        readyMsg2:`镜片安装约需1小时。<br>请您在时间方便时光临。`,
+        delayMsg:`我们正在调整镜片到货日期。`,
+        delaySorry:`让您久等了，深表歉意。<br>日期确定后，店员将立即与您联系。`,
+        chg:`日期已更新`, chgSorry:`给您带来不便，深表歉意。`
+      }
+    }
+  },
+  aging:{
+    six:[`还有点紧张`,`渐渐熟悉了`,`很自在了`,`请好好爱护我`,`默契十足`,`您的搭档 😌`],
+    ric:[`初次相遇`,`渐入佳境`,`刚刚好`,`越用越有味道`,`感情日深`,`您的搭档 😌`]
+  },
+  together:{
+    six:function(n,arch){ return arch ? `一起看过许多风景的 ${n} 天` : `一起看着同一片风景的 ${n} 天 👓`; },
+    ric:function(n,arch){ return arch ? `一路相伴的 ${n} 天` : `相伴的 ${n} 天`; }
+  },
+  archived:{
+    six:function(days){ return `🏆 <b>名人堂眼镜</b><br>${days}辛苦了，谢谢你 👓🕶️<br>— 调整和清洁<span class="forever-in">永远</span>免费 ☺️`; },
+    ric:function(days){ return `🏆 <b>名人堂眼镜</b><br>${days}与这位伙伴 👓🕶️ 的故事还远未结束。<br>调整和清洁<span class="forever-in">永远</span>免费。`; }
+  },
+  warranty:{
+    title:`保修与维修`, lead:`自取件日起，以下期限内我们将免费为您处理。`,
+    vision:{ term:`视力保修 / 90天`, h:`度数不合适时`,
+      p:`自取件日起90天内，我们保证您的视力矫正效果。<br>15岁以下的顾客因成长期度数容易变化，保修期延长至180天。<br>保修期内，如出现视力问题（度数过深或过浅等）或无法适应，我们将免费为您更换镜片。<br>保修期内还可免费更换一次镜片颜色，仅需支付颜色费用3,300日元或4,400日元。（变色镜片与偏光镜片的颜色更换不在此范围内。）<br><span class="forever">*因眼部疾病（白内障、青光眼等）或近视手术（LASIK等）导致的视力变化不在保修范围内。</span><br><span class="forever">*如眼镜是根据眼科医生的处方制作的，需要您重新取得眼科处方。</span>` },
+    frameSix:{ term:`眼镜·太阳镜保修 / 1年`, h:`镜架或镜片出现问题时`,
+      p:`自取件日起1年内，我们保证镜架与镜片的质量。<br>正常使用中镜架或镜片出现问题时，我们将免费更换或维修，请随时联系我们。<br>请注意，因顾客疏忽造成的损坏（摔落、遗留在车内、在桑拿或浴室中佩戴等）不在保修范围内。<br><span class="forever">*即使是疏忽造成的损坏，1年内也可享受破损保修（按正常价格的50%更换），详情请咨询店员。</span>` },
+    frameRic:{ term:`眼镜保修 / 依各品牌规定`, h:`镜架或镜片出现问题时`,
+      p:`镜架依各品牌的保修条款处理。<br>如为初期不良，在厂商有库存的情况下予以更换。<br>镜片自取件日起1年内保证质量。<br>因老化或疏忽（摔落、遗留在车内、在桑拿或浴室中佩戴等）造成的划痕或损坏，将作为付费更换或维修处理。` },
+    clean:{ term:`清洗、验光与调整 / 不限期`, h:`感觉松动、歪斜或脏污时`,
+      p:`拧紧螺丝、调整佩戴感、超声波清洗和验光，<span class="forever">永远免费</span>。<br>即使保修期结束，我们也不设期限，欢迎随时光临。` },
+    visit:{ term:`使用方法`, h:`到店时`,
+      p:`只需向店员出示此“我的页面”，并告知您的需求即可。<br><span class="forever">*无需携带保修卡或收据。</span>` },
+    tabSix:`Sixfour保修`, tabRic:`RICCO保修`, more:`Sixfour官网查看详情`, close:`关闭`
+  },
+  rx:{
+    title:`我的度数`, titleFam:`家人的度数`,
+    leadSix:function(chip){ return `这是我们在${chip}为您制作的眼镜的度数 👓`; },
+    leadRic:function(chip){ return `这是${chip}在本店订制的眼镜的度数。`; },
+    th:{ S:[`S`,`（球镜）`], C:[`C`,`（柱镜）`], AX:[`AX`,`（轴位）`], ADD:[`ADD`,`（下加光）`], PD:[`PD`,`（瞳距）`] },
+    lensType:`渐进多焦点`,
+    remarks:`备注：右眼棱镜 1.0△ 底朝下`,
+    cautionSix:`“我的度数”仅显示最近一副眼镜的度数。<br>如需查看更早的度数，请点击“💬 通过LINE咨询”，确认该眼镜卡号最后的数字 <span class="sq">▢</span>，然后发送“カード<span class="sq">▢</span>の度数情報”（卡号<span class="sq">▢</span>的度数信息）🙇‍♂️<br>例：01-23456-7️⃣ 中的“7”`,
+    cautionRic:`“我的度数”仅显示最近一副眼镜的度数。<br>如需查看更早的度数，请点击“💬 通过LINE咨询”，确认该眼镜卡号最后的数字 <span class="sq">▢</span>，然后发送“カード<span class="sq">▢</span>の度数情報”（卡号<span class="sq">▢</span>的度数信息）🙇‍♂️<br>例：01-23456-7️⃣ 中的“7”`,
+    askTitleSix:`👓 让我们帮您查询度数！`, askTitleRic:`👓 度数查询`,
+    askLeadSix:`请问您查询度数的用途是？`, askLeadRic:`请问您查询度数的用途是？`,
+    purposesSix:[`最近有点在意自己的视力`,`想把度数记录下来`,`想在其他店或网上配眼镜`],
+    purposesRic:[`用于确认视力`,`用于个人记录`,`用于在其他店或网上购买`],
+    tipSix:`*店员会手动查找您的档案，回复可能需要一点时间 ☺️<br><br>💡想买隐形眼镜、需要度数时<br>隐形眼镜的度数与框架眼镜不同（眼睛与镜片的距离不同）。<br>建议在眼科或购买处重新验光，更保险 👀`,
+    tipRic:`*店员确认档案后将与您联系。<br><br>💡购买隐形眼镜的顾客请注意<br>隐形眼镜的度数与框架眼镜不同（眼睛与镜片的距离不同）。<br>建议在眼科或购买处重新验光。`,
+    checkSix:`该检查视力啦 👀<br>孩子的度数很容易变化，欢迎随时来店。`,
+    checkRic:`随着孩子的成长，不妨做一次视力检查？欢迎您光临。`,
+    close:`关闭`
+  },
+  nocard:{
+    six:{ pending:`🎉 欢迎来到眼镜的世界！<br><br>店员正在为您<br>精心准备会员卡。<br>请耐心等候 👓️🕶️`,
+          pendingSub:`取件完成后，会员卡将显示在这里，并可查看保修剩余天数。`,
+          bought:`谢谢您 😌<br><br>当您到店取件时，<br>店员会确认您的姓名等信息，<br>统计您购买的眼镜和太阳镜数量，<br>并为您发放会员卡 👓️🕶️`,
+          none:`👓️ 您还没有会员卡<br><br>在Sixfour或RICCO<br>配眼镜或太阳镜后，<br>将为您发放专属会员卡。`,
+          noneSub:`保修剩余天数一目了然 ☺️` },
+    ric:{ pending:`欢迎来到RICCO。<br><br>一个静静陪伴<br>您眼镜生活的页面 👓️🕶️<br><br>我们正在精心准备 😌`,
+          pendingSub:`取件完成后，会员卡将显示在这里，并可查看保修剩余天数。`,
+          bought:`谢谢您 😌<br><br>当您到店取件时，<br>店员会确认您的信息，<br>统计您购买的眼镜数量，<br>并为您发放会员卡 👓️🕶️`,
+          none:`👓️ 您尚未拥有会员卡<br><br>在Sixfour或RICCO<br>配眼镜后，<br>将为您发放专属会员卡。`,
+          noneSub:`保修剩余天数，一目了然。` }
+  },
+  reg:{
+    lead1:`来制作您的会员卡吧 👓️`, lead2:`完成注册后，<br>购买眼镜时将为您发放<br>电子会员卡。`,
+    name:`姓名`, sei:`姓`, mei:`名`, kana:`片假名读音`, seiK:`姓（カナ）`, meiK:`名（カナ）`, birth:`出生日期`,
+    req:`必填`, opt:`选填`, y:`年`, m:`月`, d:`日`,
+    why:`15岁以下的顾客，<br><b>视力保修将从90天延长至180天</b>。<br><br>另外，<br>作为眼镜店 👓️，<br>我们也想知道您的眼睛已经辛苦工作了多少年 😌`,
+    q:`您以前在Sixfour或RICCO<br>购买过眼镜 👓️ 或太阳镜 🕶️ 吗？`,
+    qNote:`*今天购买的话，也请选择“是”`, yes:`是`, no:`否`, btn:`注册`,
+    privacy:`您填写的信息<br>仅用于会员卡和保修服务`, link:`隐私政策`
+  },
+  fam:{
+    title:`添加家人的会员卡 💳️`, btn:`提交申请`,
+    notesSix:[`所添加家人的度数和购买记录，将显示在这个“我的页面”中。<br>（未在Sixfour或RICCO购买过的人无法添加。）`,
+              `添加前，店员会在店内确认家人的信息。<br>给您添麻烦了，请您到店一趟。`,
+              `添加后如需删除，请在店内或通过LINE告知我们。`],
+    notesRic:[`所添加家人的度数和购买记录，将显示在这个“我的页面”中。<br>（未在RICCO或Sixfour购买过的人无法添加。）`,
+              `添加前，店员会在店内确认家人的信息。<br>给您带来不便，深表歉意，敬请到店一趟。`,
+              `添加后如需删除，请在店内或通过LINE告知我们。`],
+    bannerSix:`👪 正在确认家人添加申请`, bannerRic:`👪 家人添加申请确认中`,
+    fb3Six:`到店时请告诉店员`, fb3Ric:`到店时，请告知店员。`,
+    person:function(n){ return n; }
+  },
+  monthly:{
+    1:[`新年快乐！\n愿今年也是看得清清楚楚的一年 👓`,
+       `新年快乐！\n今年我们也会默默为您挑选眼镜加油 ☺️`,
+       `我们已经互道过多少次新年好了呢？\n每年都能这样向您问好，真的很开心 ☺️`],
+    2:[`一年中最冷的时候。\n如果眼镜起了雾，说明您正待在温暖的地方 ☺️`,
+       `这个季节空气干燥。干擦镜片上的灰尘可能会刮伤镜片。\n正确的做法是在水龙头下用水轻轻冲洗 👓`,
+       `这是戴着眼镜打盹的季节。\n醒来发现眼镜歪了 😭 → 我们会竭尽全力为您修好 🛠️`],
+    3:[`花粉飞舞的季节。\n眼镜也在悄悄帮您阻挡花粉 👓`,
+       `又到花粉季了。和去年说的一样，眼镜真的在悄悄帮忙。\n（愿今年症状轻一些！）😌`,
+       `今年花粉季也很难熬。\n“眼镜很有用”这话您一定听腻了吧？但这是真的 😌`],
+    4:[`樱花盛开的季节。您去赏花了吗？\n看得清清楚楚的樱花，格外特别 🌸`,
+       `又是樱花季。同样的风景，也许和去年看起来有点不一样——\n或许是因为您变了 🌸`,
+       `又是一个樱花季。看多少次，好东西依然是好东西。\n又添了一个与您共赏樱花的春天 🌸`],
+    5:[`5月是紫外线最强的时候。\n店里可以免费、轻松地测量您现有镜片的防紫外线率 ☺️`,
+       `新绿最美的时节。看绿色能让眼睛休息，这是真的。\n离开屏幕，看看远处的绿色吧 🌿`,
+       `“紫外线5月最强”——我们每年都这么说，对吧？😌\n今年也提供免费的防紫外线检测，欢迎来店！镜片的防紫外线率会随时间下降`],
+    6:[`梅雨季开始了。雨滴让眼镜模糊的日子里，\n世界会变得有点朦胧 ☔`,
+       `梅雨季又来了 ☔\n您现在一定已经是雨天擦镜片的高手了吧？`,
+       `又是梅雨季。镜片上的雨滴，您已经不太在意了吧？\n习惯真是了不起 ☔`],
+    7:[`夏天正式到来，汗水让眼镜滑下来。\n鼻托调整，本店免费 😌`,
+       `夏天来了。空调房里眼睛容易干燥。\n记得有意识地多眨眼——眼镜也能稍微缓解干涩 👓`,
+       `盛夏。如果眼镜总是往下滑，就该调整一下了。\n一直都是免费的，请不要客气 😌`],
+    8:[`酷热的日子还在继续。记得多补充水分。\n眼镜也会出汗，给它洗个澡吧 👓`,
+       `酷暑难耐。您和眼镜都累坏了。\n沾满汗水、黏糊糊的眼镜，用超声波清洗就能焕然一新。当然免费 👓`,
+       `一年一度的酷暑又来了。您和眼镜都别太勉强。\n洗一洗、歇一歇，我们再一起度过这个夏天 👓`],
+    9:[`秋天正在悄悄到来。\n夜晚变长，读书和看手机的时间也变多了。请注意保护眼睛 📖`,
+       `漫漫秋夜。手机看多了，眼睛累了吗？\n偶尔看看月亮 🌙，让眼睛休息一下`,
+       `漫漫秋夜。我们已经一起度过多少个秋天了呢？\n就不数了吧——数起来未免太不风雅 ☺️`],
+    10:[`空气清澈，能看得很远。\n您的度数还合适吗？👀`,
+        `食欲之秋——也是视觉盛宴之秋。\n看得清楚时，红叶的渐变色真的很美 🍁`,
+        `空气清澈，连远处的山峦都清晰可见。\n每年都能和您一起看这样的风景，我们很开心 👓`],
+    11:[`想喝热饮的季节。\n……眼镜起雾？我们就接受它吧 ☕`,
+        `起雾的季节又来了 ☕\n去年我们好像也说过“已经放弃了”`,
+        `起雾的季节又来了。\n放弃已经成了每年的惯例。笑着把它擦掉吧 ☕`],
+    12:[`12月到了——一年又飞快地过去了。\n趁着年底大扫除，要不要来店里免费清洗一下眼镜？👓`,
+        `不知不觉已是12月。一年真的过得好快。\n越是忙碌的日子，清晰的视野越重要。如果在意污渍，欢迎来店免费超声波清洗 👓`,
+        `12月又到了。\n这是个忙碌的季节，但请不要太勉强。偶尔让眼睛和眼镜都休息一下 ☺️`],
+    '12b':[`感谢您这一年的关照。\n愿明年我们能看到更多让人微笑的风景 👓`,
+           `今年也非常感谢您。\n又添了一年与您共同看过的风景 👓`,
+           `感谢您又陪伴了我们一年。\n无论过去多少年，与您一起看过的风景，都是我们最大的财富 👓`]
+  }
+};
+
+I18N.vi = {
+  code:'vi', htmlLang:'vi', label:'Tiếng Việt', demoName:'Nguyễn Thị Lan', numLoc:'vi-VN',
+  wd:['CN','T2','T3','T4','T5','T6','T7'],
+  monLong:['tháng 1','tháng 2','tháng 3','tháng 4','tháng 5','tháng 6','tháng 7','tháng 8','tháng 9','tháng 10','tháng 11','tháng 12'],
+  fmtDay:function(d){ return this.wd[d.getDay()]+', '+d.getDate()+'/'+(d.getMonth()+1); },
+  fmtYMD:function(y,m,d){ return d+'/'+m+'/'+y; },
+  ui:{
+    btnWarranty:`Bảo hành & sửa chữa`, btnConsult:`💬 Trao đổi qua LINE`,
+    secUsing:`Kính đang sử dụng`, secWaiting:`Đang chờ nhận`,
+    famAdd:`＋ Thêm thẻ của người thân 💳️`,
+    archToggle:function(n){ return `Kính đã hết bảo hành (${n})`; },
+    total:function(n){ return `Tổng cộng <b>${n}</b> chiếc`; },
+    rxBtn:`👓 Độ kính của tôi`, rxBtnFam:`👓 Độ kính người thân`,
+    rxUpd:function(d){ return `Cập nhật ${d}`; }, rxAsk:`👓 Xem độ kính của tôi`, rxWait:`👓 Đang tra cứu độ kính của bạn…`,
+    ringLeft:`Còn`, ringDays:`ngày`, ringEnd:`Hết hạn`,
+    wFrame:`Bảo hành gọng & tròng`, wVision:`Bảo hành thị lực`,
+    pickSix:`👓️🕶️ Chọn kính`, pickRic:`👓️🕶️ Chọn kính`, memoBtn:`📝 Lời nhắn`,
+    moMark:function(m){ return `Lời nhắn ${I18N.vi.monLong[m-1]}`; },
+    tkLabel:`Phiếu nhận kính`, tkDelay:`Đang điều chỉnh lịch`, tkFrom:`Trước đó`, tkNoteH:`Thông báo quan trọng`, slotAm:`Buổi sáng`,
+    noteClosed:function(d){ return `Cửa hàng nghỉ vào ${d}. Mong bạn lưu ý 😌`; },
+    noteFrame:`Khi thay tròng, bạn nhớ mang theo gọng kính cần thay nhé 😌`,
+    who:function(n){ return n; },
+    sub:function(product, date){ return `${product} ／ Nhận ngày ${date}`; },
+    hof:{ six:`Kính vào Đại sảnh Danh vọng`, ric:`Kính vào Đại sảnh Danh vọng` },
+    archStamp:`LƯU TRỮ`
+  },
+  tk:{
+    six:{
+      make:{
+        schedLabel:`Dự kiến hoàn thành`, pillWait:`Đang chuẩn bị`, pillReady:`✓ Đã xong`,
+        waitMsg:`Nhân viên đang chuẩn bị kính cho bạn 👓🕶️`,
+        come:`Sau thời gian trên, bạn ghé cửa hàng lúc nào tiện cũng được nhé 😊`,
+        comeDate:`Bạn ghé cửa hàng lúc nào tiện cũng được nhé 😊`,
+        next:function(n){ return `Bạn có thể nhận kính từ giờ mở cửa ngày ${n}.`; },
+        fine:`Màn hình này sẽ thay đổi khi kính của bạn hoàn thành.`,
+        readyMsg:`Chiếc kính mới 👓🕶️ của bạn<br>đang chờ ở cửa hàng 😊`,
+        readyMsg2:`Khi đến cửa hàng, vui lòng cho nhân viên xem màn hình này.`,
+        delayMsg:`Chúng tôi đang điều chỉnh ngày hoàn thành.`,
+        delaySorry:`Xin lỗi vì để bạn chờ lâu 🙇<br>Khi có ngày mới, nhân viên sẽ liên hệ ngay với bạn.`,
+        chg:`Lịch đã thay đổi`, chgSorry:`Chúng tôi xin lỗi vì sự bất tiện này 🙇`
+      },
+      lens:{
+        schedLabel:`Dự kiến tròng kính về`, pillWait:`Đang chờ tròng`, pillReady:`✓ Tròng đã về`,
+        waitMsg:`Đang chờ tròng kính của bạn về 👓🕶️`,
+        come:`Lắp tròng mất khoảng 1 tiếng.<br>Bạn ghé khi có thời gian nhé 😊`,
+        comeDate:`Lắp tròng mất khoảng 1 tiếng.<br>Bạn ghé khi có thời gian nhé 😊`,
+        next:function(n){ return `Bạn có thể ghé từ giờ mở cửa ngày ${n}.`; },
+        fine:`Màn hình này sẽ thay đổi khi tròng kính về.`,
+        readyMsg:`Tròng kính đã về! Hẹn gặp bạn nhé 😊`,
+        readyMsg2:`Lắp tròng mất khoảng 1 tiếng.<br>Bạn ghé khi có thời gian nhé 😊`,
+        delayMsg:`Chúng tôi đang điều chỉnh ngày tròng kính về.`,
+        delaySorry:`Xin lỗi vì để bạn chờ lâu 🙇<br>Khi có ngày mới, nhân viên sẽ liên hệ ngay với bạn.`,
+        chg:`Lịch đã thay đổi`, chgSorry:`Chúng tôi xin lỗi vì sự bất tiện này 🙇`
+      }
+    },
+    ric:{
+      make:{
+        schedLabel:`Dự kiến hoàn thành`, pillWait:`Đang chuẩn bị`, pillReady:`✓ Đã xong`,
+        waitMsg:`Kính của quý khách đang được hoàn thiện cẩn thận.`,
+        come:`Sau thời gian trên,<br>kính mời quý khách ghé cửa hàng khi thuận tiện.`,
+        comeDate:`Kính mời quý khách ghé cửa hàng khi thuận tiện.`,
+        next:function(n){ return `Quý khách có thể nhận kính từ giờ mở cửa ngày ${n}.`; },
+        fine:`Màn hình này sẽ được cập nhật khi kính hoàn thành.`,
+        readyMsg:`Chúng tôi rất mong được đón quý khách 🤍`,
+        readyMsg2:`Khi đến cửa hàng, xin vui lòng xuất trình màn hình này cho nhân viên.`,
+        delayMsg:`Chúng tôi đang điều chỉnh ngày hoàn thành.`,
+        delaySorry:`Chân thành xin lỗi quý khách vì sự chậm trễ.<br>Khi xác định được ngày, nhân viên sẽ liên hệ ngay.`,
+        chg:`Lịch đã được cập nhật`, chgSorry:`Chúng tôi xin lỗi vì sự bất tiện này.`
+      },
+      lens:{
+        schedLabel:`Dự kiến tròng kính về`, pillWait:`Đang chờ tròng`, pillReady:`✓ Tròng đã về`,
+        waitMsg:`Xin quý khách vui lòng chờ thêm<br>cho đến khi tròng kính về.`,
+        come:`Việc lắp tròng mất khoảng một tiếng.<br>Kính mời quý khách ghé khi thuận tiện.`,
+        comeDate:`Việc lắp tròng mất khoảng một tiếng.<br>Kính mời quý khách ghé khi thuận tiện.`,
+        next:function(n){ return `Quý khách có thể ghé từ giờ mở cửa ngày ${n}.`; },
+        fine:`Màn hình này sẽ được cập nhật khi tròng kính về.`,
+        readyMsg:`Tròng kính của quý khách đã về 🤍`,
+        readyMsg2:`Việc lắp tròng mất khoảng một tiếng.<br>Kính mời quý khách ghé khi thuận tiện.`,
+        delayMsg:`Chúng tôi đang điều chỉnh ngày tròng kính về.`,
+        delaySorry:`Chân thành xin lỗi quý khách vì sự chậm trễ.<br>Khi xác định được ngày, nhân viên sẽ liên hệ ngay.`,
+        chg:`Lịch đã được cập nhật`, chgSorry:`Chúng tôi xin lỗi vì sự bất tiện này.`
+      }
+    }
+  },
+  aging:{
+    six:[`Còn hơi bỡ ngỡ`,`Đang làm quen`,`Thấy thoải mái rồi`,`Hãy chăm sóc tôi nhé`,`Hiểu nhau rồi`,`Người bạn đồng hành 😌`],
+    ric:[`Mới gặp gỡ`,`Dần quen thuộc`,`Vừa vặn`,`Ngày càng có dấu ấn`,`Gắn bó hơn`,`Người bạn đồng hành 😌`]
+  },
+  together:{
+    six:function(n,arch){ return arch ? `${n} ngày cùng ngắm bao cảnh đẹp` : `${n} ngày cùng ngắm một khung cảnh 👓`; },
+    ric:function(n,arch){ return arch ? `${n} ngày đã đồng hành cùng nhau` : `${n} ngày đồng hành`; }
+  },
+  archived:{
+    six:function(days){ return `🏆 <b>Kính vào Đại sảnh Danh vọng</b><br>${days}Cảm ơn bạn đã vất vả 👓🕶️<br>— Chỉnh kính và vệ sinh <span class="forever-in">luôn luôn</span> miễn phí ☺️`; },
+    ric:function(days){ return `🏆 <b>Kính vào Đại sảnh Danh vọng</b><br>${days}Hành trình cùng người bạn đồng hành 👓🕶️ này vẫn còn dài.<br>Chỉnh kính và vệ sinh <span class="forever-in">luôn luôn</span> miễn phí.`; }
+  },
+  warranty:{
+    title:`Bảo hành & sửa chữa`, lead:`Chúng tôi xử lý miễn phí trong các thời hạn dưới đây, tính từ ngày nhận kính.`,
+    vision:{ term:`Bảo hành thị lực / 90 ngày`, h:`Khi độ kính không phù hợp`,
+      p:`Chúng tôi bảo đảm thị lực của bạn trong 90 ngày kể từ ngày nhận kính.<br>Với khách hàng từ 15 tuổi trở xuống, do độ kính dễ thay đổi khi lớn lên, thời hạn được kéo dài đến 180 ngày.<br>Trong thời gian này, nếu có vấn đề về thị lực (độ quá nặng hoặc quá nhẹ, v.v.) hoặc không quen được, chúng tôi sẽ đổi tròng miễn phí.<br>Trong thời gian này, bạn cũng được đổi màu tròng một lần, chỉ cần trả phí màu 3.300 yên hoặc 4.400 yên. (Không áp dụng đổi màu cho tròng đổi màu và tròng phân cực.)<br><span class="forever">*Thay đổi thị lực do bệnh về mắt (đục thủy tinh thể, tăng nhãn áp, v.v.) hoặc phẫu thuật như LASIK không thuộc phạm vi bảo hành.</span><br><span class="forever">*Nếu kính được làm theo đơn của bác sĩ nhãn khoa, bạn cần có đơn mới từ bác sĩ.</span>` },
+    frameSix:{ term:`Bảo hành kính mắt & kính râm / 1 năm`, h:`Khi gọng hoặc tròng gặp vấn đề`,
+      p:`Chúng tôi bảo đảm chất lượng gọng và tròng trong 1 năm kể từ ngày nhận kính.<br>Nếu gọng hoặc tròng gặp vấn đề trong quá trình sử dụng bình thường, chúng tôi sẽ đổi hoặc sửa miễn phí, bạn cứ liên hệ nhé.<br>Lưu ý: hư hỏng do sơ suất của khách (làm rơi, để trong xe, đeo khi xông hơi hoặc tắm, v.v.) không thuộc phạm vi bảo hành.<br><span class="forever">*Dù do sơ suất, vẫn có bảo hành hư vỡ trong 1 năm (đổi với giá 50% giá thường), vui lòng hỏi nhân viên.</span>` },
+    frameRic:{ term:`Bảo hành kính / Theo từng thương hiệu`, h:`Khi gọng hoặc tròng gặp vấn đề`,
+      p:`Gọng kính theo chính sách bảo hành của từng thương hiệu.<br>Lỗi ban đầu sẽ được đổi nếu nhà sản xuất còn hàng.<br>Tròng kính được bảo đảm chất lượng trong 1 năm kể từ ngày nhận kính.<br>Trầy xước hoặc hư hỏng do lão hóa hay sơ suất (làm rơi, để trong xe, đeo khi xông hơi hoặc tắm, v.v.) sẽ được xử lý bằng đổi hoặc sửa có tính phí.` },
+    clean:{ term:`Vệ sinh, đo mắt & chỉnh kính / Không giới hạn`, h:`Khi kính lỏng, lệch hoặc bẩn`,
+      p:`Siết ốc, chỉnh độ vừa vặn, vệ sinh bằng sóng siêu âm và đo mắt <span class="forever">luôn luôn miễn phí, mãi mãi</span>.<br>Dù đã hết hạn bảo hành, chúng tôi vẫn phục vụ không giới hạn thời gian, bạn cứ thoải mái ghé cửa hàng.` },
+    visit:{ term:`Cách sử dụng`, h:`Khi đến cửa hàng`,
+      p:`Bạn chỉ cần cho nhân viên xem Trang của tôi này và nói điều bạn cần.<br><span class="forever">*Không cần mang phiếu bảo hành hay hóa đơn.</span>` },
+    tabSix:`Bảo hành Sixfour`, tabRic:`Bảo hành RICCO`, more:`Xem chi tiết trên website Sixfour`, close:`Đóng`
+  },
+  rx:{
+    title:`Độ kính của tôi`, titleFam:`Độ kính người thân`,
+    leadSix:function(chip){ return `Đây là độ kính của chiếc kính chúng tôi đã làm cho bạn vào ${chip} 👓`; },
+    leadRic:function(chip){ return `Đây là độ kính của chiếc kính đặt tại cửa hàng vào ${chip}.`; },
+    th:{ S:[`S`,`(Cầu)`], C:[`C`,`(Trụ)`], AX:[`AX`,`(Trục)`], ADD:[`ADD`,`(Cộng thêm)`], PD:[`PD`,`(Khoảng cách đồng tử)`] },
+    lensType:`Đa tròng`,
+    remarks:`Ghi chú: mắt phải lăng kính 1.0△ đáy hướng xuống`,
+    cautionSix:`Mục Độ kính của tôi chỉ hiển thị độ của chiếc kính gần nhất.<br>Để xem độ kính cũ hơn, hãy nhấn "💬 Trao đổi qua LINE", xem chữ số cuối <span class="sq">▢</span> trên thẻ của chiếc kính đó rồi gửi "カード<span class="sq">▢</span>の度数情報" (thông tin độ kính thẻ <span class="sq">▢</span>) 🙇‍♂️<br>Ví dụ: số "7" trong 01-23456-7️⃣`,
+    cautionRic:`Mục Độ kính của tôi chỉ hiển thị độ của chiếc kính gần nhất.<br>Để xem độ kính cũ hơn, hãy nhấn "💬 Trao đổi qua LINE", xem chữ số cuối <span class="sq">▢</span> trên thẻ của chiếc kính đó rồi gửi "カード<span class="sq">▢</span>の度数情報" (thông tin độ kính thẻ <span class="sq">▢</span>) 🙇‍♂️<br>Ví dụ: số "7" trong 01-23456-7️⃣`,
+    askTitleSix:`👓 Để chúng tôi tra độ kính cho bạn!`, askTitleRic:`👓 Tra cứu độ kính`,
+    askLeadSix:`Bạn dùng độ kính này để làm gì?`, askLeadRic:`Xin cho biết quý khách dùng để làm gì?`,
+    purposesSix:[`Dạo này tôi lo về thị lực của mình`,`Tôi muốn lưu lại độ kính`,`Tôi muốn làm kính ở cửa hàng khác hoặc trên mạng`],
+    purposesRic:[`Để kiểm tra thị lực`,`Để lưu hồ sơ cá nhân`,`Để mua ở nơi khác hoặc trực tuyến`],
+    tipSix:`*Nhân viên sẽ tìm hồ sơ của bạn thủ công, nên phản hồi có thể hơi lâu một chút ☺️<br><br>💡Nếu bạn mua kính áp tròng và cần biết độ<br>Độ kính áp tròng khác với kính gọng (khoảng cách giữa mắt và tròng khác nhau).<br>Đo lại tại phòng khám mắt hoặc nơi mua sẽ an toàn hơn 👀`,
+    tipRic:`*Nhân viên sẽ kiểm tra hồ sơ và liên hệ với quý khách sau.<br><br>💡Dành cho quý khách mua kính áp tròng<br>Độ kính áp tròng khác với kính gọng (khoảng cách giữa mắt và tròng khác nhau).<br>Chúng tôi khuyên quý khách đo tại phòng khám mắt hoặc nơi mua.`,
+    checkSix:`Đến lúc kiểm tra thị lực rồi 👀<br>Độ kính của trẻ em dễ thay đổi, hãy ghé cửa hàng nhé.`,
+    checkRic:`Khi con lớn lên, quý khách có muốn kiểm tra thị lực không? Rất hân hạnh được đón tiếp.`,
+    close:`Đóng`
+  },
+  nocard:{
+    six:{ pending:`🎉 Chào mừng đến với thế giới kính mắt!<br><br>Nhân viên đang chuẩn bị<br>thẻ thành viên cho bạn.<br>Bạn đợi một chút nhé 👓️🕶️`,
+          pendingSub:`Khi nhận kính xong, thẻ thành viên sẽ hiện ở đây, cùng số ngày bảo hành còn lại.`,
+          bought:`Cảm ơn bạn 😌<br><br>Khi bạn đến nhận kính,<br>nhân viên sẽ xác nhận tên và thông tin của bạn,<br>đếm số kính và kính râm bạn đã mua<br>rồi cấp thẻ thành viên 👓️🕶️`,
+          none:`👓️ Bạn chưa có thẻ thành viên<br><br>Khi làm kính mắt hoặc kính râm<br>tại Sixfour hoặc RICCO,<br>thẻ thành viên riêng của bạn sẽ được cấp.`,
+          noneSub:`Số ngày bảo hành còn lại hiện rõ trong tầm mắt ☺️` },
+    ric:{ pending:`Chào mừng đến với RICCO.<br><br>Một trang lặng lẽ đồng hành<br>cùng cuộc sống kính mắt của quý khách 👓️🕶️<br><br>Chúng tôi đang chuẩn bị thật cẩn thận 😌`,
+          pendingSub:`Khi nhận kính xong, thẻ thành viên sẽ hiện ở đây, cùng số ngày bảo hành còn lại.`,
+          bought:`Cảm ơn quý khách 😌<br><br>Khi quý khách đến nhận kính,<br>nhân viên sẽ xác nhận thông tin,<br>đếm số kính đã mua<br>rồi cấp thẻ thành viên 👓️🕶️`,
+          none:`👓️ Quý khách chưa có thẻ thành viên<br><br>Khi làm kính<br>tại Sixfour hoặc RICCO,<br>thẻ thành viên riêng sẽ được cấp.`,
+          noneSub:`Số ngày bảo hành còn lại, thấy ngay trong tầm mắt.` }
+  },
+  reg:{
+    lead1:`Cùng làm thẻ thành viên nhé 👓️`, lead2:`Sau khi đăng ký,<br>thẻ thành viên điện tử sẽ được cấp<br>khi bạn mua kính.`,
+    name:`Họ tên`, sei:`Họ`, mei:`Tên`, kana:`Cách đọc katakana`, seiK:`Họ (カナ)`, meiK:`Tên (カナ)`, birth:`Ngày sinh`,
+    req:`Bắt buộc`, opt:`Tùy chọn`, y:`Năm`, m:`Tháng`, d:`Ngày`,
+    why:`Khách hàng từ 15 tuổi trở xuống<br>được <b>kéo dài bảo hành thị lực từ 90 lên 180 ngày</b>.<br><br>Và còn một điều nữa —<br>là cửa hàng kính 👓️,<br>chúng tôi muốn biết đôi mắt của bạn đã vất vả bao nhiêu năm rồi 😌`,
+    q:`Bạn đã từng mua kính 👓️ hoặc kính râm 🕶️<br>tại Sixfour hoặc RICCO chưa?`,
+    qNote:`*Nếu hôm nay bạn mua kính, hãy chọn "Rồi"`, yes:`Rồi`, no:`Chưa`, btn:`Đăng ký`,
+    privacy:`Thông tin bạn cung cấp<br>chỉ dùng cho thẻ thành viên và bảo hành`, link:`Chính sách bảo mật`
+  },
+  fam:{
+    title:`Thêm thẻ của người thân 💳️`, btn:`Gửi yêu cầu`,
+    notesSix:[`Độ kính và lịch sử mua hàng của người thân được thêm sẽ hiển thị trong Trang của tôi này.<br>(Người chưa từng mua tại Sixfour hoặc RICCO không thể thêm.)`,
+              `Nhân viên sẽ xác nhận thông tin người thân tại cửa hàng trước khi thêm.<br>Xin lỗi vì làm phiền, bạn vui lòng ghé cửa hàng nhé.`,
+              `Nếu muốn xóa ai đó sau khi thêm, hãy báo cho chúng tôi tại cửa hàng hoặc qua LINE.`],
+    notesRic:[`Độ kính và lịch sử mua hàng của người thân được thêm sẽ hiển thị trong Trang của tôi này.<br>(Chúng tôi không thể thêm người chưa từng mua tại RICCO hoặc Sixfour.)`,
+              `Nhân viên sẽ xác nhận thông tin người thân tại cửa hàng trước khi thêm.<br>Chúng tôi xin lỗi vì sự bất tiện và kính mời quý khách ghé cửa hàng.`,
+              `Nếu muốn xóa ai đó sau khi thêm, xin vui lòng báo cho chúng tôi tại cửa hàng hoặc qua LINE.`],
+    bannerSix:`👪 Đang xác nhận yêu cầu thêm người thân`, bannerRic:`👪 Yêu cầu thêm người thân đang được xác nhận`,
+    fb3Six:`Khi đến cửa hàng, hãy báo cho nhân viên`, fb3Ric:`Khi đến cửa hàng, xin vui lòng báo cho nhân viên.`,
+    person:function(n){ return n; }
+  },
+  monthly:{
+    1:[`Chúc mừng năm mới!\nChúc một năm nữa nhìn thật rõ ràng 👓`,
+       `Chúc mừng năm mới!\nNăm nay chúng tôi cũng lặng lẽ cổ vũ cho những lựa chọn kính của bạn ☺️`,
+       `Chúng ta đã chúc nhau năm mới bao nhiêu lần rồi nhỉ?\nThật vui vì năm nào cũng được chào bạn như thế này ☺️`],
+    2:[`Thời điểm lạnh nhất trong năm.\nNếu kính bị mờ hơi nước, nghĩa là bạn đang ở nơi ấm áp ☺️`,
+       `Mùa này không khí khô. Lau bụi trên tròng kính khi còn khô có thể gây xước.\nCách đúng là rửa nhanh dưới vòi nước 👓`,
+       `Đây là mùa ngủ gật khi vẫn đeo kính.\nTỉnh dậy thấy kính bị méo 😭 → chúng tôi sẽ chỉnh lại hết lòng 🛠️`],
+    3:[`Phấn hoa đang bay khắp nơi.\nKính mắt cũng lặng lẽ giúp chống phấn hoa 👓`,
+       `Lại đến mùa phấn hoa. Như năm ngoái đã nói, kính mắt thật sự giúp được một chút.\n(Mong triệu chứng năm nay nhẹ hơn!) 😌`,
+       `Mùa phấn hoa năm nay lại khó chịu.\nChắc bạn nghe chán câu "kính mắt có ích" rồi nhỉ? Nhưng đó là sự thật 😌`],
+    4:[`Mùa hoa anh đào đã đến. Bạn đi ngắm hoa chưa?\nHoa anh đào nhìn thật rõ nét là một điều đặc biệt 🌸`,
+       `Lại đến mùa hoa anh đào. Cùng một khung cảnh nhưng có lẽ năm nay trông khác năm ngoái một chút —\nCó thể là vì bạn đã thay đổi 🌸`,
+       `Lại một mùa hoa anh đào nữa. Ngắm bao nhiêu lần, điều đẹp vẫn cứ đẹp.\nThêm một mùa xuân chúng ta cùng ngắm hoa 🌸`],
+    5:[`Tháng 5 là lúc tia UV mạnh nhất.\nTại cửa hàng, chúng tôi đo miễn phí và nhanh chóng khả năng chống UV của tròng kính hiện tại ☺️`,
+       `Mùa lá xanh non đẹp nhất. Nhìn màu xanh quả thật giúp mắt nghỉ ngơi.\nHãy rời màn hình một lát và nhìn cây xanh ở xa 🌿`,
+       `"UV mạnh nhất vào tháng 5" — năm nào chúng tôi cũng nói thế nhỉ? 😌\nNăm nay vẫn đo UV miễn phí, bạn ghé nhé! Khả năng chống UV của tròng kính giảm dần theo thời gian`],
+    6:[`Mùa mưa đã bắt đầu. Những ngày hạt mưa làm mờ kính,\nthế giới trông hơi nhòe một chút ☔`,
+       `Mùa mưa lại về ☔\nBây giờ bạn chắc đã là cao thủ lau kính ngày mưa rồi nhỉ?`,
+       `Lại mùa mưa. Hạt mưa trên tròng kính giờ chắc không còn làm bạn bận tâm nữa nhỉ?\nQuen dần thật là điều kỳ diệu ☔`],
+    7:[`Mùa hè đã vào cao điểm, mồ hôi làm kính trượt xuống.\nCửa hàng chỉnh miếng đệm mũi miễn phí 😌`,
+       `Mùa hè đến rồi. Trong phòng điều hòa mắt dễ bị khô.\nHãy chủ động chớp mắt — kính cũng giúp giảm khô mắt phần nào 👓`,
+       `Giữa mùa hè. Nếu kính cứ tuột xuống thì đã đến lúc chỉnh lại.\nLúc nào cũng miễn phí — đừng ngại nhé 😌`],
+    8:[`Những ngày nóng vẫn tiếp tục. Nhớ uống đủ nước.\nKính cũng đổ mồ hôi đấy — hãy rửa cho nó nhé 👓`,
+       `Nắng nóng như thiêu. Bạn và chiếc kính đều đã mệt.\nKính dính mồ hôi sẽ như mới sau khi vệ sinh bằng sóng siêu âm. Tất nhiên là miễn phí 👓`,
+       `Cái nóng gay gắt hằng năm lại đến. Bạn và chiếc kính đừng cố quá sức.\nRửa sạch, nghỉ ngơi, rồi mình cùng vượt qua mùa hè này 👓`],
+    9:[`Mùa thu đang lặng lẽ đến gần.\nĐêm dài hơn, thời gian đọc sách và dùng điện thoại cũng nhiều hơn. Hãy giữ gìn đôi mắt nhé 📖`,
+       `Những đêm thu dài. Mắt bạn có mỏi vì dùng điện thoại quá nhiều không?\nThỉnh thoảng hãy ngắm trăng 🌙 để mắt được nghỉ`,
+       `Những đêm thu dài. Chúng ta đã cùng nhau trải qua bao nhiêu mùa thu rồi nhỉ?\nĐừng đếm nữa — đếm thì hơi mất duyên ☺️`],
+    10:[`Không khí trong lành, nhìn được thật xa.\nĐộ kính của bạn còn phù hợp không? 👀`,
+        `Mùa thu ăn ngon — cũng là bữa tiệc cho đôi mắt.\nMàu lá thu chuyển sắc thật đẹp khi nhìn rõ nét 🍁`,
+        `Không khí trong lành, đến những ngọn núi xa cũng hiện rõ.\nChúng tôi rất vui khi năm nào cũng được cùng bạn ngắm khung cảnh này 👓`],
+    11:[`Mùa muốn uống đồ nóng.\n...còn kính bị mờ hơi nước ư? Mình chấp nhận thôi ☕`,
+        `Mùa kính mờ hơi nước lại đến ☕\nHình như năm ngoái chúng ta cũng đã nói "bỏ cuộc rồi"`,
+        `Mùa kính mờ hơi nước lại đến.\nBỏ cuộc đã thành truyền thống hằng năm. Hãy mỉm cười lau đi nhé ☕`],
+    12:[`Tháng 12 đến rồi — một năm nữa trôi qua thật nhanh.\nNhân dịp tổng vệ sinh cuối năm, bạn ghé cửa hàng vệ sinh kính miễn phí nhé? 👓`,
+        `Thoáng cái đã tháng 12. Một năm trôi nhanh thật.\nNhững ngày bận rộn, tầm nhìn rõ ràng càng quan trọng. Nếu kính bị bẩn, hãy ghé vệ sinh siêu âm miễn phí 👓`,
+        `Tháng 12 lại đến.\nĐây là mùa bận rộn, nhưng đừng cố quá sức. Thỉnh thoảng hãy cho đôi mắt và chiếc kính được nghỉ ngơi ☺️`],
+    '12b':[`Cảm ơn bạn đã đồng hành cùng chúng tôi trong năm nay.\nNăm sau, mong chúng ta cùng ngắm thật nhiều khung cảnh khiến ta mỉm cười 👓`,
+           `Năm nay cũng xin cảm ơn bạn rất nhiều.\nThêm một năm những khung cảnh chúng ta đã cùng ngắm 👓`,
+           `Cảm ơn bạn đã đồng hành thêm một năm nữa.\nDù bao nhiêu năm trôi qua, những khung cảnh cùng bạn ngắm nhìn vẫn là báu vật lớn nhất của chúng tôi 👓`]
+  }
+};
+
+/* ===== 本番だけで使う文言（デモ5に無かったもの）。ja は本番の文言そのまま ===== */
+var I18NX = {};
+I18NX.ja = {
+  loading:'会員証を読み込んでいます…',
+  designNames:['ブラック × ゴールド','シャンパンシルバー','デミ柄','ブラック × シルバー','シルバー × ネイビー','ピンクゴールド'],
+  dpTitleSix:'メガネ👓️🕶️を選ぶ', dpTitleRic:'アイウェア👓️🕶️を選ぶ',
+  dpLeadSix:'お好みのメガネをお選びください。あとから変更もできます。<br>時と共に、メガネも育ちますのでお楽しみに☺️',
+  dpLeadRic:'お好みのアイウェアをお選びください。あとから変更もできます。<br>時と共に、アイウェアも育ちますのでお楽しみに☺️',
+  close:'閉じる', save:'保存する', saving:'保存しています…', saved:'✓ 保存しました',
+  errSlow:'通信に時間がかかっています。もう一度お試しください',
+  errServer:'サーバーに接続できませんでした', errSave:'保存できませんでした',
+  memoTitleSix:'📝 このメガネのメモ', memoTitleRic:'📝 このアイウェアのメモ',
+  memoNote:'このメモは、あなたのスマホの中だけに保存されます。<br>お店からは全く見えませんので、ご自由にどうぞ☺️<br>※なのでスマホを機種変更すると消えます。ご了承ください🙏',
+  memoEx:'例）なくした💦と思って買った2本目<br>　　寝落ち用(意外と丈夫)',
+  memoPh:'メモを入力', memoDel:'メモを消す',
+  na:'対象外', lensOnly:'レンズ交換のため対象外',
+  u15Six:'15歳以下のお客様は、見え方保証を180日間に延長しています。',
+  u15Ric:'15歳以下のお客様は、見え方保証を180日間とさせていただいております。',
+  gradSix:'今お使いのメガネ・サングラスの保証は、すべて終了しています。<br>でも、調整・クリーニングは<span class="forever-in">いつまでも</span>無料です☺️<br>新しい一本も、いつでもお待ちしてます👓🕶️',
+  gradRic:'現在、保証期間中のアイウェアはございません。<br>お手入れは、<span class="forever-in">いつまでも</span>承ります。<br>次の一本との出会いも、心よりお待ちしております。',
+  errLoad:'申し訳ありません。会員証を読み込めませんでした。<br>通信環境の良い場所で、もう一度お試しください。',
+  errTimeout:'通信がタイムアウトしました', errData:'データ取得に失敗しました', errLogin:'ログイン情報を取得できませんでした',
+  kanaOpt:'任意',
+  regErrName:'お名前をご入力ください', regErrKana:'フリガナをご入力ください',
+  regErrBought:'ご購入の有無をお選びください', regErrBirth:'生年月日は、年・月・日をすべてお選びください',
+  regSending:'登録しています…',
+  regSlow:'通信に時間がかかっています。電波の良い場所でもう一度お試しください',
+  regFail:'登録できませんでした',
+  consultGuide:function(w){ return 'トーク画面で「'+w+'」と送信してください。すぐにご案内が届きます。'; },
+  rxAskPlain:'度数を確認する',
+  rxLeadNoDateSix:'お店でお作りしたメガネの度数です👓', rxLeadNoDateRic:'店頭で承ったお度数でございます。',
+  rxEmptySix:function(n){ return n+'さんの度数情報は、まだ登録がありません。'; },
+  rxEmptyRic:function(n){ return n+'さまの度数情報は、まだ登録がございません。'; },
+  rxAskThis:'👓 この方の度数を確認する',
+  rxAskWhoSix:function(n){ return '👓'+n+'さんの度数、お調べします!'; },
+  rxAskWhoRic:function(n){ return '👓'+n+'さまの度数のお問い合わせ'; },
+  rxSending:'お店に送っています…', rxDone:'承りました。お調べしてご連絡いたします🙇‍♂️',
+  rxTimeout:'通信がタイムアウトしました。もう一度お試しください。',
+  rxFail:'送信に失敗しました。もう一度お試しください。', rxNet:'通信に失敗しました。もう一度お試しください。',
+  lens:{ '遠近両用':'遠近両用', '遠用':'遠用', '近用':'近用', '中近両用':'中近両用', '近近両用':'近近両用', 'ヴィジョンサポート':'ヴィジョンサポート' },
+  prevHSix:'📩 以前のメガネの度数を問い合わせる', prevHRic:'📩 以前のアイウェアのお度数を問い合わせる',
+  prevLeadSix:'知りたいカードを押すと、お店のLINEにお問い合わせが届きます👓',
+  prevLeadRic:'お知りになりたいカードをお選びいただくと、店舗のLINEへお問い合わせが届きます。',
+  prevCard:function(n){ return 'カード'+n; },
+  prevSub:function(product, date){ return (product ? product+' ／ ' : '')+date+' お渡し'; },
+  prevFail:function(n){ return 'うまく送れませんでした。トーク画面で「カード'+n+'の度数情報」と送信してください。'; },
+  famSending:'申請しています…', famErrLogin:'ログイン情報を取得できませんでした。画面を開き直してください',
+  famFail:'申請できませんでした。もう一度お試しください',
+  langTitle:'🌐 言語 / Language', langSub:'Idioma・语言・Ngôn ngữ',
+  langNote:'選んだ言語は保存され、次回から自動で使われます。スタッフが変更することもできます。',
+  err:{}
+};
+I18NX.en = {
+  loading:'Loading your membership card…',
+  designNames:['Black × Gold','Champagne Silver','Tortoiseshell','Black × Silver','Silver × Navy','Pink Gold'],
+  dpTitleSix:'Choose your glasses 👓️🕶️', dpTitleRic:'Choose your eyewear 👓️🕶️',
+  dpLeadSix:'Pick the glasses you like. You can change it anytime.<br>Your glasses will age with you over time — enjoy ☺️',
+  dpLeadRic:'Please choose the eyewear you like. You may change it at any time.<br>Your eyewear will mature gracefully over time ☺️',
+  close:'Close', save:'Save', saving:'Saving…', saved:'✓ Saved',
+  errSlow:'The connection is taking a while. Please try again.',
+  errServer:'Could not connect to the server.', errSave:'Could not save.',
+  memoTitleSix:'📝 Memo for these glasses', memoTitleRic:'📝 Memo for this eyewear',
+  memoNote:'This memo is saved only on your phone.<br>Our store can never see it, so feel free to write anything ☺️<br>*It will be lost if you change phones. Thank you for understanding 🙏',
+  memoEx:'e.g.) 2nd pair, bought when I thought I lost one 💦<br>　　For napping (surprisingly tough)',
+  memoPh:'Write a memo', memoDel:'Delete memo',
+  na:'N/A', lensOnly:'Not covered (lens replacement)',
+  u15Six:'For customers aged 15 or under, the vision warranty is extended to 180 days.',
+  u15Ric:'For customers aged 15 or under, the vision warranty is 180 days.',
+  gradSix:'The warranties on all your glasses and sunglasses have ended.<br>But adjustments and cleaning are free <span class="forever-in">forever</span> ☺️<br>We\'re always here for your next pair 👓🕶️',
+  gradRic:'You currently have no eyewear under warranty.<br>We will care for your eyewear <span class="forever-in">forever</span>.<br>We look forward to helping you find your next pair.',
+  errLoad:'Sorry, we couldn\'t load your membership card.<br>Please try again where the connection is better.',
+  errTimeout:'The connection timed out.', errData:'Could not get your data.', errLogin:'Could not get your login information.',
+  kanaOpt:'Optional (romaji OK)',
+  regErrName:'Please enter your name.', regErrKana:'Please enter the katakana reading.',
+  regErrBought:'Please tell us whether you have purchased before.', regErrBirth:'Please select the year, month and day of your birth.',
+  regSending:'Registering…',
+  regSlow:'The connection is taking a while. Please try again where the signal is better.',
+  regFail:'Registration failed.',
+  consultGuide:function(w){ return 'Please send "'+w+'" in the chat. We will reply with guidance right away.'; },
+  rxAskPlain:'Check prescription',
+  rxLeadNoDateSix:'This is the prescription of glasses made at our store 👓', rxLeadNoDateRic:'This is the prescription we prepared for you at our store.',
+  rxEmptySix:function(n){ return 'No prescription has been registered for '+n+' yet.'; },
+  rxEmptyRic:function(n){ return 'No prescription has been registered for '+n+' yet.'; },
+  rxAskThis:'👓 Check this person\'s prescription',
+  rxAskWhoSix:function(n){ return '👓 We\'ll look up '+n+'\'s prescription!'; },
+  rxAskWhoRic:function(n){ return '👓 Prescription inquiry for '+n; },
+  rxSending:'Sending to the store…', rxDone:'Received. We will look it up and contact you 🙇‍♂️',
+  rxTimeout:'The connection timed out. Please try again.',
+  rxFail:'Sending failed. Please try again.', rxNet:'Connection failed. Please try again.',
+  lens:{ '遠近両用':'Progressive', '遠用':'Distance', '近用':'Reading', '中近両用':'Intermediate–near', '近近両用':'Desk (near–near)', 'ヴィジョンサポート':'Vision Support' },
+  prevHSix:'📩 Ask about an earlier prescription', prevHRic:'📩 Ask about an earlier prescription',
+  prevLeadSix:'Tap the card you want to know about. Your inquiry will be sent to our LINE chat 👓',
+  prevLeadRic:'Please select the card you would like to know about. Your inquiry will be sent to our LINE chat.',
+  prevCard:function(n){ return 'Card '+n; },
+  prevSub:function(product, date){ return (product ? product+' ／ ' : '')+'Picked up '+date; },
+  prevFail:function(n){ return 'Could not send. Please send "カード'+n+'の度数情報" in the chat.'; },
+  famSending:'Sending…', famErrLogin:'Could not get your login information. Please reopen this screen.',
+  famFail:'Could not send your request. Please try again.',
+  langTitle:'🌐 言語 / Language', langSub:'Idioma・语言・Ngôn ngữ',
+  langNote:'Your choice is saved and used next time. Our staff can also change it for you.',
+  err:{ auth:'We could not verify your identity. Please reopen this screen.',
+        notfound:'We could not find your registration. Please ask us at the store or on LINE.',
+        nobuy:'We could not find a purchase record. Please ask us at the store or on LINE.',
+        name:'Please enter your name.', kana:'Please enter the katakana reading.',
+        birth:'Please select the year, month and day of birth.',
+        dupReg:'You are already registered.', dupFam:'This family member has already been added to your page.',
+        busy:'We are busy right now. Please wait a moment and try again.' }
+};
+I18NX.pt = {
+  loading:'Carregando seu cartão de membro…',
+  designNames:['Preto × Dourado','Prata champanhe','Tartaruga','Preto × Prata','Prata × Azul-marinho','Ouro rosé'],
+  dpTitleSix:'Escolha seus óculos 👓️🕶️', dpTitleRic:'Escolha seus óculos 👓️🕶️',
+  dpLeadSix:'Escolha os óculos de que você gosta. Dá para trocar depois.<br>Com o tempo, seus óculos também envelhecem com você ☺️',
+  dpLeadRic:'Escolha os óculos de sua preferência. É possível alterar depois.<br>Com o tempo, seus óculos ganham ainda mais charme ☺️',
+  close:'Fechar', save:'Salvar', saving:'Salvando…', saved:'✓ Salvo',
+  errSlow:'A conexão está demorando. Tente novamente.',
+  errServer:'Não foi possível conectar ao servidor.', errSave:'Não foi possível salvar.',
+  memoTitleSix:'📝 Anotação destes óculos', memoTitleRic:'📝 Anotação destes óculos',
+  memoNote:'Esta anotação fica salva só no seu celular.<br>A loja não consegue ver nada, então escreva à vontade ☺️<br>*Por isso, ela será apagada se você trocar de celular. Obrigado pela compreensão 🙏',
+  memoEx:'Ex.) O 2º par, comprado quando achei que tinha perdido 💦<br>　　Para cochilar (surpreendentemente resistente)',
+  memoPh:'Escreva uma anotação', memoDel:'Apagar anotação',
+  na:'N/A', lensOnly:'Não coberto (troca de lentes)',
+  u15Six:'Para clientes com 15 anos ou menos, a garantia de visão é estendida para 180 dias.',
+  u15Ric:'Para clientes com 15 anos ou menos, a garantia de visão é de 180 dias.',
+  gradSix:'A garantia de todos os seus óculos e óculos de sol já terminou.<br>Mas ajustes e limpeza são grátis <span class="forever-in">para sempre</span> ☺️<br>Estamos sempre esperando pelo seu próximo par 👓🕶️',
+  gradRic:'No momento, você não tem óculos na garantia.<br>Cuidamos dos seus óculos <span class="forever-in">para sempre</span>.<br>Será um prazer ajudar você a encontrar o próximo par.',
+  errLoad:'Desculpe, não foi possível carregar seu cartão de membro.<br>Tente novamente em um local com conexão melhor.',
+  errTimeout:'A conexão expirou.', errData:'Não foi possível obter os dados.', errLogin:'Não foi possível obter os dados de login.',
+  kanaOpt:'Opcional (pode ser em letras romanas)',
+  regErrName:'Digite seu nome.', regErrKana:'Digite a leitura em katakana.',
+  regErrBought:'Informe se já comprou conosco.', regErrBirth:'Selecione o ano, o mês e o dia de nascimento.',
+  regSending:'Cadastrando…',
+  regSlow:'A conexão está demorando. Tente novamente em um local com sinal melhor.',
+  regFail:'Não foi possível cadastrar.',
+  consultGuide:function(w){ return 'Envie "'+w+'" na conversa. Você receberá as orientações em seguida.'; },
+  rxAskPlain:'Consultar grau',
+  rxLeadNoDateSix:'Este é o grau dos óculos feitos na nossa loja 👓', rxLeadNoDateRic:'Este é o grau que preparamos para você na loja.',
+  rxEmptySix:function(n){ return 'Ainda não há grau registrado para '+n+'.'; },
+  rxEmptyRic:function(n){ return 'Ainda não há grau registrado para '+n+'.'; },
+  rxAskThis:'👓 Consultar o grau desta pessoa',
+  rxAskWhoSix:function(n){ return '👓 Vamos procurar o grau de '+n+'!'; },
+  rxAskWhoRic:function(n){ return '👓 Consulta de grau de '+n; },
+  rxSending:'Enviando para a loja…', rxDone:'Recebido. Vamos verificar e entraremos em contato 🙇‍♂️',
+  rxTimeout:'A conexão expirou. Tente novamente.',
+  rxFail:'Falha no envio. Tente novamente.', rxNet:'Falha na conexão. Tente novamente.',
+  lens:{ '遠近両用':'Multifocal', '遠用':'Para longe', '近用':'Para perto (leitura)', '中近両用':'Intermediária–perto', '近近両用':'Escritório (perto–perto)', 'ヴィジョンサポート':'Vision Support' },
+  prevHSix:'📩 Perguntar sobre um grau anterior', prevHRic:'📩 Perguntar sobre um grau anterior',
+  prevLeadSix:'Toque no cartão que você quer saber. A pergunta será enviada para o LINE da loja 👓',
+  prevLeadRic:'Selecione o cartão que deseja consultar. A pergunta será enviada para o LINE da loja.',
+  prevCard:function(n){ return 'Cartão '+n; },
+  prevSub:function(product, date){ return (product ? product+' ／ ' : '')+'Retirado em '+date; },
+  prevFail:function(n){ return 'Não foi possível enviar. Envie "カード'+n+'の度数情報" na conversa.'; },
+  famSending:'Enviando…', famErrLogin:'Não foi possível obter os dados de login. Abra esta tela novamente.',
+  famFail:'Não foi possível enviar a solicitação. Tente novamente.',
+  langTitle:'🌐 言語 / Language', langSub:'Idioma・语言・Ngôn ngữ',
+  langNote:'O idioma escolhido fica salvo e será usado na próxima vez. A equipe também pode alterá-lo.',
+  err:{ auth:'Não foi possível confirmar sua identidade. Abra esta tela novamente.',
+        notfound:'Não encontramos seu cadastro. Pergunte na loja ou pelo LINE.',
+        nobuy:'Não encontramos registro de compra. Pergunte na loja ou pelo LINE.',
+        name:'Digite o nome.', kana:'Digite a leitura em katakana.',
+        birth:'Selecione o ano, o mês e o dia de nascimento.',
+        dupReg:'Você já está cadastrado.', dupFam:'Este familiar já foi adicionado à sua página.',
+        busy:'Estamos com muito acesso agora. Aguarde um pouco e tente novamente.' }
+};
+I18NX.zh = {
+  loading:'正在加载会员卡…',
+  designNames:['黑 × 金','香槟银','玳瑁纹','黑 × 银','银 × 藏青','玫瑰金'],
+  dpTitleSix:'选择眼镜 👓️🕶️', dpTitleRic:'选择眼镜 👓️🕶️',
+  dpLeadSix:'请选择您喜欢的眼镜，之后也可以更改。<br>眼镜会随着时间和您一起“成长”，敬请期待☺️',
+  dpLeadRic:'请选择您喜爱的眼镜，之后也可随时更改。<br>眼镜将随着时光愈发有味道☺️',
+  close:'关闭', save:'保存', saving:'正在保存…', saved:'✓ 已保存',
+  errSlow:'网络响应较慢，请重试。',
+  errServer:'无法连接到服务器。', errSave:'保存失败。',
+  memoTitleSix:'📝 这副眼镜的备忘', memoTitleRic:'📝 这副眼镜的备忘',
+  memoNote:'此备忘只保存在您的手机里。<br>店里完全看不到，请随意填写☺️<br>※因此更换手机后会消失，敬请谅解🙏',
+  memoEx:'例）以为弄丢了💦才买的第2副<br>　　午睡专用（意外地结实）',
+  memoPh:'输入备忘', memoDel:'删除备忘',
+  na:'不适用', lensOnly:'更换镜片，不在保修范围内',
+  u15Six:'15岁以下的顾客，视力保修延长至180天。',
+  u15Ric:'15岁以下的顾客，视力保修为180天。',
+  gradSix:'您目前使用的眼镜・太阳镜的保修均已结束。<br>不过，调整和清洗<span class="forever-in">永远</span>免费☺️<br>随时欢迎您来挑选新的一副👓🕶️',
+  gradRic:'目前没有处于保修期内的眼镜。<br>保养服务<span class="forever-in">永久</span>提供。<br>衷心期待与您一起遇见下一副。',
+  errLoad:'抱歉，无法加载会员卡。<br>请在网络良好的地方重试。',
+  errTimeout:'网络连接超时。', errData:'获取数据失败。', errLogin:'无法获取登录信息。',
+  kanaOpt:'选填（可用罗马字）',
+  regErrName:'请输入姓名。', regErrKana:'请输入片假名读音。',
+  regErrBought:'请选择是否购买过。', regErrBirth:'请选择出生的年、月、日。',
+  regSending:'正在注册…',
+  regSlow:'网络响应较慢，请在信号好的地方重试。',
+  regFail:'注册失败。',
+  consultGuide:function(w){ return '请在聊天界面发送「'+w+'」，我们会马上回复。'; },
+  rxAskPlain:'查询度数',
+  rxLeadNoDateSix:'这是在本店配制的眼镜度数👓', rxLeadNoDateRic:'这是在本店为您配制的度数。',
+  rxEmptySix:function(n){ return n+'的度数信息尚未登记。'; },
+  rxEmptyRic:function(n){ return n+'的度数信息尚未登记。'; },
+  rxAskThis:'👓 查询这位的度数',
+  rxAskWhoSix:function(n){ return '👓 帮您查询'+n+'的度数!'; },
+  rxAskWhoRic:function(n){ return '👓 '+n+'的度数咨询'; },
+  rxSending:'正在发送到店铺…', rxDone:'已收到。查询后会与您联系🙇‍♂️',
+  rxTimeout:'网络连接超时，请重试。',
+  rxFail:'发送失败，请重试。', rxNet:'网络连接失败，请重试。',
+  lens:{ '遠近両用':'渐进多焦点', '遠用':'看远用', '近用':'看近用（老花）', '中近両用':'中近距离', '近近両用':'办公近用', 'ヴィジョンサポート':'Vision Support' },
+  prevHSix:'📩 咨询以前的眼镜度数', prevHRic:'📩 咨询以前的眼镜度数',
+  prevLeadSix:'点击想了解的会员卡，咨询就会发送到店铺的LINE👓',
+  prevLeadRic:'请选择想了解的会员卡，咨询将发送到店铺的LINE。',
+  prevCard:function(n){ return '卡 '+n; },
+  prevSub:function(product, date){ return (product ? product+' ／ ' : '')+date+' 取件'; },
+  prevFail:function(n){ return '发送失败。请在聊天界面发送「カード'+n+'の度数情報」。'; },
+  famSending:'正在申请…', famErrLogin:'无法获取登录信息，请重新打开此页面。',
+  famFail:'申请失败，请重试。',
+  langTitle:'🌐 言語 / Language', langSub:'Idioma・语言・Ngôn ngữ',
+  langNote:'您选择的语言会被保存，下次自动使用。店员也可以为您更改。',
+  err:{ auth:'无法确认您的身份，请重新打开此页面。',
+        notfound:'未找到您的注册信息，请到店或通过LINE咨询。',
+        nobuy:'未找到购买记录，请到店或通过LINE咨询。',
+        name:'请输入姓名。', kana:'请输入片假名读音。',
+        birth:'请选择出生的年、月、日。',
+        dupReg:'您已经注册过了。', dupFam:'这位家人已经添加到您的页面了。',
+        busy:'当前访问较多，请稍后再试。' }
+};
+I18NX.vi = {
+  loading:'Đang tải thẻ thành viên…',
+  designNames:['Đen × Vàng','Bạc champagne','Vân đồi mồi','Đen × Bạc','Bạc × Xanh navy','Vàng hồng'],
+  dpTitleSix:'Chọn kính 👓️🕶️', dpTitleRic:'Chọn kính 👓️🕶️',
+  dpLeadSix:'Hãy chọn mẫu kính bạn thích. Có thể đổi lại sau.<br>Theo thời gian, kính cũng "lớn lên" cùng bạn đấy ☺️',
+  dpLeadRic:'Xin mời chọn mẫu kính quý khách yêu thích. Có thể thay đổi sau.<br>Theo thời gian, kính sẽ càng thêm nét riêng ☺️',
+  close:'Đóng', save:'Lưu', saving:'Đang lưu…', saved:'✓ Đã lưu',
+  errSlow:'Kết nối đang chậm. Vui lòng thử lại.',
+  errServer:'Không kết nối được với máy chủ.', errSave:'Không lưu được.',
+  memoTitleSix:'📝 Ghi chú cho kính này', memoTitleRic:'📝 Ghi chú cho kính này',
+  memoNote:'Ghi chú này chỉ được lưu trong điện thoại của bạn.<br>Cửa hàng hoàn toàn không xem được, cứ thoải mái ghi nhé ☺️<br>*Vì vậy, khi đổi điện thoại ghi chú sẽ mất. Mong bạn thông cảm 🙏',
+  memoEx:'VD) Chiếc thứ 2, mua vì tưởng làm mất 💦<br>　　Để ngủ gật (bền bất ngờ)',
+  memoPh:'Nhập ghi chú', memoDel:'Xóa ghi chú',
+  na:'Không áp dụng', lensOnly:'Không áp dụng (thay tròng)',
+  u15Six:'Khách hàng từ 15 tuổi trở xuống được kéo dài bảo hành thị lực lên 180 ngày.',
+  u15Ric:'Khách hàng từ 15 tuổi trở xuống được bảo hành thị lực 180 ngày.',
+  gradSix:'Bảo hành của tất cả kính và kính râm bạn đang dùng đã kết thúc.<br>Nhưng chỉnh kính và vệ sinh thì <span class="forever-in">mãi mãi</span> miễn phí ☺️<br>Luôn chờ bạn đến chọn chiếc kính mới 👓🕶️',
+  gradRic:'Hiện tại quý khách không có kính nào còn trong thời hạn bảo hành.<br>Dịch vụ chăm sóc kính luôn được phục vụ <span class="forever-in">mãi mãi</span>.<br>Rất mong được cùng quý khách tìm chiếc kính tiếp theo.',
+  errLoad:'Xin lỗi, không tải được thẻ thành viên.<br>Vui lòng thử lại ở nơi có kết nối tốt hơn.',
+  errTimeout:'Hết thời gian kết nối.', errData:'Không lấy được dữ liệu.', errLogin:'Không lấy được thông tin đăng nhập.',
+  kanaOpt:'Tùy chọn (có thể ghi chữ La-tinh)',
+  regErrName:'Vui lòng nhập họ tên.', regErrKana:'Vui lòng nhập cách đọc katakana.',
+  regErrBought:'Vui lòng chọn đã từng mua hay chưa.', regErrBirth:'Vui lòng chọn đủ năm, tháng, ngày sinh.',
+  regSending:'Đang đăng ký…',
+  regSlow:'Kết nối đang chậm. Vui lòng thử lại ở nơi có sóng tốt hơn.',
+  regFail:'Không đăng ký được.',
+  consultGuide:function(w){ return 'Vui lòng gửi "'+w+'" trong khung trò chuyện. Chúng tôi sẽ hướng dẫn ngay.'; },
+  rxAskPlain:'Xem độ kính',
+  rxLeadNoDateSix:'Đây là độ của kính làm tại cửa hàng 👓', rxLeadNoDateRic:'Đây là độ kính cửa hàng đã làm cho quý khách.',
+  rxEmptySix:function(n){ return 'Chưa có thông tin độ kính của '+n+'.'; },
+  rxEmptyRic:function(n){ return 'Chưa có thông tin độ kính của '+n+'.'; },
+  rxAskThis:'👓 Xem độ kính của người này',
+  rxAskWhoSix:function(n){ return '👓 Tra độ kính của '+n+' nhé!'; },
+  rxAskWhoRic:function(n){ return '👓 Hỏi độ kính của '+n; },
+  rxSending:'Đang gửi đến cửa hàng…', rxDone:'Đã nhận. Chúng tôi sẽ tra cứu và liên hệ lại 🙇‍♂️',
+  rxTimeout:'Hết thời gian kết nối. Vui lòng thử lại.',
+  rxFail:'Gửi không thành công. Vui lòng thử lại.', rxNet:'Kết nối thất bại. Vui lòng thử lại.',
+  lens:{ '遠近両用':'Đa tròng', '遠用':'Nhìn xa', '近用':'Nhìn gần (đọc sách)', '中近両用':'Trung–gần', '近近両用':'Văn phòng (gần–gần)', 'ヴィジョンサポート':'Vision Support' },
+  prevHSix:'📩 Hỏi độ của kính trước đây', prevHRic:'📩 Hỏi độ của kính trước đây',
+  prevLeadSix:'Chạm vào thẻ bạn muốn biết, câu hỏi sẽ được gửi đến LINE của cửa hàng 👓',
+  prevLeadRic:'Xin chọn thẻ quý khách muốn biết, câu hỏi sẽ được gửi đến LINE của cửa hàng.',
+  prevCard:function(n){ return 'Thẻ '+n; },
+  prevSub:function(product, date){ return (product ? product+' ／ ' : '')+'Nhận ngày '+date; },
+  prevFail:function(n){ return 'Không gửi được. Vui lòng gửi "カード'+n+'の度数情報" trong khung trò chuyện.'; },
+  famSending:'Đang gửi…', famErrLogin:'Không lấy được thông tin đăng nhập. Vui lòng mở lại màn hình này.',
+  famFail:'Không gửi được yêu cầu. Vui lòng thử lại.',
+  langTitle:'🌐 言語 / Language', langSub:'Idioma・语言・Ngôn ngữ',
+  langNote:'Ngôn ngữ bạn chọn sẽ được lưu và dùng cho lần sau. Nhân viên cũng có thể đổi giúp bạn.',
+  err:{ auth:'Không xác nhận được danh tính. Vui lòng mở lại màn hình này.',
+        notfound:'Không tìm thấy thông tin đăng ký. Vui lòng hỏi tại cửa hàng hoặc qua LINE.',
+        nobuy:'Không tìm thấy lịch sử mua hàng. Vui lòng hỏi tại cửa hàng hoặc qua LINE.',
+        name:'Vui lòng nhập họ tên.', kana:'Vui lòng nhập cách đọc katakana.',
+        birth:'Vui lòng chọn đủ năm, tháng, ngày sinh.',
+        dupReg:'Bạn đã đăng ký rồi.', dupFam:'Người thân này đã được thêm vào trang của bạn.',
+        busy:'Hiện đang đông truy cập. Vui lòng đợi một chút rồi thử lại.' }
+};
+
+/* ============================================================
+ *  ★2026/11/19 多言語（日本語・English・Português・简体中文・Tiếng Việt）
+ *  ・言語の決め方：①シートの「言語」列（お客様が🌐で選んだ／スタッフが変えた）
+ *                  ②このスマホで🌐で選んだ言語 ③LINEアプリの言語 ④スマホの言語
+ *                  ⑤対応していない言語は日本語
+ *  ・💬LINEで相談する の送信文・「カード▢の度数情報」・度数のお問い合わせの送信文は、
+ *    お店側の自動応答・スタッフが読むため、どの言語でも日本語のまま送る
+ * ============================================================ */
+var LANGS = ['ja','en','pt','zh','vi'];
+var LANG_SHORT = { ja:'JA', en:'EN', pt:'PT', zh:'中文', vi:'VI' };
+var LANG_KEY = 'sf_lang';
+var LANG = 'ja';
+var LANG_FROM_SERVER = false;   // シートの言語で決まったか
+
+function normLang(s){
+  var t = String(s || '').toLowerCase().replace('_','-');
+  if(!t) return '';
+  if(t.indexOf('ja') === 0) return 'ja';
+  if(t.indexOf('en') === 0) return 'en';
+  if(t.indexOf('pt') === 0) return 'pt';
+  if(t.indexOf('zh') === 0) return 'zh';
+  if(t.indexOf('vi') === 0) return 'vi';
+  if(t.indexOf('fil') === 0 || t.indexOf('tl') === 0) return 'en';   // フィリピンの方は英語
+  return '';
+}
+function langStored(){ try{ return normLang(window.localStorage.getItem(LANG_KEY)); }catch(e){ return ''; } }
+function langStore(l){ try{ window.localStorage.setItem(LANG_KEY, l); }catch(e){} }
+/* LINEアプリの言語が分かればそれだけで決める（対応外なら日本語）。分からないときだけスマホの言語 */
+function langDetect(){
+  var raw = '';
+  try{ if(window.liff && liff.getLanguage) raw = liff.getLanguage() || ''; }catch(e){ raw = ''; }
+  if(!raw){ try{ raw = navigator.language || (navigator.languages && navigator.languages[0]) || ''; }catch(e){} }
+  return normLang(raw) || 'ja';
+}
+LANG = langStored() || langDetect();
+
+function L(){ return I18N[LANG] || I18N.ja; }          // デモ5の辞書
+function X(){ return I18NX[LANG] || I18NX.ja; }        // 本番だけの文言
+function isJa(){ return LANG === 'ja'; }
+function numL(n){ if(isJa()) return comma(n); try{ return Number(n).toLocaleString(L().numLoc); }catch(e){ return String(n); } }
+
+/* 「2026.11.17」「2026-11-17」→ その言語の日付 */
+function ymdL(s){
+  var t = String(s == null ? '' : s);
+  if(isJa()) return t;
+  var m = /^(\d{4})[.\-\/](\d{1,2})[.\-\/](\d{1,2})$/.exec(t.trim());
+  return m ? L().fmtYMD(+m[1], +m[2], +m[3]) : t;
+}
+/* 「2026-11-18」→ Date（日本時間の日付として） */
+function isoDate(iso){
+  var m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(iso || '');
+  return m ? new Date(+m[1], +m[2]-1, +m[3]) : null;
+}
+function dayL(iso){ var d = isoDate(iso); return d ? L().fmtDay(d) : esc(iso || ''); }
+
+/* 商品名：「Sixfourオリジナル」だけは外国語で「Sixfour Original」に（ほかのブランド名はそのまま） */
+function productL(p){ var t = String(p == null ? '' : p); return isJa() ? t : t.replace(/オリジナル/g, ' Original').replace(/\s+/g, ' ').trim(); }
+
+/* カード2行目「MOSCOT ／ 2026.9.10 お渡し」→ 言語ごと */
+function subPartsL(sub){
+  var t = String(sub == null ? '' : sub);
+  var m = /^(?:(.*?)\s*／\s*)?(\d{4}\.\d{1,2}\.\d{1,2})\s*お渡し$/.exec(t);
+  if(!m) return null;
+  return { product: m[1] || '', date: m[2] };
+}
+
+/* ===== 🌐 言語ボタン ===== */
+function gbtnInner(){
+  return '<span class="gi" aria-hidden="true">🌐</span>'+LANG_SHORT[LANG]+'<span class="gc" aria-hidden="true">▾</span>';
+}
+function gbarHtml(){
+  return '<div class="gbar"><button type="button" class="gbtn" onclick="openLang()" aria-haspopup="dialog" aria-label="'+esc(L().label)+' / Language">'+gbtnInner()+'</button></div>';
+}
+var _langFocus = null;
+window.openLang = function(){
+  _langFocus = document.activeElement;
+  document.getElementById('lopts').innerHTML = LANGS.map(function(l){
+    var on = (l === LANG);
+    return '<button type="button" class="lopt'+(on?' on':'')+'" lang="'+I18N[l].htmlLang+'" aria-pressed="'+on+'" onclick="pickLang(\''+l+'\')"><span>'+I18N[l].label+'</span><span class="ck" aria-hidden="true">'+(on?'✓':'')+'</span></button>';
+  }).join('');
+  var n = document.getElementById('lnote'); n.textContent = X().langNote; n.setAttribute('lang', L().htmlLang);
+  document.getElementById('lback').classList.add('on');
+  document.getElementById('lsheet').classList.add('on');
+  document.body.style.overflow = 'hidden';
+  var cur = document.querySelector('.lopt.on'); if(cur) cur.focus();
+};
+window.closeLang = function(){
+  document.getElementById('lback').classList.remove('on');
+  document.getElementById('lsheet').classList.remove('on');
+  document.body.style.overflow = '';
+  if(_langFocus && _langFocus.focus){ try{ _langFocus.focus(); }catch(e){} }
+};
+window.pickLang = function(l){
+  closeLang();
+  if(l === LANG) return;
+  setLang(l, true);
+};
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && document.getElementById('lsheet').classList.contains('on')) closeLang(); });
+
+/* 言語を切り替えて、画面を描き直す。user=true のときは、このスマホとシートにも保存する */
+function setLang(l, user){
+  l = normLang(l) || 'ja';
+  LANG = l;
+  if(user){ langStore(l); saveLangToServer(l); }
+  applyLang();
+  if(PAGE_DATA && imgDone){
+    if(PAGE_DATA.registered === false) renderRegister(); else render();
+  }
+}
+
+/* 画面の決まった部分（シートやボタン）の文字を、今の言語にそろえる */
+var STATIC_JA = null;
+function applyLang(){
+  var U = L().ui, x = X(), W = L().warranty, R = L().reg, F = L().fam;
+  document.documentElement.lang = L().htmlLang;
+  document.body.setAttribute('data-lang', LANG);
+  var $ = function(id){ return document.getElementById(id); };
+  var gh = $('gbtnHead'); if(gh){ gh.innerHTML = gbtnInner(); gh.setAttribute('aria-label', L().label+' / Language'); }
+  var lt = $('loadingTxt'); if(lt) lt.textContent = x.loading;
+  $('actWarranty').textContent = U.btnWarranty;
+  $('actConsult').textContent  = U.btnConsult;
+  $('dpClose').textContent = x.close;
+  $('dpSave').textContent  = x.save;
+  $('mmClose').textContent = x.close;
+  $('mmEx').innerHTML = x.memoEx;
+  $('mmInput').setAttribute('placeholder', x.memoPh);
+  $('mmSave').textContent = x.save;
+  $('mmDel').textContent  = x.memoDel;
+  $('rxClose').textContent = x.close;
+  $('rxAskClose').textContent = x.close;
+  $('ltitle').textContent = x.langTitle;
+  $('lsub').textContent = x.langSub;
+  /* 保証・修理：日本語は元のHTMLのまま。ほかの言語は辞書から組み立てる（idは同じ） */
+  var wp = $('warrantyPanel');
+  if(STATIC_JA === null) STATIC_JA = wp.innerHTML;
+  if(isJa()){ wp.innerHTML = STATIC_JA; }
+  else{
+    wp.innerHTML =
+      '<h2>'+W.title+'</h2><div class="lead">'+W.lead+'</div>'+
+      '<div class="w-item"><span class="w-icon">👀</span><span class="term">'+W.vision.term+'</span><h3>'+W.vision.h+'</h3><p>'+W.vision.p+'</p></div>'+
+      '<div class="w-item"><div class="w-tabs" id="frameTabs" style="display:none;">'+
+        '<button type="button" class="w-tab" id="tabBtnSix" onclick="showFrameTab(\'sixfour\')">'+W.tabSix+'</button>'+
+        '<button type="button" class="w-tab" id="tabBtnRicco" onclick="showFrameTab(\'ricco\')">'+W.tabRic+'</button></div>'+
+        '<div class="w-tab-content">'+
+        '<div id="frameItemSix"><span class="w-icon">👓</span><span class="term">'+W.frameSix.term+'</span><h3>'+W.frameSix.h+'</h3><p>'+W.frameSix.p+'</p></div>'+
+        '<div id="frameItemRicco" style="display:none;"><span class="w-icon">🕶️</span><span class="term">'+W.frameRic.term+'</span><h3>'+W.frameRic.h+'</h3><p>'+W.frameRic.p+'</p></div>'+
+      '</div></div>'+
+      '<div class="w-item"><span class="w-icon">🧼</span><span class="term">'+W.clean.term+'</span><h3>'+W.clean.h+'</h3><p>'+W.clean.p+'</p></div>'+
+      '<div class="w-item"><span class="w-icon">📱</span><span class="term">'+W.visit.term+'</span><h3>'+W.visit.h+'</h3><p>'+W.visit.p+'</p></div>'+
+      '<a class="more" id="warrantyMore" href="https://www.6666mega.net/guarantee-repair/" target="_blank" rel="noopener">'+W.more+'</a>'+
+      '<button type="button" class="close" onclick="closeWarranty()">'+W.close+'</button>';
+  }
+  /* 家族の会員証の追加 */
+  $('famTitle').textContent = F.title;
+  $('fNameL').textContent = R.name; $('fNameReq').textContent = R.req;
+  $('fKanaL').textContent = R.kana;
+  var kr = $('fKanaReq');
+  if(isJa()){ kr.className = 'req'; kr.textContent = R.req; } else { kr.className = 'hint'; kr.textContent = x.kanaOpt; }
+  $('fBirthL').textContent = R.birth; $('fBirthReq').textContent = R.req;
+  $('fSei').setAttribute('placeholder', R.sei); $('fMei').setAttribute('placeholder', R.mei);
+  $('fSeiK').setAttribute('placeholder', R.seiK); $('fMeiK').setAttribute('placeholder', R.meiK);
+  $('fBtn').textContent = F.btn;
+  $('famClose').textContent = x.close;
+}
+
+/* シートの「言語」列に保存する（失敗しても画面には何も出さない） */
+function saveLangToServer(l){
+  try{
+    if(!window.liff || !liff.getIDToken) return;
+    var idToken = liff.getIDToken(); if(!idToken) return;
+    var cbName = 'langcb_' + Date.now();
+    var sc = document.createElement('script');
+    var done = function(){
+      try{ delete window[cbName]; }catch(e){ window[cbName] = undefined; }
+      if(sc.parentNode) sc.parentNode.removeChild(sc);
+    };
+    window[cbName] = function(json){ done(); if(json && json.ok && PAGE_DATA) PAGE_DATA.lang = json.lang; };
+    sc.id = cbName;
+    sc.src = API_URL + '?action=saveLang&idToken=' + encodeURIComponent(idToken) + '&lang=' + encodeURIComponent(l) + '&callback=' + cbName;
+    sc.onerror = done;
+    setTimeout(done, 20000);
+    document.body.appendChild(sc);
+  }catch(e){}
+}
+
+/* 会員証データが届いたときに、言語を決める */
+function langFromData(json){
+  var sv = normLang(json && json.lang);
+  if(sv){
+    LANG_FROM_SERVER = true;
+    langStore(sv);
+    if(sv !== LANG){ LANG = sv; applyLang(); }
+    return;
+  }
+  if(json && json.registered !== false){
+    var mine = langStored();
+    if(mine) saveLangToServer(mine);            // このスマホで選んだ言語を、シートにも
+    else if(LANG !== 'ja') saveLangToServer(LANG);  // 自動で外国語になった方は、通知もその言語にするため保存
+  }
+}
+
+/* サーバーのエラー文：日本語はそのまま、ほかの言語は code で訳す */
+function srvErr(json, fallback, ctx){
+  if(isJa()) return (json && json.error) ? json.error : I18NX.ja[fallback];
+  var c = json && json.code;
+  if(c === 'dup') c = (ctx === 'fam') ? 'dupFam' : 'dupReg';
+  return (c && X().err[c]) || X()[fallback];
+}
+
+/* ============================================================
+ *  ★2026/11/19 🎫お引換券（スタッフ画面で保存されたものだけ出る）
+ * ============================================================ */
+var CLOSED_RE = /^(\d{1,2})\/(\d{1,2})\([日月火水木金土]\)は定休日となりますので、お気をつけください😌$/;
+function voucherNoteL(t, baseIso){
+  if(isJa()) return esc(t);
+  var m = CLOSED_RE.exec(String(t || '').trim());
+  if(!m) return esc(t);                         // スタッフの自由入力は日本語のまま
+  var base = isoDate(baseIso) || new Date();
+  var y = base.getFullYear(), mo = +m[1], d = +m[2];
+  var dt = new Date(y, mo-1, d);
+  if(dt.getTime() < base.getTime() - 180*86400000) dt = new Date(y+1, mo-1, d);   // 年をまたぐとき
+  return esc(L().ui.noteClosed(L().fmtDay(dt)));
+}
+function slotHtmlL(date, slot, time){
+  var U = L().ui;
+  if(slot === 'am')   return dayL(date)+'<span class="sl">'+esc(U.slotAm)+'</span>';
+  if(slot === 'time') return dayL(date)+'<span class="sl">'+esc(time)+'</span>';
+  return dayL(date);
+}
+function slotTextL(f){
+  if(!f) return '';
+  var U = L().ui, s = dayL(f.date);
+  if(f.slot === 'am') s += ' '+U.slotAm;
+  else if(f.slot === 'time' && f.time) s += ' '+f.time;
+  return s;
+}
+function ticketHtml(v){
+  var U = L().ui, r = (v.brand === 'ricco'), lens = (v.kind === 'lens'), st = v.state || 'wait';
+  var C = L().tk[r?'ric':'six'][lens?'lens':'make'];
+  var ready = (st === 'ready'), delay = (st === 'delay');
+  var from = v.from ? slotTextL(v.from) : '';
+  var pill = delay ? '<span class="tk-pill delay">'+U.tkDelay+'</span>'
+           : ready ? '<span class="tk-pill ready">'+C.pillReady+'</span>'
+           :         '<span class="tk-pill wait">'+C.pillWait+'</span>';
+  var body = '';
+  if(delay) body += '<div class="tk-strike"><s>'+slotHtmlL(v.date, v.slot, v.time)+'</s></div>';
+  body += '<div class="tk-msg">'+(delay ? C.delayMsg : ready ? C.readyMsg : C.waitMsg)+'</div>';
+  if(!delay){
+    body += '<div class="tk-sched">'+
+      (from ? '<div class="tk-chg">'+C.chg+'</div>' : '')+
+      '<div class="tk-sl">'+C.schedLabel+'</div>'+
+      '<div class="tk-sd">'+slotHtmlL(v.date, v.slot, v.time)+'</div>'+
+      (from ? '<div class="tk-from">'+U.tkFrom+'　<s>'+from+'</s></div>' : '')+
+      (v.slot === 'date' && v.next ? '<div class="tk-sx">'+C.next(dayL(v.next))+'</div>' : '')+
+    '</div>';
+    if(from) body += '<div class="tk-msg2" style="margin-top:7px;">'+C.chgSorry+'</div>';
+  }else{
+    body += '<div class="tk-msg2">'+C.delaySorry+'</div>';
+  }
+  var notes = (lens ? [esc(U.noteFrame)] : []).concat((v.notes || []).map(function(t){ return voucherNoteL(t, v.date); }));
+  if(notes.length){
+    body += '<div class="tk-note"><div class="tk-note-h">'+U.tkNoteH+'</div>'+notes.map(function(t){ return '<p>'+t+'</p>'; }).join('')+'</div>';
+  }
+  if(!delay){
+    body += '<div class="tk-msg2">'+(ready ? C.readyMsg2 : (v.slot === 'date' ? C.comeDate : C.come))+'</div>';
+    if(!ready) body += '<div class="tk-fine">'+C.fine+'</div>';
+  }
+  var n = parseInt(v.count, 10);
+  var no = esc(v.memberNo || '') + ((!isNaN(n) && n > 0) ? '-' + n : '');
+  return '<div class="ticket '+(r?'ricco':'sixfour')+(ready?' ready':'')+'">'+
+    '<div class="tk-top">'+logoHtml(r)+'<div class="tk-label">'+U.tkLabel+'</div></div>'+
+    '<div class="tk-main"><div class="tk-name">'+nameHtml(v.name)+'</div><div class="tk-no">'+no+'</div></div>'+
+    (v.product ? '<div class="tk-sub"><span>'+esc(productL(v.product))+'</span></div>' : '')+
+    '<div class="tk-cut"></div>'+
+    '<div class="tk-state">'+pill+body+'</div></div>';
+}
+function vouchersHtml(){
+  var list = (PAGE_DATA && PAGE_DATA.vouchers) || [];
+  if(!list.length) return '';
+  return '<div class="sec-label">'+L().ui.secWaiting+'</div>' + list.map(ticketHtml).join('');
+}
+
+/* ============================================================
+ *  ★2026/11/19 以前のメガネの度数を、カードを選んで問い合わせる
+ *  押すと「カルテNO・お名前」と「カード▢の度数情報」（日本語）をお店のトークへ送る
+ * ============================================================ */
+function rxPrevCards(person){
+  var cards = (PAGE_DATA && PAGE_DATA.cards) || [];
+  var full = person ? String((person.sei || '') + ' ' + (person.mei || '')).trim() : '';
+  var list = cards.filter(function(c){
+    var n = parseInt(c.count, 10);
+    if(isNaN(n) || n <= 0) return false;
+    return !full || String(c.name || '').trim() === full;
+  });
+  return list.length >= 2 ? list : [];
+}
+function rxPrevHtml(person){
+  var list = rxPrevCards(person);
+  if(!list.length) return '';
+  var x = X(), r = rxIsRicco();
+  return '<div class="rx-prev"><div class="rx-prev-h">'+(r ? x.prevHRic : x.prevHSix)+'</div>'+
+    '<div class="rx-prev-lead">'+(r ? x.prevLeadRic : x.prevLeadSix)+'</div>'+
+    list.map(function(c){
+      var p = subPartsL(c.sub), n = parseInt(c.count, 10);
+      var sub = p ? x.prevSub(productL(p.product), ymdL(p.date)) : String(c.sub || '');
+      return '<button type="button" class="rx-prev-btn" onclick="sendRxPrev(\''+esc(c.rowId)+'\')">'+
+        '<span class="pc">'+esc(x.prevCard(n))+'</span><span class="ps">'+esc(sub)+'</span><span class="pa" aria-hidden="true">›</span></button>';
+    }).join('')+'</div>';
+}
+window.sendRxPrev = function(rowId){
+  var cards = (PAGE_DATA && PAGE_DATA.cards) || [];
+  var c = null; for(var i=0;i<cards.length;i++){ if(cards[i].rowId === rowId){ c = cards[i]; break; } }
+  if(!c) return;
+  var n = parseInt(c.count, 10);
+  var nm = String(c.name || '').replace(/[ 　]*様[ 　]*$/, '').trim();
+  var info = [String(c.memberNo || '').trim(), nm ? nm + '様' : ''].filter(function(s){ return s; }).join('\n');
+  var msgs = [];
+  if(info) msgs.push({ type:'text', text: info });
+  msgs.push({ type:'text', text: 'カード' + n + 'の度数情報' });
+  try{
+    liff.sendMessages(msgs)
+      .then(function(){ liff.closeWindow(); })
+      .catch(function(){ alert(X().prevFail(n)); });
+  }catch(e){
+    alert(X().prevFail(n));
+  }
+};
 
 /* ============================================================
  *  ここから下は、何も書き換えなくてOK
@@ -883,9 +2657,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   /* ★2026/9/22：エイジングの言葉をブランド別に。
    *   Sixfour＝メガネの気持ち版／RICCO＝情緒・やさしい言葉。最終段だけ両ブランド共通。 */
   function agingLabel(months, isRicco){
-    var SIX = ["まだ緊張中","少し慣れてきた","くつろぎ中","大切にしてね","あ・うんの呼吸","相棒😌"];
-    var RIC = ["出会ったばかり","なじみ始め","しっくり","風合いが出てきた","愛着が深まる","相棒😌"];
-    var L = isRicco ? RIC : SIX;
+    var L = I18N[LANG].aging[isRicco ? 'ric' : 'six'];   // ★2026/11/19 言語ごと
     if(months<6) return L[0];
     if(months<12) return L[1];
     if(months<24) return L[2];
@@ -917,13 +2689,13 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
 
   function ring(active,ratio,days,isRicco){
     var track=isRicco?"rgba(120,102,60,.20)":"rgba(0,0,0,.1)";
-    if(!active) return '<div class="ring">'+ringSVG(0,track,null)+'<div class="rtxt"><span class="rsm">終了</span></div></div>';
+    if(!active) return '<div class="ring">'+ringSVG(0,track,null)+'<div class="rtxt"><span class="rsm">'+L().ui.ringEnd+'</span></div></div>';
     // 保証の種類（90日/180日/365日）に関係なく「残り日数」で判定する。
     // 割合だけで色を決めると、メガネ保証だけ先に赤くなって基準がバラつくため。
     var n = parseInt(days,10);
     var warn = (!isNaN(n) && n <= WARN_DAYS);
     var col = warn ? WARN_COLOR : arcColor(ratio);
-    return '<div class="ring'+(warn?' warn':'')+'">'+ringSVG(ratio,track,col)+'<div class="rtxt"><span class="r1">残り</span><span class="r2">'+days+'</span><span class="r3">日</span></div></div>'; }
+    return '<div class="ring'+(warn?' warn':'')+'">'+ringSVG(ratio,track,col)+'<div class="rtxt"><span class="r1">'+L().ui.ringLeft+'</span><span class="r2">'+days+'</span><span class="r3">'+L().ui.ringDays+'</span></div></div>'; }
   function ringNA(label,isRicco){
     var track=isRicco?"rgba(120,102,60,.20)":"rgba(0,0,0,.1)";
     return '<div class="ring">'+ringSVG(0,track,null)+'<div class="rtxt"><span class="rsm">'+label+'</span></div></div>';
@@ -981,11 +2753,11 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var d = new Date();
     var m = d.getMonth() + 1;
     var key = (m === 12 && d.getDate() >= 25) ? "12b" : m;      // 12/25以降は年末の御礼
-    var set = MONTHLY[key];
+    var set = isJa() ? MONTHLY[key] : L().monthly[key];   // ★2026/11/19 言語ごと
     if(!set) return "";
     var y = parseInt(years, 10); if(isNaN(y) || y < 0) y = 0;
     var txt = set[y % 3];                                        // 3年サイクル
-    return '<div class="monthly"><div class="mo-mark">'+m+'月のひとこと</div>'+
+    return '<div class="monthly"><div class="mo-mark">'+L().ui.moMark(m)+'</div>'+
            esc(txt).replace(/\n/g, "<br>")+'</div>';
   }
 
@@ -996,12 +2768,9 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
 
   /* ===== 共に過ごした日数（コピー集シーン9・現役は現在進行形／殿堂入りは完了形） ===== */
   function togetherText(card){
+    /* ★2026/11/19 言語ごと（日本語は「n日間、…」でこれまでと同じ） */
     var isRicco = (card.brand === "RICCO");
-    var n = comma(card.togetherDays) + "日間、";
-    if(card.archived){
-      return n + (isRicco ? "共に時を過ごしてまいりました" : "たくさんの景色を一緒に見てきました");
-    }
-    return n + (isRicco ? "共に時を過ごしております" : "いつも一緒に同じ景色を見ています👓");
+    return L().together[isRicco ? 'ric' : 'six'](numL(card.togetherDays), !!card.archived);
   }
 
   /* ===== 文字を安全に表示する ===== */
@@ -1016,6 +2785,15 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
      ／ の前後をそれぞれ「途中で切らないひと塊」にして、／ の位置でだけ折り返すようにした。 */
   function subHtml(sub){
     var t = String(sub == null ? "" : sub);
+    /* ★2026/11/19 日本語以外：「商品名」「お渡し日」をその言語で2行に */
+    if(!isJa()){
+      var sp = subPartsL(t);
+      if(sp){
+        var parts2 = L().ui.sub(productL(sp.product), ymdL(sp.date)).split('／').map(function(p){ return p.replace(/^\s+|\s+$/g, ''); });
+        if(!sp.product) parts2 = parts2.filter(function(p){ return p; });
+        return parts2.map(function(p){ return '<span class="sub-line">'+esc(p)+'</span>'; }).join('');
+      }
+    }
     if(t.indexOf("／") < 0) return '<span style="white-space:nowrap">'+esc(t)+'</span>';
     var parts = t.split("／"), out = [], i;
     for(i = 0; i < parts.length; i++){
@@ -1028,7 +2806,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   function logoHtml(isRicco){
     var src = isRicco ? IMG.ricco : IMG.six;
     if(src) return '<img class="brand-logo" src="'+src+'" alt="">';
-    return '<div class="logo-text">'+(isRicco?"RICCO":"SIXFOUR")+'</div>';
+    return '<div class="logo-text">'+(isRicco?"RICCO":"Sixfour")+'</div>';   // ★2026/11/19 SIXFOUR→Sixfour
   }
 
   /* ★メッセージカードの店名（ロゴが読めなければ文字で代用） */
@@ -1108,11 +2886,8 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     MEMO_ROW = rowId;
     var ricco = (SHOP === 'ricco');
     document.getElementById('mmTitle').textContent =
-      ricco ? '📝 このアイウェアのメモ' : '📝 このメガネのメモ';
-    document.getElementById('mmNote').innerHTML =
-      'このメモは、あなたのスマホの中だけに保存されます。<br>'+
-      'お店からは全く見えませんので、ご自由にどうぞ☺️<br>'+
-      '※なのでスマホを機種変更すると消えます。ご了承ください🙏';
+      ricco ? X().memoTitleRic : X().memoTitleSix;
+    document.getElementById('mmNote').innerHTML = X().memoNote;
     var cur = memoGet(rowId);
     var inp = document.getElementById('mmInput');
     inp.value = cur;
@@ -1140,13 +2915,13 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     if(btn){
       btn.disabled = true;
       btn.classList.add('saved');
-      btn.textContent = '✓ 保存しました';
+      btn.textContent = X().saved;
     }
     setTimeout(function(){
       if(btn){
         btn.disabled = false;
         btn.classList.remove('saved');
-        btn.textContent = '保存する';        /* 次に開いたとき元に戻っているように */
+        btn.textContent = X().save;        /* 次に開いたとき元に戻っているように */
       }
       closeMemo();
       render();        /* カード下のメモ表示をその場で更新する */
@@ -1169,10 +2944,10 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var btns = '';
     if(pickRowId){
       btns += '<button type="button" class="pick-btn" onclick="openPicker(\''+pickRowId+'\','+no+')">'+
-              (SHOP==='ricco' ? '👓️🕶️ アイウェアを選ぶ' : '👓️🕶️ メガネを選ぶ')+'</button>';
+              (SHOP==='ricco' ? L().ui.pickRic : L().ui.pickSix)+'</button>';
     }
     if(memoRowId){
-      btns += '<button type="button" class="pick-btn" onclick="openMemo(\''+memoRowId+'\')">📝 メモ</button>';
+      btns += '<button type="button" class="pick-btn" onclick="openMemo(\''+memoRowId+'\')">'+L().ui.memoBtn+'</button>';
     }
     var row = btns ? '<div class="pick-row">'+btns+'</div>' : '';
     return '<div class="specs"><img class="gimg" src="'+gsrc+'" alt="" style="width:'+GLASS_W+'px">'+
@@ -1204,11 +2979,11 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var u15=card.isU15?' <span class="u15">U15</span>':'';
     var frameCell;
     if(card.lensOnly){
-      frameCell='<div class="w-cell">'+ringNA("対象外",isRicco)+
-        '<div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date" style="font-size:13.8px;opacity:.6">レンズ交換のため対象外</div></div></div>';
+      frameCell='<div class="w-cell">'+ringNA(X().na,isRicco)+
+        '<div class="w-texts"><div class="w-label">'+L().ui.wFrame+'</div><div class="w-date" style="font-size:13.8px;opacity:.6">'+X().lensOnly+'</div></div></div>';
     } else {
       frameCell='<div class="w-cell">'+ring(card.frameActive,card.frameRatio,card.frameDays,isRicco)+
-        '<div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date">'+esc(card.frameEnd)+'</div></div></div>';
+        '<div class="w-texts"><div class="w-label">'+L().ui.wFrame+'</div><div class="w-date">'+esc(ymdL(card.frameEnd))+'</div></div></div>';
     }
     var html='<div class="card '+cls+'">'+
       '<div class="card-headgrid">'+
@@ -1220,13 +2995,13 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       '</div>'+
       '<div class="w-grid">'+ frameCell +
         '<div class="w-cell">'+ring(card.visionActive,card.visionRatio,card.visionDays,isRicco)+
-          '<div class="w-texts"><div class="w-label">見え方保証'+u15+'</div><div class="w-date">'+esc(card.visionEnd)+'</div></div></div>'+
+          '<div class="w-texts"><div class="w-label">'+L().ui.wVision+u15+'</div><div class="w-date">'+esc(ymdL(card.visionEnd))+'</div></div></div>'+
       '</div>';
     if(card.togetherDays>0){
       html+='<div class="together">'+esc(togetherText(card))+'</div>';
     }
     if(card.isU15){
-      var u15txt = isRicco ? '15歳以下のお客様は、見え方保証を180日間とさせていただいております。' : '15歳以下のお客様は、見え方保証を180日間に延長しています。';
+      var u15txt = isRicco ? X().u15Ric : X().u15Six;
       html+='<div class="u15-note">'+u15txt+'</div>';
     }
     html+=memoPreviewHtml(card.rowId);   // ★メガネ手帳のメモ（書いてあるときだけ出る）
@@ -1239,12 +3014,8 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   function archivedCard(card){
     var isRicco=(card.brand==="RICCO");
     var days = (card.togetherDays>0) ? esc(togetherText(card))+'<br>' : '';
-    var msg = isRicco
-      ? '🏆 <b>殿堂入りアイウェア</b><br>'+days+
-        'この相棒👓🕶️との時間は、まだまだ続きます。<br>調整・クリーニングは、<span class="forever-in">いつまでも</span>無料で承ります。'
-      : '🏆 <b>殿堂入りメガネ</b><br>'+days+
-        'お疲れさま。そして、ありがとう👓🕶️<br>——調整・クリーニングは、<span class="forever-in">いつまでも</span>無料です☺️';
-    return '<div class="card '+(isRicco?"ricco":"sixfour")+' archived"><div class="archived-stamp">ARCHIVE</div>'+
+    var msg = L().archived[isRicco ? 'ric' : 'six'](days);   // ★2026/11/19 言語ごと
+    return '<div class="card '+(isRicco?"ricco":"sixfour")+' archived"><div class="archived-stamp">'+L().ui.archStamp+'</div>'+
       '<div class="card-headgrid">'+
         logoHtml(isRicco) +
         '<div class="mid-left"><div class="card-name">'+nameHtml(card.name)+'</div><div class="card-sub">'+subHtml(card.sub)+'</div></div>' +
@@ -1256,8 +3027,8 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
           specsHtml(card.months, true, card.design, card.rowId, card.rowId, isRicco) +
         '</div>' +
       '</div>'+
-      '<div class="w-grid"><div class="w-cell"><div class="w-texts"><div class="w-label">メガネ・サングラス保証</div><div class="w-date">'+esc(card.frameEnd)+'</div></div></div>'+
-        '<div class="w-cell"><div class="w-texts"><div class="w-label">見え方保証</div><div class="w-date">'+esc(card.visionEnd)+'</div></div></div></div>'+
+      '<div class="w-grid"><div class="w-cell"><div class="w-texts"><div class="w-label">'+L().ui.wFrame+'</div><div class="w-date">'+esc(ymdL(card.frameEnd))+'</div></div></div>'+
+        '<div class="w-cell"><div class="w-texts"><div class="w-label">'+L().ui.wVision+'</div><div class="w-date">'+esc(ymdL(card.visionEnd))+'</div></div></div></div>'+
       '<div class="archived-msg">'+msg+'</div>'+
       memoPreviewHtml(card.rowId)+'</div>';   // ★メガネ手帳のメモ
   }
@@ -1296,6 +3067,16 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     fitName(document.getElementById('whoName'), 28, 20);
     var names = document.querySelectorAll('.card-name');
     for(var n=0; n<names.length; n++) fitName(names[n], 24, 18);
+    /* ★2026/11/19 引換券の名前も同じように縮める */
+    var tks = document.querySelectorAll('.tk-name');
+    for(var t2=0; t2<tks.length; t2++) fitName(tks[t2], 24, 18);
+    /* ★2026/11/19 カルテNOが右上の🌐ボタンと重なるときだけ、カルテNOを小さくする（下限15px） */
+    var no = document.getElementById('whoNo'), gb = document.getElementById('gbtnHead');
+    if(no && gb && no.clientWidth){
+      no.style.fontSize = '';
+      var ns = 22;
+      while(ns > 15 && no.getBoundingClientRect().right > gb.getBoundingClientRect().left - 4){ ns -= 1; no.style.fontSize = ns + 'px'; }
+    }
     /* ★2026/9/22：度数カプセルの1行表示（「👓 度数をお調べしています…」等）も同じ考え方で縮める */
     var caps = document.querySelectorAll('.cap .fit1');
     for(var j=0; j<caps.length; j++){
@@ -1626,7 +3407,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     document.getElementById("head").style.display="block";
     /* ★2026/9/22：上の名前も語ごとのかたまりに（外国のお客様の長い名前もスペースの位置で改行） */
     var headName = String(d.name || '').replace(/[ \u3000]*様[ \u3000]*$/, '');
-    document.getElementById("whoName").innerHTML = headName ? nameHtml(headName, '様') : '';
+    document.getElementById("whoName").innerHTML = headName ? (isJa() ? nameHtml(headName, '様') : nameHtml(L().ui.who(headName))) : '';
     document.getElementById("whoNo").textContent=d.no||"";
     /* ★2026/9/22 ⑥：ランクとMy度数情報を横並びの2つのカプセルで出す */
     var capRank = '';
@@ -1634,7 +3415,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       var rk=rankStyle(d.rank);
       capRank = '<div class="cap cap-rank" style="background:'+rk.grad+'; color:'+rk.text+'">'+
         '<div class="c1">'+badgeGlasses(rk.icon)+'<span class="rk">'+rk.name+'</span></div>'+
-        (d.total ? '<div class="c2">通算<b>'+d.total+'</b>本</div>' : '')+'</div>';
+        (d.total ? '<div class="c2">'+L().ui.total(d.total)+'</div>' : '')+'</div>';
     }
     document.getElementById("tenureWrap").innerHTML =
       '<div class="top-pair">'+capRank+rxCapHtml(d)+'</div>';
@@ -1645,25 +3426,24 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     /* ★2026/9/22：My度数情報はランクの横（tenureWrap）へ移動したので、ここでは出さない */
     var html = '<div id="actionsSlot"></div>'; // ★2026/9/22 ボタンはランク/度数の直後（ひとことの前）
     html += monthlyHtml(d.memberYears);      // ★月替わりのひとこと（ボタンの下）
+    html += vouchersHtml();                  // ★2026/11/19 🎫お引換券（ひとことの下・会員証の上）
 
     if(active.length){
-      html+='<div class="sec-label">ご利用中のメガネ</div>';
+      html+='<div class="sec-label">'+L().ui.secUsing+'</div>';
       active.forEach(function(c){ html+=activeCard(c); });
     } else {
       // 現役ゼロ＝卒業生。最新の1枚は必ず表示する
-      html+='<div class="sec-label">ご利用中のメガネ</div>';
+      html+='<div class="sec-label">'+L().ui.secUsing+'</div>';
       html+=archivedCard(archived[0]);
       var isRicco = (archived[0].brand === "RICCO");   // ★直近カードのブランドで文体を分ける
       archived=archived.slice(1);
       html += isRicco
-        ? '<div class="msg-card ricco">'+msgBrandHtml(true)+
-          '現在、保証期間中のアイウェアはございません。<br>お手入れは、<span class="forever-in">いつまでも</span>承ります。<br>次の一本との出会いも、心よりお待ちしております。</div>'
-        : '<div class="msg-card sixfour">'+msgBrandHtml(false)+
-          '今お使いのメガネ・サングラスの保証は、すべて終了しています。<br>でも、調整・クリーニングは<span class="forever-in">いつまでも</span>無料です☺️<br>新しい一本も、いつでもお待ちしてます👓🕶️</div>';
+        ? '<div class="msg-card ricco">'+msgBrandHtml(true)+X().gradRic+'</div>'
+        : '<div class="msg-card sixfour">'+msgBrandHtml(false)+X().gradSix+'</div>';
     }
     html += famBoxHtml();                    // ★2026/11/15 家族の会員証の追加（申請中なら「確認中」）
     if(archived.length){
-      html+='<button class="archive-toggle" onclick="toggleArchive(this)"><span class="chev">▶</span> 保証が終了したメガネ（'+archived.length+'本）</button><div class="archive-wrap">';
+      html+='<button class="archive-toggle" onclick="toggleArchive(this)"><span class="chev">▶</span> '+L().ui.archToggle(archived.length)+'</button><div class="archive-wrap">';
       archived.forEach(function(c){ html+=archivedCard(c); });
       html+='</div>';
     }
@@ -1686,27 +3466,24 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var pending = !!(PAGE_DATA && PAGE_DATA.pending);
     var bought  = (PAGE_DATA && PAGE_DATA.bought) === 'あり';
     var ricco   = (SHOP === 'ricco');
+    var N = L().nocard[ricco ? 'ric' : 'six'];   // ★2026/11/19 言語ごと
     var body;
 
     if(pending){
-      body = ricco
-        ? 'ようこそ、RICCOへ！<br><br>あなたのアイウェアライフに、<br>そっと寄り添うページを👓️🕶️<br><br>只今、心を込めて準備中です😌'
-        : '🎉ようこそ、メガネの沼へ！<br><br>ただいま、スタッフが会員証を<br>せっせと準備中です<br>完成まで気長にお待ちください👓️🕶️';
-      body += '<div class="msg-sub">お渡しの手続きが済むと、ここに会員証が表示されます。保証の残り日数も、ひと目でわかるようになります。</div>';
+      body = N.pending + '<div class="msg-sub">'+N.pendingSub+'</div>';
     } else if(bought){
-      body = ricco
-        ? 'ありがとうございます😌<br><br>ご来店・お渡しの際に、<br>スタッフがお名前などを確認の上、<br>ご購入いただいた<br>アイウェアを数えて<br>会員証を発行いたします👓️🕶️'
-        : 'ありがとうございます😌<br><br>ご来店・お渡しの際に、<br>スタッフがお名前などを確認して、<br>ご購入いただいた<br>メガネ・サングラスを数えて<br>会員証を発行いたします👓️🕶️';
+      body = N.bought;
     } else {
-      body = ricco
-        ? '👓️まだ会員証がございません<br><br>SixfourとRICCOで<br>アイウェアを<br>お作りいただきますと、<br>あなただけの会員証が発行されます。<div class="msg-sub">保証の残り日数も、ひと目で。</div>'
-        : '👓️まだ会員証がありません<br><br>SixfourとRICCOで<br>メガネ・サングラスを<br>お作りいただくと、<br>あなただけの会員証が発行されます。<div class="msg-sub">保証の残り日数も、ひと目でわかります☺️</div>';
+      body = N.none + '<div class="msg-sub">'+N.noneSub+'</div>';
     }
 
     parkActions();
+    /* ★2026/11/19 🌐（右上）と、🎫お引換券（初めてのお客様は、会員証より先に引換券が出る） */
     document.getElementById("app").innerHTML=
+      gbarHtml() + vouchersHtml() +
       '<div class="msg-card '+(ricco?'ricco':'sixfour')+'">'+msgBrandHtml(ricco)+body+'</div>';
     showActions();
+    fitCardNos();
   }
 
   /* ============================================================
@@ -1719,43 +3496,51 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   function renderRegister(){
     document.getElementById("head").style.display="none";
     var ricco = (SHOP === 'ricco');
+    var R = L().reg, x = X();
+    /* ★2026/11/19 言語を切り替えたときに、入力済みの内容を消さない */
+    var keep = {};
+    ["rSei","rMei","rSeiK","rMeiK","rY","rM","rD"].forEach(function(id){ var el=document.getElementById(id); if(el) keep[id]=el.value; });
 
-    var yearOpts = '<option value="">年</option>';
-    for(var y=2026; y>=1930; y--){ yearOpts += '<option value="'+y+'">'+y+'（'+wareki(y)+'）</option>'; }
-    var monOpts = '<option value="">月</option>';
+    var yearOpts = '<option value="">'+R.y+'</option>';
+    for(var y=2026; y>=1930; y--){ yearOpts += '<option value="'+y+'">'+y+(isJa() ? '（'+wareki(y)+'）' : '')+'</option>'; }
+    var monOpts = '<option value="">'+R.m+'</option>';
     for(var m=1;m<=12;m++) monOpts += '<option value="'+m+'">'+m+'</option>';
+    /* フリガナ：日本語は必須、ほかの言語は任意（ローマ字でも可） */
+    var kanaTag = isJa() ? '<span class="req">'+R.req+'</span>' : '<span class="hint">'+x.kanaOpt+'</span>';
 
     parkActions();
     document.getElementById("app").innerHTML =
-      '<div class="reg-lead"><b>会員証をお作りします👓️</b>'+
-        'ご登録いただくと、<br>ご購入後にデジタル会員証が<br>発行されます。</div>'+
+      gbarHtml() +
+      '<div class="reg-lead"><b>'+R.lead1+'</b>'+R.lead2+'</div>'+
 
-      '<div class="reg-field"><label>お名前<span class="req">必須</span></label>'+
-        '<div class="reg-two"><input id="rSei" type="text" placeholder="姓" maxlength="20">'+
-        '<input id="rMei" type="text" placeholder="名" maxlength="20"></div></div>'+
+      '<div class="reg-field"><label>'+R.name+'<span class="req">'+R.req+'</span></label>'+
+        '<div class="reg-two"><input id="rSei" type="text" placeholder="'+R.sei+'" maxlength="20">'+
+        '<input id="rMei" type="text" placeholder="'+R.mei+'" maxlength="20"></div></div>'+
 
-      '<div class="reg-field"><label>フリガナ<span class="req">必須</span></label>'+
-        '<div class="reg-two"><input id="rSeiK" type="text" placeholder="セイ" maxlength="20">'+
-        '<input id="rMeiK" type="text" placeholder="メイ" maxlength="20"></div></div>'+
+      '<div class="reg-field"><label>'+R.kana+kanaTag+'</label>'+
+        '<div class="reg-two"><input id="rSeiK" type="text" placeholder="'+R.seiK+'" maxlength="20">'+
+        '<input id="rMeiK" type="text" placeholder="'+R.meiK+'" maxlength="20"></div></div>'+
 
-      '<div class="reg-field"><label>生年月日<span class="hint">任意</span></label>'+
+      '<div class="reg-field"><label>'+R.birth+'<span class="hint">'+R.opt+'</span></label>'+
         '<div class="reg-three"><select id="rY">'+yearOpts+'</select>'+
         '<select id="rM">'+monOpts+'</select><select id="rD"></select></div></div>'+
 
-      '<div class="reg-why">15歳以下のお客様は、<br><b>見え方保証が90日間→180日間</b>になります。<br><br>'+
-        'それと──<br>あなたの目が何年がんばってきたか、<br>メガネ屋👓️としては、<br>ちょっと知っておきたいのです😌</div>'+
+      '<div class="reg-why">'+R.why+'</div>'+
 
-      '<div class="reg-field"><label>SixfourまたはRICCOでメガネ👓️や<br>サングラス🕶️をご購入されたことはありますか？<span class="req">必須</span><br><span class="hint" style="display:block;margin:5px 0 0;font-size:11.5px;color:#9E1A3A;font-weight:700;">※今回ご購入の方も「はい」でお願いします</span></label>'+
-        '<div class="reg-yesno"><button type="button" id="rYes" onclick="setBought(\'あり\')">はい</button>'+
-        '<button type="button" id="rNo" onclick="setBought(\'なし\')">いいえ</button></div></div>'+
+      '<div class="reg-field"><label>'+R.q+'<span class="req">'+R.req+'</span><br><span class="hint" style="display:block;margin:5px 0 0;font-size:11.5px;color:#9E1A3A;font-weight:700;">'+R.qNote+'</span></label>'+
+        '<div class="reg-yesno"><button type="button" id="rYes" onclick="setBought(\'あり\')">'+R.yes+'</button>'+
+        '<button type="button" id="rNo" onclick="setBought(\'なし\')">'+R.no+'</button></div></div>'+
 
-      '<button class="reg-btn" id="rBtn" onclick="submitRegister()">登録する</button>'+
+      '<button class="reg-btn" id="rBtn" onclick="submitRegister()">'+R.btn+'</button>'+
       '<div class="reg-err" id="rErr"></div>'+
-      '<div class="reg-privacy">お預かりした情報は、<br>会員証と保証のためだけに使います<br>'+
-        '<a href="privacy.html" target="_blank">プライバシーポリシー</a></div>';
+      '<div class="reg-privacy">'+R.privacy+'<br>'+
+        '<a href="privacy.html" target="_blank">'+R.link+'</a></div>';
 
     document.getElementById("actions").style.display = "none";   // 登録前は下のボタンを出さない
+    ["rSei","rMei","rSeiK","rMeiK","rY","rM"].forEach(function(id){ if(keep[id]) document.getElementById(id).value = keep[id]; });
     buildDays();
+    if(keep.rD) document.getElementById("rD").value = keep.rD;
+    if(REG_BOUGHT) setBought(REG_BOUGHT);
     document.getElementById("rY").addEventListener("change", buildDays);
     document.getElementById("rM").addEventListener("change", buildDays);
     primeYearSetup();
@@ -1775,7 +3560,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var mv=parseInt(document.getElementById("rM").value,10);
     var last=(yv&&mv)?new Date(yv,mv,0).getDate():31;
     var dsel=document.getElementById("rD"); var keep=dsel.value;
-    var h='<option value="">日</option>';
+    var h='<option value="">'+L().reg.d+'</option>';
     for(var d=1;d<=last;d++) h+='<option value="'+d+'">'+d+'</option>';
     dsel.innerHTML=h;
     if(keep && parseInt(keep,10)<=last) dsel.value=keep;
@@ -1803,27 +3588,27 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var g=function(id){ return (document.getElementById(id).value||'').trim(); };
     var sei=g("rSei"), mei=g("rMei"), seiK=g("rSeiK"), meiK=g("rMeiK");
 
-    if(!sei||!mei){ err.textContent="お名前をご入力ください"; return; }
-    if(!seiK||!meiK){ err.textContent="フリガナをご入力ください"; return; }
-    if(!REG_BOUGHT){ err.textContent="ご購入の有無をお選びください"; return; }
+    if(!sei||!mei){ err.textContent=X().regErrName; return; }
+    if(isJa() && (!seiK||!meiK)){ err.textContent=X().regErrKana; return; }   // ★2026/11/19 外国語はフリガナ任意
+    if(!REG_BOUGHT){ err.textContent=X().regErrBought; return; }
 
     var y=g("rY"), m=g("rM"), d=g("rD"), birthday='';
     if(y&&m&&d){
       birthday = y+'-'+('0'+m).slice(-2)+'-'+('0'+d).slice(-2);
     }else if(y||m||d){
-      err.textContent="生年月日は、年・月・日をすべてお選びください"; return;
+      err.textContent=X().regErrBirth; return;
     }
 
     err.textContent="";
     var btn=document.getElementById("rBtn");
-    btn.disabled=true; btn.textContent="登録しています…";
+    btn.disabled=true; btn.textContent=X().regSending;
 
     var idToken = liff.getIDToken();
     var cbName = "regcb_" + Date.now();
     var timer = setTimeout(function(){
       cleanupReg(cbName);
-      btn.disabled=false; btn.textContent="登録する";
-      err.textContent="通信に時間がかかっています。電波の良い場所でもう一度お試しください";
+      btn.disabled=false; btn.textContent=L().reg.btn;
+      err.textContent=X().regSlow;
     }, 15000);
 
     window[cbName] = function(json){
@@ -1832,8 +3617,8 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       if(json && json.ok){
         location.reload();          // 登録できたら読み込み直して、次の状態を表示する
       }else{
-        btn.disabled=false; btn.textContent="登録する";
-        err.textContent = (json && json.error) ? json.error : "登録できませんでした";
+        btn.disabled=false; btn.textContent=L().reg.btn;
+        err.textContent = srvErr(json, 'regFail', 'reg');
       }
     };
 
@@ -1847,14 +3632,15 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       + "&brand="    + encodeURIComponent(SHOP)
       + "&store="    + encodeURIComponent(STORE)
       + "&bought="   + encodeURIComponent(REG_BOUGHT)
+      + "&lang="     + encodeURIComponent(LANG)          // ★2026/11/19 選んでいた言語も一緒に保存
       + "&callback=" + cbName;
 
     var sc=document.createElement("script");
     sc.id=cbName; sc.src=url;
     sc.onerror=function(){
       clearTimeout(timer); cleanupReg(cbName);
-      btn.disabled=false; btn.textContent="登録する";
-      err.textContent="サーバーに接続できませんでした";
+      btn.disabled=false; btn.textContent=L().reg.btn;
+      err.textContent=X().errServer;
     };
     document.body.appendChild(sc);
   }
@@ -1867,9 +3653,9 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   function renderError(msg){
     document.getElementById("head").style.display="none";
     parkActions();
-    document.getElementById("app").innerHTML=
+    document.getElementById("app").innerHTML= gbarHtml() +
       '<div class="msg-card sixfour">'+msgBrandHtml(false)+
-        '申し訳ありません。会員証を読み込めませんでした。<br>通信環境の良い場所で、もう一度お試しください。'+
+        X().errLoad+
         '<div class="msg-sub">'+esc(msg||"")+'</div></div>';
     showActions();
   }
@@ -1973,7 +3759,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
 
   window.consult = function(){
     var word = "お問い合わせ";   // 失敗したときの案内用（公式アカウントには、このキーワードも残してある）
-    var guide = "トーク画面で「"+word+"」と送信してください。すぐにご案内が届きます。";
+    var guide = X().consultGuide(word);   // ★2026/11/19 案内は言語ごと（送る言葉は日本語のまま）
     try{
       liff.sendMessages(memberInfoMessages().concat([{ type:"text", text: CONSULT_KEYWORD }]))
         .then(function(){ liff.closeWindow(); })
@@ -2003,24 +3789,26 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
    *   rxBarHtml（旧・1行版）は使わなくなったが、戻せるように残してある。 */
   function rxCapHtml(d){
     /* ★2026/11/15 家族が2人以上：「Myファミリー度数情報」。日付は家族の中で一番新しい更新日。
-     *   押すと、更新日が一番新しい方のタブで開く。度数がまだ誰も無いときは「度数を確認する」 */
+     *   押すと、更新日が一番新しい方のタブで開く。度数がまだ誰も無いときは「度数を確認する」
+     * ★2026/11/19 言語ごと */
+    var U = L().ui;
     var fam = rxFam();
     if(fam && fam.length >= 2){
       var ni = rxNewestIdx(fam);
       var upd = (ni >= 0) ? fam[ni].rx.updatedAt : '';
       return '<button type="button" class="cap cap-rx" onclick="openRx()">'+
-               '<div class="c1 fit1">👓 Myファミリー度数情報</div>'+
-               '<div class="c2">'+(upd ? '最終更新 '+esc(upd) : '度数を確認する')+'</div></button>';
+               '<div class="c1 fit1">'+U.rxBtnFam+'</div>'+
+               '<div class="c2">'+(upd ? U.rxUpd(esc(ymdL(upd))) : X().rxAskPlain)+'</div></button>';
     }
     if(d && d.rx && d.rx.updatedAt){
       return '<button type="button" class="cap cap-rx" onclick="openRx()">'+
-               '<div class="c1">👓 My度数情報</div><div class="c2">最終更新 '+esc(d.rx.updatedAt)+'</div></button>';
+               '<div class="c1">'+U.rxBtn+'</div><div class="c2">'+U.rxUpd(esc(ymdL(d.rx.updatedAt)))+'</div></button>';
     }
     if(d && d.rxPending){
-      return '<div class="cap cap-rx cap-wait"><div class="c1 fit1">👓 度数をお調べしています…</div></div>';
+      return '<div class="cap cap-rx cap-wait"><div class="c1 fit1">'+U.rxWait+'</div></div>';
     }
     return '<button type="button" class="cap cap-rx" onclick="openRxAsk()">'+
-             '<div class="c1 fit1">👓 度数を確認する</div></button>';
+             '<div class="c1 fit1">'+U.rxAsk+'</div></button>';
   }
 
   function rxBarHtml(d){
@@ -2090,9 +3878,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     if(!rx || !rx.made || !birth) return '';
     if(rxAgeOf(birth) > 15 || rxMonthsSince(rx.made) < 6) return '';
     return '<div class="rx-check"><span class="ic">👀</span><div>' +
-      (rxIsRicco()
-        ? 'ご成長にあわせて、そろそろ見え方のご確認はいかがでしょうか。お気軽にお立ち寄りくださいませ。'
-        : 'そろそろ見え方チェックの時期です👀<br>お子様の度数は変わりやすいので、お気軽にお立ち寄りください。') +
+      (rxIsRicco() ? L().rx.checkRic : L().rx.checkSix) +
       '</div></div>';
   }
 
@@ -2100,7 +3886,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   function rxDetailHtml(rx, extra){
     var isRicco = rxIsRicco();
     var chips = '';
-    if(rx.lens)  chips += '<span class="rx-chip">'+rx.lens+'</span>';
+    if(rx.lens)  chips += '<span class="rx-chip">'+(X().lens[rx.lens] || rx.lens)+'</span>';
     if(rx.index) chips += '<span class="rx-chip">'+rx.index+'</span>';
 
     /* ADDは遠用・近用だと空。空の欄は「ー」で埋めて、表がガタつかないようにする */
@@ -2125,21 +3911,14 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     return (chips ? '<div class="rx-meta">'+chips+'</div>' : '') +
       '<table class="rx-table"><thead><tr>'+
         '<th></th>'+
-        '<th>S<small>(球面)</small></th>'+
-        '<th>C<small>(乱視)</small></th>'+
-        '<th>AX<small>(軸度)</small></th>'+
-        '<th>ADD<small>(加入度)</small></th>'+
-        '<th>PD<small>(目の距離)</small></th>'+
+        ['S','C','AX','ADD','PD'].map(function(k){ var t = L().rx.th[k]; return '<th>'+t[0]+'<small>'+t[1]+'</small></th>'; }).join('')+
       '</tr></thead><tbody>'+ row("R", "r") + row("L", "l") +'</tbody></table>'+
       (rx.remarks ? '<div class="rx-remarks">'+rx.remarks+'</div>' : '')+
       (extra || '')+
       '<div class="rx-caution">'+
         /* ★2026/11/1 SixfourとRICCOで文言を統一（ナオユキ指示）。
          *   「カード▢の度数情報」と問い合わせてもらう方式に両店舗とも揃えた（旧Sixfourの「6 その他」案内は廃止）。 */
-        'My度数情報は最新の'+(isRicco ? "アイウェア" : "メガネ")+'分のみを表示しています。<br>'+
-        '以前の度数をご希望の場合は、「💬LINEで相談する」から、対象のメガネ(カード)の'+
-          '末尾番号<span class="sq">▢</span>を確認して「カード<span class="sq">▢</span>の度数情報」とお問い合わせください🙇‍♂️<br>'+
-        '例：01-23456-7️⃣の「７」の数字'+
+        (isRicco ? L().rx.cautionRic : L().rx.cautionSix)+
       '</div>';
   }
 
@@ -2151,10 +3930,10 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var isRicco = rxIsRicco();
     var madeNice = rx.made ? rxDateNice(rx.made) : '';
     var madeChip = madeNice ? '<span class="rx-chip">'+madeNice+'</span>' : '';
+    if(madeChip) madeChip = '<span class="rx-chip">'+ymdL(madeNice)+'</span>';   // ★2026/11/19 言語ごとの日付
     return madeNice
-      ? (isRicco ? "店頭で"+madeChip+"に作製を承ったお度数でございます。"
-                 : "お店で"+madeChip+"に作製したメガネの度数です👓")
-      : (isRicco ? "店頭で承ったお度数でございます。" : "お店でお作りしたメガネの度数です👓");
+      ? (isRicco ? L().rx.leadRic(madeChip) : L().rx.leadSix(madeChip))
+      : (isRicco ? X().rxLeadNoDateRic : X().rxLeadNoDateSix);
   }
 
   /* 家族のタブと、選んだ方の中身を組み立てる */
@@ -2176,15 +3955,14 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var p = fam[RX_CUR], lead = document.getElementById("rxLead"), body = '';
     if(p.rx){
       lead.innerHTML = rxLeadHtml(p.rx); lead.style.display = '';
-      body = rxDetailHtml(p.rx, rxCheckHtml(p.birth, p.rx));
+      body = rxDetailHtml(p.rx, rxCheckHtml(p.birth, p.rx)) + rxPrevHtml(p);   // ★2026/11/19 以前の度数をカードで問い合わせ
     }else{
       lead.innerHTML = ''; lead.style.display = 'none';
       if(p.rxPending){
-        body = '<div class="rx-empty"><span class="rx-wait">👓 度数をお調べしています…</span></div>';
+        body = '<div class="rx-empty"><span class="rx-wait">'+L().ui.rxWait+'</span></div>';
       }else{
-        body = '<div class="rx-empty"><div class="em-t">'+esc(rxPersonName(fam, p))+
-               (isRicco ? 'さまの度数情報は、まだ登録がございません。' : 'さんの度数情報は、まだ登録がありません。')+'</div>'+
-               '<button type="button" class="rx-ask-btn" onclick="openRxAsk('+RX_CUR+')">👓 この方の度数を確認する</button></div>';
+        body = '<div class="rx-empty"><div class="em-t">'+(isRicco ? X().rxEmptyRic(esc(rxPersonName(fam, p))) : X().rxEmptySix(esc(rxPersonName(fam, p))))+'</div>'+
+               '<button type="button" class="rx-ask-btn" onclick="openRxAsk('+RX_CUR+')">'+X().rxAskThis+'</button></div>';
       }
     }
     document.getElementById("rxBody").innerHTML = body;
@@ -2200,7 +3978,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       /* ★2026/11/15 家族：最初は更新日が一番新しい方のタブ（誰も無ければ先頭＝TOPの方） */
       if(typeof i === 'number') RX_CUR = i;
       else { var ni = rxNewestIdx(fam); RX_CUR = ni >= 0 ? ni : 0; }
-      document.getElementById("rxTitle").textContent = "Myファミリー度数情報";
+      document.getElementById("rxTitle").textContent = L().rx.titleFam;
       sheet.classList.add("fam");
       rxRenderFam();
       sheet.classList.add("open");
@@ -2211,14 +3989,14 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     /* 1人だけ：これまで通り */
     var rx = PAGE_DATA && PAGE_DATA.rx;
     if(!rx) return;
-    document.getElementById("rxTitle").textContent = "My度数情報";
+    document.getElementById("rxTitle").textContent = L().rx.title;
     document.getElementById("rxTabs").style.display = "none";
     sheet.classList.remove("fam");
     var lead = document.getElementById("rxLead");
     lead.style.display = '';
     lead.innerHTML = rxLeadHtml(rx);
     var me = fam ? fam[0] : null;   // 15歳以下の方へのお知らせ（1人だけのときも同じ条件で出す）
-    document.getElementById("rxBody").innerHTML = rxDetailHtml(rx, me ? rxCheckHtml(me.birth, rx) : '');
+    document.getElementById("rxBody").innerHTML = rxDetailHtml(rx, me ? rxCheckHtml(me.birth, rx) : '') + rxPrevHtml(null);   // ★2026/11/19
     sheet.classList.add("open");
     document.body.style.overflow = "hidden";
   };
@@ -2236,7 +4014,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
 
   window.openRxAsk = function(i){
     var isRicco = rxIsRicco();
-    var list = isRicco ? RX_PURPOSES_RIC : RX_PURPOSES_SIX;
+    var list = isRicco ? L().rx.purposesRic : L().rx.purposesSix;   // ★2026/11/19 表示は言語ごと（送るのは日本語）
     /* ★2026/11/15 家族のタブから開いたときは「その方の分」。1人だけのときは、その方の行を伝えるだけ（見た目はこれまで通り） */
     var fam = rxFam();
     RX_ASK_TARGET = null;
@@ -2248,27 +4026,17 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var who = (RX_ASK_TARGET && RX_ASK_TARGET.name) ? RX_ASK_TARGET.name : '';
 
     var body = "";
-    list.forEach(function(t){
-      body += '<button type="button" class="rx-pick" onclick="sendRxRequest(this,\''+
-              t.replace(/'/g, "\\'")+'\')">'+t+'</button>';
+    list.forEach(function(t, k){
+      body += '<button type="button" class="rx-pick" onclick="sendRxRequest(this,'+k+')">'+t+'</button>';
     });
-    body += '<div class="rx-tip">'+
-      (isRicco
-        ? '※スタッフがカルテを確認し、のちほどご連絡いたします。'
-        : '※手作業でカルテをお探ししますので、お返事まで少しだけお待ちを☺️')+
-      '<br><br>💡コンタクト購入で度数を知りたい方へ<br>'+
-      'メガネとは度数が異なります。(目とレンズの距離が違うため)<br>'+
-      (isRicco
-        ? '眼科さんやご購入先での測定をおすすめいたします。'
-        : '眼科さんやご購入先での測定が安心です👀')+
-      '</div>';
+    body += '<div class="rx-tip">'+(isRicco ? L().rx.tipRic : L().rx.tipSix)+'</div>';
     body += '<div class="rx-sending" id="rxAskMsg"></div>';
 
     document.getElementById("rxAskTitle").textContent = who
-      ? (isRicco ? "👓"+who+"さまの度数のお問い合わせ" : "👓"+who+"さんの度数、お調べします!")
-      : (isRicco ? "👓度数のお問い合わせ" : "👓度数、お調べします!");
+      ? (isRicco ? X().rxAskWhoRic(who) : X().rxAskWhoSix(who))
+      : (isRicco ? L().rx.askTitleRic : L().rx.askTitleSix);
     document.getElementById("rxAskLead").textContent =
-      isRicco ? "ご用途をお聞かせください。" : "ご用途を教えてください。";
+      isRicco ? L().rx.askLeadRic : L().rx.askLeadSix;
     document.getElementById("rxAskBody").innerHTML = body;
     document.getElementById("rxAskSheet").classList.add("open");
     document.body.style.overflow = "hidden";
@@ -2284,13 +4052,15 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
      ②お店のLINEにもメッセージを送る（片方を見落としても拾える二重通知） */
   window.sendRxRequest = function(btn, purpose){
     if(RX_ASKING) return;
+    /* ★2026/11/19 ご用途は番号で受け取り、お店には日本語で送る */
+    if(typeof purpose === 'number') purpose = (rxIsRicco() ? RX_PURPOSES_RIC : RX_PURPOSES_SIX)[purpose] || '';
     RX_ASKING = true;
 
     var msg = document.getElementById("rxAskMsg");
     var picks = document.querySelectorAll(".rx-pick");
     for(var i=0;i<picks.length;i++){ picks[i].disabled = true; picks[i].style.opacity = ".45"; }
     if(btn) btn.style.opacity = "1";
-    if(msg) msg.textContent = "お店に送っています…";
+    if(msg) msg.textContent = X().rxSending;
 
     var done = function(ok, text){
       RX_ASKING = false;
@@ -2315,7 +4085,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       var timer = setTimeout(function(){
         cleanup();
         if (!isLast) { attemptSend(attempt + 1); return; }
-        done(false, "通信がタイムアウトしました。もう一度お試しください。");
+        done(false, X().rxTimeout);
       }, timeoutMs);
 
       function cleanup(){
@@ -2329,7 +4099,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
         cleanup();
         if(!json || json.ok !== true){
           if (!isLast) { attemptSend(attempt + 1); return; }
-          done(false, (json && json.error) ? json.error : "送信に失敗しました。もう一度お試しください。");
+          done(false, srvErr(json, 'rxFail', 'rx'));
           return;
         }
         /* ②お店のトークにも流す。ここが失敗しても受付自体は済んでいるので、
@@ -2341,7 +4111,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
             .then(function(){}).catch(function(){});
         }catch(e){}
 
-        done(true, "承りました。お調べしてご連絡いたします🙇‍♂️");
+        done(true, X().rxDone);
         setTimeout(function(){
           closeRxAsk();
           if(PAGE_DATA){
@@ -2373,7 +4143,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       sc.onerror = function(){
         clearTimeout(timer); cleanup();
         if (!isLast) { attemptSend(attempt + 1); return; }
-        done(false, "通信に失敗しました。もう一度お試しください。");
+        done(false, X().rxNet);
       };
       document.body.appendChild(sc);
     }
@@ -2399,7 +4169,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var timer = setTimeout(function(){
       cleanup();
       if (!isLast) { fetchCards(idToken, attempt + 1); return; }
-      renderError("通信がタイムアウトしました");
+      renderError(X().errTimeout);
     }, timeoutMs);
 
     function cleanup(){
@@ -2413,10 +4183,11 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       cleanup();
       if(!json || json.ok !== true){
         if (!isLast) { fetchCards(idToken, attempt + 1); return; }
-        renderError(json && json.error ? json.error : "データ取得に失敗しました");
+        renderError(json && (json.error || json.code) ? srvErr(json, 'errData', 'cards') : X().errData);
         return;
       }
       PAGE_DATA = json;
+      langFromData(json);   // ★2026/11/19 シートの言語を最優先にする
       render();
     };
 
@@ -2432,7 +4203,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       clearTimeout(timer);
       cleanup();
       if (!isLast) { fetchCards(idToken, attempt + 1); return; }
-      renderError("サーバーに接続できませんでした");
+      renderError(X().errServer);
     };
     document.body.appendChild(sc);
   }
@@ -2451,17 +4222,13 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var h = '';
     for(var i=1;i<=6;i++){
       h += '<div class="dp-item' + (i===DP_PICK?' on':'') + '" id="dpI'+i+'" onclick="pickDesign('+i+')">' +
-           '<div class="dp-thumb"><img style="width:'+((FRAME_SCALE[i]||1)*100)+'%" src="'+FRAMES[i].src+'" alt="'+FRAMES[i].name+'"></div>' +
-           '<div class="dp-name">'+FRAMES[i].name+'</div></div>';
+           '<div class="dp-thumb"><img style="width:'+((FRAME_SCALE[i]||1)*100)+'%" src="'+FRAMES[i].src+'" alt="'+X().designNames[i-1]+'"></div>' +
+           '<div class="dp-name">'+X().designNames[i-1]+'</div></div>';
     }
     document.getElementById('dpGrid').innerHTML = h;
     var ricco = (SHOP === 'ricco');
-    document.getElementById('dpTitle').innerHTML =
-      (ricco ? 'アイウェア👓️🕶️を選ぶ' : 'メガネ👓️🕶️を選ぶ');
-    document.getElementById('dpLead').innerHTML =
-      (ricco
-        ? 'お好みのアイウェアをお選びください。あとから変更もできます。<br>時と共に、アイウェアも育ちますのでお楽しみに☺️'
-        : 'お好みのメガネをお選びください。あとから変更もできます。<br>時と共に、メガネも育ちますのでお楽しみに☺️');
+    document.getElementById('dpTitle').innerHTML = (ricco ? X().dpTitleRic : X().dpTitleSix);
+    document.getElementById('dpLead').innerHTML = (ricco ? X().dpLeadRic : X().dpLeadSix);
     document.getElementById('dpMsg').textContent = '';
     document.getElementById('dpVeil').classList.add('open');
     document.getElementById('dp').style.display = 'block';
@@ -2481,21 +4248,21 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   function saveDesign(){
     var btn = document.getElementById('dpSave');
     var msg = document.getElementById('dpMsg');
-    btn.disabled = true; btn.textContent = '保存しています…';
+    btn.disabled = true; btn.textContent = X().saving;
     msg.textContent = '';
 
     var idToken = liff.getIDToken();
     var cbName = 'dpcb_' + Date.now();
     var timer = setTimeout(function(){
       cleanupDp(cbName);
-      btn.disabled=false; btn.textContent='保存する';
-      msg.textContent = '通信に時間がかかっています。もう一度お試しください';
+      btn.disabled=false; btn.textContent=X().save;
+      msg.textContent = X().errSlow;
     }, 15000);
 
     window[cbName] = function(json){
       clearTimeout(timer);
       cleanupDp(cbName);
-      btn.disabled=false; btn.textContent='保存する';
+      btn.disabled=false; btn.textContent=X().save;
       if(json && json.ok){
         // 画面のデータも書き換えて、その場で反映する
         if(PAGE_DATA && PAGE_DATA.cards){
@@ -2506,7 +4273,7 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
         closePicker();
         render();
       }else{
-        msg.textContent = (json && json.error) ? json.error : '保存できませんでした';
+        msg.textContent = srvErr(json, 'errSave', 'dp');
       }
     };
 
@@ -2520,8 +4287,8 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     sc.id = cbName; sc.src = url;
     sc.onerror = function(){
       clearTimeout(timer); cleanupDp(cbName);
-      btn.disabled=false; btn.textContent='保存する';
-      msg.textContent = 'サーバーに接続できませんでした';
+      btn.disabled=false; btn.textContent=X().save;
+      msg.textContent = X().errServer;
     };
     document.body.appendChild(sc);
   }
@@ -2543,17 +4310,21 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     var ricco = famIsRicco(), h = '';
     var list = (PAGE_DATA && PAGE_DATA.famPending) || [];
     if(list.length){
-      var names = list.map(function(f){ return esc(f.name) + ' さん'; }).join('<br>');
-      h += '<div class="fam-banner"><div class="fb1">👪 '+(ricco ? 'ご家族の追加を確認中でございます' : '家族の追加を確認中です')+'</div>'+
+      var F = L().fam;   // ★2026/11/19 言語ごと
+      var names = list.map(function(f){ return esc(F.person(f.name)); }).join('<br>');
+      h += '<div class="fam-banner"><div class="fb1">'+(ricco ? F.bannerRic : F.bannerSix)+'</div>'+
            '<div class="fb2">'+names+'</div>'+
-           '<div class="fb3">'+(ricco ? 'ご来店の際、スタッフにお声がけくださいませ' : 'ご来店の際、スタッフにお声がけください')+'</div></div>';
+           '<div class="fb3">'+(ricco ? F.fb3Ric : F.fb3Six)+'</div></div>';
     }
-    h += '<button type="button" class="fam-add" onclick="openFam()">＋ 家族の会員証💳️を追加する</button>';
+    h += '<button type="button" class="fam-add" onclick="openFam()">'+L().ui.famAdd+'</button>';
     return '<div class="fam-box" id="famBox">' + h + '</div>';
   }
 
   function famNoteHtml(){
     var ricco = famIsRicco();
+    if(!isJa()){   // ★2026/11/19 日本語以外は辞書の文章
+      return L().fam[ricco ? 'notesRic' : 'notesSix'].map(function(t){ return '<p>・'+t+'</p>'; }).join('');
+    }
     /* ¶＝改行の位置（ナオユキ指定）　|＝画面が狭いときに折り返してよい位置（句の切れ目） */
     var lines = ricco ? [
       '追加されたご家族の度数情報・|ご購入履歴が、|こちらのマイページに表示されます。¶（RICCOまたはSixfourで|ご購入のない方は、|追加いたしかねます）',
@@ -2571,20 +4342,20 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   function famBuildDays(){
     var yv=parseInt(document.getElementById("fY").value,10), mv=parseInt(document.getElementById("fM").value,10);
     var last=(yv&&mv)?new Date(yv,mv,0).getDate():31, dsel=document.getElementById("fD"), keep=dsel.value;
-    var h='<option value="">日</option>'; for(var d=1; d<=last; d++) h+='<option value="'+d+'">'+d+'</option>';
+    var h='<option value="">'+L().reg.d+'</option>'; for(var d=1; d<=last; d++) h+='<option value="'+d+'">'+d+'</option>';
     dsel.innerHTML=h; if(keep && parseInt(keep,10)<=last) dsel.value=keep;
   }
   function openFam(){
     document.getElementById("famNote").innerHTML = famNoteHtml();
     ["fSei","fMei","fSeiK","fMeiK"].forEach(function(id){ document.getElementById(id).value=""; });
     var thisYear = new Date().getFullYear();
-    var yo='<option value="">年</option>'; for(var y=thisYear; y>=1920; y--) yo+='<option value="'+y+'">'+y+'（'+wareki(y)+'）</option>';
-    var mo='<option value="">月</option>'; for(var m=1; m<=12; m++) mo+='<option value="'+m+'">'+m+'</option>';
+    var yo='<option value="">'+L().reg.y+'</option>'; for(var y=thisYear; y>=1920; y--) yo+='<option value="'+y+'">'+y+(isJa() ? '（'+wareki(y)+'）' : '')+'</option>';
+    var mo='<option value="">'+L().reg.m+'</option>'; for(var m=1; m<=12; m++) mo+='<option value="'+m+'">'+m+'</option>';
     document.getElementById("fY").innerHTML=yo; document.getElementById("fM").innerHTML=mo;
     famBuildDays();
     document.getElementById("fY").onchange = famBuildDays; document.getElementById("fM").onchange = famBuildDays;
     document.getElementById("fErr").textContent = "";
-    var btn=document.getElementById("fBtn"); btn.disabled=false; btn.textContent="申請する";
+    var btn=document.getElementById("fBtn"); btn.disabled=false; btn.textContent=L().fam.btn;
     document.getElementById("famSheet").classList.add("open");
   }
   function closeFam(){ document.getElementById("famSheet").classList.remove("open"); }
@@ -2592,32 +4363,32 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
   function submitFam(){
     var g=function(id){ return (document.getElementById(id).value||"").trim(); };
     var err=document.getElementById("fErr"), btn=document.getElementById("fBtn");
-    if(!g("fSei")||!g("fMei")){ err.textContent="お名前をご入力ください"; return; }
-    if(!g("fSeiK")||!g("fMeiK")){ err.textContent="フリガナをご入力ください"; return; }
-    if(!g("fY")||!g("fM")||!g("fD")){ err.textContent="生年月日は、年・月・日をすべてお選びください"; return; }
+    if(!g("fSei")||!g("fMei")){ err.textContent=X().regErrName; return; }
+    if(isJa() && (!g("fSeiK")||!g("fMeiK"))){ err.textContent=X().regErrKana; return; }   // ★2026/11/19 外国語はフリガナ任意
+    if(!g("fY")||!g("fM")||!g("fD")){ err.textContent=X().regErrBirth; return; }
     err.textContent="";
     var p2=function(n){ return ("0"+n).slice(-2); };
     var birthday = g("fY")+"-"+p2(g("fM"))+"-"+p2(g("fD"));
 
     var idToken = liff.getIDToken();
-    if(!idToken){ err.textContent="ログイン情報を取得できませんでした。画面を開き直してください"; return; }
-    btn.disabled=true; btn.textContent="申請しています…";
+    if(!idToken){ err.textContent=X().famErrLogin; return; }
+    btn.disabled=true; btn.textContent=X().famSending;
 
     var cbName = 'famcb_' + Date.now();
     var timer = setTimeout(function(){
       cleanupDp(cbName);
-      btn.disabled=false; btn.textContent="申請する";
-      err.textContent="通信に時間がかかっています。もう一度お試しください";
+      btn.disabled=false; btn.textContent=L().fam.btn;
+      err.textContent=X().errSlow;
     }, 15000);
     window[cbName] = function(json){
       clearTimeout(timer); cleanupDp(cbName);
-      btn.disabled=false; btn.textContent="申請する";
+      btn.disabled=false; btn.textContent=L().fam.btn;
       if(json && json.ok){
         if(PAGE_DATA) PAGE_DATA.famPending = json.famPending || PAGE_DATA.famPending || [];
         closeFam(); render();
         var b=document.querySelector(".fam-banner"); if(b && b.scrollIntoView) b.scrollIntoView({block:"center", behavior:"smooth"});
       }else{
-        err.textContent = (json && json.error) ? json.error : "申請できませんでした。もう一度お試しください";
+        err.textContent = srvErr(json, 'famFail', 'fam');
       }
     };
     var url = API_URL + "?action=requestFamily"
@@ -2627,18 +4398,20 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
       + "&seiKana="  + encodeURIComponent(g("fSeiK"))
       + "&meiKana="  + encodeURIComponent(g("fMeiK"))
       + "&birthday=" + encodeURIComponent(birthday)
+      + "&lang="     + encodeURIComponent(LANG)          // ★2026/11/19 外国語のときはフリガナ任意
       + "&callback=" + cbName;
     var sc = document.createElement('script');
     sc.id = cbName; sc.src = url;
     sc.onerror = function(){
       clearTimeout(timer); cleanupDp(cbName);
-      btn.disabled=false; btn.textContent="申請する";
-      err.textContent = "サーバーに接続できませんでした";
+      btn.disabled=false; btn.textContent=L().fam.btn;
+      err.textContent = X().errServer;
     };
     document.body.appendChild(sc);
   }
 
   /* ===== 起動 ===== */
+  applyLang();       // ★2026/11/19 最初の言語（このスマホで選んだ言語→スマホの言語）で、決まった部分の文字をそろえる
   preloadFrames();
   loadImages();
 
@@ -2704,8 +4477,10 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxxYflXeZI96B2tUpik5AEk3I
     .then(function(state){
       if(state === "reloading") return;                // 次のIDで開き直し中
       if(!liff.isLoggedIn()){ liff.login(); return; }
+      /* ★2026/11/19 まだ🌐で選んでいなければ、LINEアプリの言語に合わせる */
+      if(!langStored()){ var dl = langDetect(); if(dl !== LANG){ LANG = dl; applyLang(); } }
       var idToken = liff.getIDToken();
-      if(!idToken){ renderError("ログイン情報を取得できませんでした"); return; }
+      if(!idToken){ renderError(X().errLogin); return; }
       return fetchCards(idToken);
     })
     .catch(function(err){
