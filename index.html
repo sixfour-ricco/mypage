@@ -542,6 +542,7 @@
   .tk-amt .r b{ font-size:22px; line-height:1.1; font-variant-numeric:tabular-nums; }
   .tk-pay{ display:inline-block; font-size:13.5px; font-weight:800; color:#fff; border-radius:8px; padding:4px 13px; text-align:center; }
   .tk-pay.paid{ background:#1f7a4d; } .tk-pay.unpaid{ background:#d9731a; }
+  .tk-tr{ display:block; margin-top:3px; font-size:11px; font-weight:400; opacity:.62; line-height:1.5; }
   .tk-strike{ font-size:19px; font-weight:700; opacity:.62; margin:0 0 7px; font-variant-numeric:tabular-nums; }
   .tk-strike s{ text-decoration-thickness:2px; }
   .tk-strike .sl{ font-size:15px; margin-left:8px; }
@@ -2453,7 +2454,7 @@ function reTicketHtml(v){
       (v.pay === 'paid' ? '<span class="tk-pay paid">'+R.paid+'</span>' : v.pay === 'unpaid' ? '<span class="tk-pay unpaid">'+R.unpaid+'</span>' : '')+
       '</span></div>';
   }
-  var notes = ((v.kd === 'k5' && v.fs === 'use') ? [esc(U.noteFrame)] : []).concat((v.notes || []).map(function(t){ return voucherNoteL(t, v.date); }));
+  var notes = ((v.kd === 'k5' && v.fs === 'use') ? [esc(U.noteFrame)] : []).concat((v.notes || []).map(function(t, n){ return voucherNoteL(t, v.date, (v.notesTr || [])[n]); }));
   if(notes.length){
     body += '<div class="tk-note"><div class="tk-note-h">'+U.tkNoteH+'</div>'+notes.map(function(t){ return '<p>'+t+'</p>'; }).join('')+'</div>';
   }
@@ -2475,10 +2476,16 @@ function reTicketHtml(v){
  *  ★2026/11/19 🎫お引換券（スタッフ画面で保存されたものだけ出る）
  * ============================================================ */
 var CLOSED_RE = /^(\d{1,2})\/(\d{1,2})\([日月火水木金土]\)は定休日となりますので、お気をつけください😌$/;
-function voucherNoteL(t, baseIso){
+/* ★2026/11/20 スタッフの自由入力は、自動翻訳を出す（下に小さく「自動翻訳」と元の日本語。お店で見せてもらえば、スタッフにも分かる） */
+var AUTO_TR = { en:'Auto-translated', pt:'Tradução automática', zh:'自动翻译', vi:'Dịch tự động' };
+function voucherNoteL(t, baseIso, tr){
   if(isJa()) return esc(t);
   var m = CLOSED_RE.exec(String(t || '').trim());
-  if(!m) return esc(t);                         // スタッフの自由入力は日本語のまま
+  if(!m){
+    var x = tr && tr[LANG];
+    if(!x) return esc(t);                       // 訳が無いときは日本語のまま
+    return esc(x)+'<span class="tk-tr">🌐 '+esc(AUTO_TR[LANG] || '')+'｜'+esc(t)+'</span>';
+  }
   var base = isoDate(baseIso) || new Date();
   var y = base.getFullYear(), mo = +m[1], d = +m[2];
   var dt = new Date(y, mo-1, d);
@@ -2522,7 +2529,7 @@ function ticketHtml(v){
   }else{
     body += '<div class="tk-msg2">'+C.delaySorry+'</div>';
   }
-  var notes = (lens ? [esc(U.noteFrame)] : []).concat((v.notes || []).map(function(t){ return voucherNoteL(t, v.date); }));
+  var notes = (lens ? [esc(U.noteFrame)] : []).concat((v.notes || []).map(function(t, n){ return voucherNoteL(t, v.date, (v.notesTr || [])[n]); }));
   if(notes.length){
     body += '<div class="tk-note"><div class="tk-note-h">'+U.tkNoteH+'</div>'+notes.map(function(t){ return '<p>'+t+'</p>'; }).join('')+'</div>';
   }
