@@ -532,6 +532,16 @@
   .ricco .tk-note-h::before{ background:#6b5c3a; }
   .tk-note p{ margin:0; font-size:14.5px; font-weight:800; line-height:1.7; text-wrap:pretty; word-break:auto-phrase; }
   .tk-note p + p{ margin-top:7px; padding-top:7px; border-top:1.5px dotted rgba(0,0,0,.3); }
+  /* ★2026/11/20 🎫(再)引換券：種類名・お支払い金額 */
+  .tk-kind{ font-size:19px; font-weight:800; letter-spacing:.04em; margin-top:8px; }
+  .tk-amt{ margin-top:11px; padding:10px 14px; border-radius:12px; background:rgba(255,255,255,.62); border:1.5px solid rgba(0,0,0,.14);
+           display:flex; justify-content:space-between; align-items:flex-start; gap:10px; text-align:left; }
+  .ricco .tk-amt{ border-color:rgba(70,60,40,.26); }
+  .tk-amt .l{ font-size:13px; font-weight:700; padding-top:4px; white-space:nowrap; }
+  .tk-amt .r{ display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+  .tk-amt .r b{ font-size:22px; line-height:1.1; font-variant-numeric:tabular-nums; }
+  .tk-pay{ display:inline-block; font-size:13.5px; font-weight:800; color:#fff; border-radius:8px; padding:4px 13px; text-align:center; }
+  .tk-pay.paid{ background:#1f7a4d; } .tk-pay.unpaid{ background:#d9731a; }
   .tk-strike{ font-size:19px; font-weight:700; opacity:.62; margin:0 0 7px; font-variant-numeric:tabular-nums; }
   .tk-strike s{ text-decoration-thickness:2px; }
   .tk-strike .sl{ font-size:15px; margin-left:8px; }
@@ -878,7 +888,7 @@ I18N.ja = {
         chg:`予定が変更になりました`, chgSorry:`ご迷惑をおかけして申し訳ありません🙇`
       },
       lens:{
-        schedLabel:`レンズ入荷予定`, pillWait:`入荷待ち`, pillReady:`✓ 入荷しました`,
+        schedLabel:`レンズ入荷予定`, pillWait:`入荷待ち`, pillReady:`✓ レンズ入荷しました`,
         waitMsg:`レンズの入荷をお待ちください👓🕶️`,
         come:`レンズ加工に1時間ほどかかります。<br>お時間に余裕のある時にご来店ください😊`,
         comeDate:`レンズ加工に1時間ほどかかります。<br>お時間に余裕のある時にご来店ください😊`,
@@ -906,7 +916,7 @@ I18N.ja = {
         chg:`予定を変更いたしました`, chgSorry:`ご迷惑をおかけし、申し訳ございません。`
       },
       lens:{
-        schedLabel:`レンズ入荷予定`, pillWait:`入荷待ち`, pillReady:`✓ 入荷しました`,
+        schedLabel:`レンズ入荷予定`, pillWait:`入荷待ち`, pillReady:`✓ レンズ入荷しました`,
         waitMsg:`レンズの入荷まで、<br>いましばらくお待ちくださいませ。`,
         come:`レンズの加工に1時間ほどいただきます。<br>お時間にゆとりのあるときに、お越しくださいませ。`,
         comeDate:`レンズの加工に1時間ほどいただきます。<br>お時間にゆとりのあるときに、お越しくださいませ。`,
@@ -2352,6 +2362,115 @@ function srvErr(json, fallback, ctx){
   return (c && X().err[c]) || X()[fallback];
 }
 
+/* ★2026/11/20 🎫(再)引換券（見え方保証・修理など）の文言。種類名は（お預り／使用中）を出さない */
+I18N.ja.re = {
+  kinds:{ k1:`保証交換`, k2:`修理`, k3:`フレームオール交換`, k4:`パーツ交換`, k5:`レンズ交換` },
+  done:{ k1:`✓ レンズ保証交換完了しました`, k2:`✓ 修理仕上がりました`, k3:`✓ フレーム交換完了しました`, k4:`✓ パーツ交換完了しました`, k5:`✓ レンズ交換完了しました` },
+  arrived:{ lens:`✓ レンズ入荷しました`, frame:`✓ フレーム入荷しました`, parts:`✓ パーツ入荷しました` },
+  waitPill:{ lens:`入荷待ち`, frame:`入荷待ち`, parts:`入荷待ち` },
+  schedIn:{ lens:`レンズ入荷予定`, frame:`フレーム入荷予定`, parts:`パーツ入荷予定` },
+  waitIn:{ lens:`レンズの入荷をお待ちください👓🕶️`, frame:`フレームの入荷をお待ちください👓🕶️`, parts:`パーツの入荷をお待ちください👓🕶️` },
+  readyIn:{ lens:`レンズが届きました！お待ちしています😊`, frame:`フレームが届きました！お待ちしています😊`, parts:`パーツが届きました！お待ちしています😊` },
+  readyDone:`お待たせしました！<br>店頭でお待ちしています😊`,
+  comeFP:`お使いのメガネをお持ちになって、ご来店ください。<br>交換は10分ほどで終わります😊`,
+  amtLabel:`お支払い金額（税込）`, paid:`✓ お支払い済み`, unpaid:`お渡し時にお支払いください`
+};
+I18N.en.re = {
+  kinds:{ k1:`Warranty replacement`, k2:`Repair`, k3:`Frame replacement`, k4:`Parts replacement`, k5:`Lens replacement` },
+  done:{ k1:`✓ Lens warranty replacement complete`, k2:`✓ Repair complete`, k3:`✓ Frame replacement complete`, k4:`✓ Parts replacement complete`, k5:`✓ Lens replacement complete` },
+  arrived:{ lens:`✓ Lenses arrived`, frame:`✓ Frame arrived`, parts:`✓ Parts arrived` },
+  waitPill:{ lens:`Awaiting lenses`, frame:`Awaiting frame`, parts:`Awaiting parts` },
+  schedIn:{ lens:`Estimated lens arrival`, frame:`Estimated frame arrival`, parts:`Estimated parts arrival` },
+  waitIn:{ lens:`Please wait for your lenses to arrive 👓🕶️`, frame:`Please wait for your frame to arrive 👓🕶️`, parts:`Please wait for the parts to arrive 👓🕶️` },
+  readyIn:{ lens:`Your lenses have arrived! We look forward to seeing you 😊`, frame:`Your frame has arrived! We look forward to seeing you 😊`, parts:`The parts have arrived! We look forward to seeing you 😊` },
+  readyDone:`Thank you for waiting!<br>We look forward to seeing you at the store 😊`,
+  comeFP:`Please bring the glasses you are using.<br>The replacement takes about 10 minutes 😊`,
+  amtLabel:`Amount due (tax incl.)`, paid:`✓ Paid`, unpaid:`Please pay at pickup`
+};
+I18N.pt.re = {
+  kinds:{ k1:`Troca pela garantia`, k2:`Conserto`, k3:`Troca de armação`, k4:`Troca de peças`, k5:`Troca de lentes` },
+  done:{ k1:`✓ Troca das lentes pela garantia concluída`, k2:`✓ Conserto pronto`, k3:`✓ Troca de armação concluída`, k4:`✓ Troca de peças concluída`, k5:`✓ Troca de lentes concluída` },
+  arrived:{ lens:`✓ Lentes chegaram`, frame:`✓ Armação chegou`, parts:`✓ Peças chegaram` },
+  waitPill:{ lens:`Aguardando lentes`, frame:`Aguardando armação`, parts:`Aguardando peças` },
+  schedIn:{ lens:`Previsão de chegada das lentes`, frame:`Previsão de chegada da armação`, parts:`Previsão de chegada das peças` },
+  waitIn:{ lens:`Aguarde a chegada das lentes 👓🕶️`, frame:`Aguarde a chegada da armação 👓🕶️`, parts:`Aguarde a chegada das peças 👓🕶️` },
+  readyIn:{ lens:`As lentes chegaram! Estamos esperando por você 😊`, frame:`A armação chegou! Estamos esperando por você 😊`, parts:`As peças chegaram! Estamos esperando por você 😊` },
+  readyDone:`Obrigado por aguardar!<br>Estamos esperando por você na loja 😊`,
+  comeFP:`Traga os óculos que você está usando.<br>A troca leva cerca de 10 minutos 😊`,
+  amtLabel:`Valor a pagar (impostos incluídos)`, paid:`✓ Pago`, unpaid:`Pague na retirada`
+};
+I18N.zh.re = {
+  kinds:{ k1:`保修更换`, k2:`维修`, k3:`镜架更换`, k4:`配件更换`, k5:`镜片更换` },
+  done:{ k1:`✓ 镜片保修更换已完成`, k2:`✓ 维修已完成`, k3:`✓ 镜架更换已完成`, k4:`✓ 配件更换已完成`, k5:`✓ 镜片更换已完成` },
+  arrived:{ lens:`✓ 镜片已到`, frame:`✓ 镜架已到`, parts:`✓ 配件已到` },
+  waitPill:{ lens:`等待镜片`, frame:`等待镜架`, parts:`等待配件` },
+  schedIn:{ lens:`镜片预计到货`, frame:`镜架预计到货`, parts:`配件预计到货` },
+  waitIn:{ lens:`请等待镜片到货 👓🕶️`, frame:`请等待镜架到货 👓🕶️`, parts:`请等待配件到货 👓🕶️` },
+  readyIn:{ lens:`镜片到货啦！我们在店里等您 😊`, frame:`镜架到货啦！我们在店里等您 😊`, parts:`配件到货啦！我们在店里等您 😊` },
+  readyDone:`让您久等了！<br>我们在店里等您 😊`,
+  comeFP:`请带上您正在使用的眼镜来店。<br>更换大约需要10分钟 😊`,
+  amtLabel:`应付金额（含税）`, paid:`✓ 已付款`, unpaid:`请在取件时付款`
+};
+I18N.vi.re = {
+  kinds:{ k1:`Thay theo bảo hành`, k2:`Sửa kính`, k3:`Thay gọng`, k4:`Thay linh kiện`, k5:`Thay tròng` },
+  done:{ k1:`✓ Đã thay tròng theo bảo hành`, k2:`✓ Đã sửa xong`, k3:`✓ Đã thay gọng xong`, k4:`✓ Đã thay linh kiện xong`, k5:`✓ Đã thay tròng xong` },
+  arrived:{ lens:`✓ Tròng đã về`, frame:`✓ Gọng đã về`, parts:`✓ Linh kiện đã về` },
+  waitPill:{ lens:`Đang chờ tròng`, frame:`Đang chờ gọng`, parts:`Đang chờ linh kiện` },
+  schedIn:{ lens:`Dự kiến tròng kính về`, frame:`Dự kiến gọng kính về`, parts:`Dự kiến linh kiện về` },
+  waitIn:{ lens:`Vui lòng chờ tròng kính về nhé 👓🕶️`, frame:`Vui lòng chờ gọng kính về nhé 👓🕶️`, parts:`Vui lòng chờ linh kiện về nhé 👓🕶️` },
+  readyIn:{ lens:`Tròng kính đã về! Chúng tôi đang chờ bạn 😊`, frame:`Gọng kính đã về! Chúng tôi đang chờ bạn 😊`, parts:`Linh kiện đã về! Chúng tôi đang chờ bạn 😊` },
+  readyDone:`Cảm ơn bạn đã chờ đợi!<br>Chúng tôi đang chờ bạn tại cửa hàng 😊`,
+  comeFP:`Hãy mang theo kính bạn đang dùng nhé.<br>Việc thay mất khoảng 10 phút 😊`,
+  amtLabel:`Số tiền thanh toán (đã gồm thuế)`, paid:`✓ Đã thanh toán`, unpaid:`Vui lòng thanh toán khi nhận kính`
+};
+
+/* ★2026/11/20 🎫(再)引換券のチケット（通常の引換券と同じ見た目に、種類名とお支払い金額を足す） */
+function reTicketHtml(v){
+  var U = L().ui, r = (v.brand === 'ricco'), R = L().re || I18N.ja.re, it = v.item || '';
+  var T = L().tk[r?'ric':'six'], CM = T.make, CL = T.lens;
+  var st = v.state || 'wait', ready = (st === 'ready'), delay = (st === 'delay');
+  var arrived = (v.stage === 'in');
+  var pill = delay ? '<span class="tk-pill delay">'+U.tkDelay+'</span>'
+           : ready ? '<span class="tk-pill ready">'+(arrived ? R.arrived[it] : R.done[v.kd])+'</span>'
+           :         '<span class="tk-pill wait">'+(it ? R.waitPill[it] : CM.pillWait)+'</span>';
+  var body = '';
+  if(delay) body += '<div class="tk-strike"><s>'+slotHtmlL(v.date, v.slot, v.time)+'</s></div>';
+  body += '<div class="tk-msg">'+(delay ? (it === 'lens' ? CL.delayMsg : CM.delayMsg)
+                                : ready ? (arrived ? R.readyIn[it] : (r ? CM.readyMsg : R.readyDone))
+                                : (it ? R.waitIn[it] : CM.waitMsg))+'</div>';
+  if(!delay){
+    body += '<div class="tk-sched">'+
+      '<div class="tk-sl">'+(it ? R.schedIn[it] : CM.schedLabel)+'</div>'+
+      '<div class="tk-sd">'+slotHtmlL(v.date, v.slot, v.time)+'</div>'+
+      (v.slot === 'date' && v.next ? '<div class="tk-sx">'+(it === 'lens' ? CL : CM).next(dayL(v.next))+'</div>' : '')+
+    '</div>';
+  }else{
+    body += '<div class="tk-msg2">'+CM.delaySorry+'</div>';
+  }
+  if(v.amount !== '' && v.amount !== null && v.amount !== undefined){
+    var n = Number(v.amount);
+    body += '<div class="tk-amt"><span class="l">'+R.amtLabel+'</span><span class="r"><b>¥'+n.toLocaleString(L().numLoc || 'ja-JP')+'</b>'+
+      (v.pay === 'paid' ? '<span class="tk-pay paid">'+R.paid+'</span>' : v.pay === 'unpaid' ? '<span class="tk-pay unpaid">'+R.unpaid+'</span>' : '')+
+      '</span></div>';
+  }
+  var notes = ((v.kd === 'k5' && v.fs === 'use') ? [esc(U.noteFrame)] : []).concat((v.notes || []).map(function(t){ return voucherNoteL(t, v.date); }));
+  if(notes.length){
+    body += '<div class="tk-note"><div class="tk-note-h">'+U.tkNoteH+'</div>'+notes.map(function(t){ return '<p>'+t+'</p>'; }).join('')+'</div>';
+  }
+  if(!delay){
+    var come = it === 'lens' ? (v.slot === 'date' ? CL.comeDate : CL.come) : it ? R.comeFP : (v.slot === 'date' ? CM.comeDate : CM.come);
+    var after = arrived ? (it === 'lens' ? CL.readyMsg2 : R.comeFP) : CM.readyMsg2;
+    body += '<div class="tk-msg2">'+(ready ? after : come)+'</div>';
+    if(!ready) body += '<div class="tk-fine">'+(it ? CL.fine : CM.fine)+'</div>';
+  }
+  return '<div class="ticket '+(r?'ricco':'sixfour')+(ready?' ready':'')+'">'+
+    '<div class="tk-top">'+logoHtml(r)+'<div class="tk-label">'+U.tkLabel+'</div></div>'+
+    '<div class="tk-main"><div class="tk-name">'+nameHtml(v.name)+'</div><div class="tk-no">'+esc(v.memberNo || '')+'</div></div>'+
+    '<div class="tk-kind">'+esc(R.kinds[v.kd] || '')+'</div>'+
+    '<div class="tk-cut"></div>'+
+    '<div class="tk-state">'+pill+body+'</div></div>';
+}
+
 /* ============================================================
  *  ★2026/11/19 🎫お引換券（スタッフ画面で保存されたものだけ出る）
  * ============================================================ */
@@ -2380,6 +2499,7 @@ function slotTextL(f){
   return s;
 }
 function ticketHtml(v){
+  if(v.re) return reTicketHtml(v);                      // ★2026/11/20 🎫(再)引換券
   var U = L().ui, r = (v.brand === 'ricco'), lens = (v.kind === 'lens'), st = v.state || 'wait';
   var C = L().tk[r?'ric':'six'][lens?'lens':'make'];
   var ready = (st === 'ready'), delay = (st === 'delay');
